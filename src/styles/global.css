@@ -1,0 +1,169 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------
+ * Design tokens — the single source of truth for the site's styling.
+ * Every color/font/spacing utility below (bg-teal, font-heading, etc.)
+ * is generated from these. Change a brand value here, it updates
+ * everywhere it's used as a Tailwind utility.
+ * ------------------------------------------------------------------- */
+@theme {
+  --color-teal: #00b8c9;
+  --color-teal-hover: #4fd6e2;
+  --color-orange: #ff9a5c;
+  --color-green: #47c89a;
+  --color-bg: #16181d;
+  --color-surface: #000000;
+  --color-surface-alt: #0a0a0a;
+  --color-grey: #808080;
+
+  --font-heading: 'Sora', sans-serif;
+  --font-body: 'Roboto', system-ui, sans-serif;
+
+  --spacing-gutter: clamp(28px, 5vw, 72px);
+  --spacing-gutter-nav: clamp(104px, 7vw, 132px);
+
+  --animate-boxin: boxin 0.7s ease both;
+  --animate-fadeup: fadeup 0.3s ease both;
+
+  @keyframes boxin {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes fadeup {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: var(--color-grey);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-teal);
+  text-decoration: none;
+  font-family: var(--font-body);
+}
+
+a:hover {
+  color: var(--color-teal-hover);
+}
+
+::selection {
+  background: rgb(0 184 201 / 0.3);
+  color: #fff;
+}
+
+input,
+textarea,
+button {
+  font-family: var(--font-body);
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Sleek scrollbar — thin, dark track, teal on hover/active. Applies to
+   every scrollable box, not just the page: `scrollbar-width` /
+   `scrollbar-color` don't inherit onto arbitrary elements (Firefox), so
+   set them with a universal selector rather than only on `html`. The
+   `::-webkit-scrollbar` rules below cover Chrome/Safari/Edge the same
+   way, applying uniformly wherever something actually scrolls. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(0 184 201 / 0.45);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-teal);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+#root {
+  min-height: 100vh;
+  display: block;
+}
+
+/* Background grid pointer-glow mask — driven by CSS vars set from JS
+   (usePointerGlow) since a radial-gradient mask position can't be a
+   Tailwind utility. */
+.bg-grid-mask {
+  -webkit-mask-image: radial-gradient(
+    circle var(--gr, 210px) at var(--mx, -9999px) var(--my, -9999px),
+    #000 0%,
+    rgb(0 0 0 / 0.75) 38%,
+    rgb(0 0 0 / 0.25) 66%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(
+    circle var(--gr, 210px) at var(--mx, -9999px) var(--my, -9999px),
+    #000 0%,
+    rgb(0 0 0 / 0.75) 38%,
+    rgb(0 0 0 / 0.25) 66%,
+    transparent 82%
+  );
+}
