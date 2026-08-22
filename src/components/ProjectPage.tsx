@@ -1,7 +1,9 @@
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import type { Category } from '../data/content';
 import { PROCESS_ROWS } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { Overlay } from './Overlay';
 
 interface ProjectPageProps {
   category: Category;
@@ -17,24 +19,27 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   const projectName = category.projects[pIdx];
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
-    <div
-      onClick={onClose}
-      className="animate-fadeup fixed inset-0 z-60 grid place-items-start justify-items-center overflow-y-auto bg-black/72 px-6 py-10 backdrop-blur-md"
+    <Overlay
+      z="z-60"
+      onClose={onClose}
+      className="m-auto w-[min(1500px,100%)] overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
     >
-      <div
-        onClick={stop}
-        className="m-auto w-[min(1500px,100%)] overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
-      >
+      <div>
         <div className="sticky top-0 z-2 flex flex-col gap-4.5 border-b border-white/8 bg-black/92 px-8 py-5.5 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
-              <div className="font-heading text-[26px] font-semibold tracking-[-0.02em] text-white">
+              <motion.div
+                key={projectName}
+                className="font-heading text-[26px] font-semibold tracking-[-0.02em] text-white"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, ease: [0.2, 0.7, 0.2, 1] }}
+              >
                 {projectName}
-              </div>
+              </motion.div>
             </div>
             <div className="flex items-center gap-3.5">
               <div className="flex flex-wrap justify-end gap-1.75">
@@ -61,19 +66,20 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             {category.projects.map((p, i) => {
               const on = i === pIdx;
               return (
-                <button
+                <motion.button
                   key={p}
                   type="button"
                   onClick={() => setProjectIdx(i)}
-                  className="cursor-pointer rounded-[7px] border px-3.5 py-2 font-body text-xs transition-colors duration-180 hover:bg-white/8"
-                  style={{
-                    background: on ? 'rgba(255,154,92,.12)' : 'transparent',
+                  className="cursor-pointer rounded-[7px] border px-3.5 py-2 font-body text-xs"
+                  animate={{
+                    backgroundColor: on ? 'rgba(255,154,92,.12)' : 'rgba(255,255,255,0)',
                     borderColor: on ? 'rgba(255,154,92,.4)' : 'rgba(255,255,255,.1)',
-                    color: on ? 'var(--color-orange)' : 'var(--color-grey)',
+                    color: on ? '#FF9A5C' : '#808080',
                   }}
+                  transition={{ duration: 0.18 }}
                 >
                   {p}
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -134,16 +140,18 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             >
               ← Back to {category.short}
             </button>
-            <button
+            <motion.button
               type="button"
               onClick={handleNext}
-              className="cursor-pointer rounded-[10px] border-none bg-orange px-5.5 py-3 font-heading text-[13.5px] font-medium text-bg transition-transform duration-180 hover:-translate-y-0.5"
+              className="cursor-pointer rounded-[10px] border-none bg-orange px-5.5 py-3 font-heading text-[13.5px] font-medium text-bg"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.18 }}
             >
               Next project →
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

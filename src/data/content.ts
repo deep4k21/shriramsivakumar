@@ -159,14 +159,19 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
+export interface BulletRun {
+  text: string;
+  strong?: boolean;
+}
+
 export interface Role {
   name: string;
   font: 'sora' | 'roboto';
   logo: string;
   title: string;
   period: string;
-  progression?: string;
-  bullets: string[];
+  progression?: string[];
+  bullets: BulletRun[][];
 }
 
 export const ROLES: Role[] = [
@@ -174,15 +179,39 @@ export const ROLES: Role[] = [
     name: 'Protiviti',
     font: 'sora',
     logo: '/images/career/logo-protiviti.svg',
-    title: 'Deputy Manager – Marketing Design',
-    period: '(June 2023 – April 2025)',
+    title: 'Deputy Manager - Marketing Design',
+    period: 'June 2023 - April 2025',
     bullets: [
-      'Led the UI/UX function within the Marketing Design team.',
-      'Designed enterprise dashboards, mobile apps and web experiences for clients across India and the Middle East.',
-      'Created marketing collaterals including exhibition booths, brochures, e-magazines and campaign assets.',
-      'Simplified complex business challenges into strategic presentations and user-centered digital solutions.',
-      'Built and maintained scalable design systems to ensure consistency across projects.',
-      'Transformed ideas into interactive dashboard prototypes, helping stakeholders visualise solutions before development.',
+      [{ text: 'Led the ' }, { text: 'UI/UX', strong: true }, { text: ' function within the Marketing Design team.' }],
+      [
+        { text: 'Designed enterprise ' },
+        { text: 'dashboards', strong: true },
+        { text: ', ' },
+        { text: 'mobile apps,', strong: true },
+        { text: ' and ' },
+        { text: 'web experiences', strong: true },
+        { text: ' for clients across India and the Middle East.' },
+      ],
+      [
+        { text: 'Created ' },
+        { text: 'marketing collaterals', strong: true },
+        { text: ' including exhibition booths, brochures, e-magazines, and campaign assets.' },
+      ],
+      [
+        { text: 'Simplified complex business challenges into ' },
+        { text: 'strategic presentations,', strong: true },
+        { text: ' intuitive & user-centered digital solutions.' },
+      ],
+      [
+        { text: 'Built and maintained ' },
+        { text: 'scalable design systems', strong: true },
+        { text: ' to ensure consistency across projects.' },
+      ],
+      [
+        { text: 'Transformed ideas into ' },
+        { text: 'interactive dashboard prototypes,', strong: true },
+        { text: ' helping stakeholders visualize solutions before development.' },
+      ],
     ],
   },
   {
@@ -190,28 +219,126 @@ export const ROLES: Role[] = [
     font: 'sora',
     logo: '/images/career/logo-freshworks.svg',
     title: 'Senior Visual Designer',
-    period: '(add dates)',
-    progression: 'Graphic Designer → Visual Designer → Senior Visual Designer',
+    period: 'January 2019 - December 2022',
+    progression: ['Graphic Designer', 'Visual Designer', 'Senior Visual Designer'],
     bullets: [
-      'Placeholder — send the bullets and I will drop them in verbatim.',
-      'Suggested coverage: product marketing design, campaign systems, brand application at scale.',
+      [
+        { text: 'Progressed through ' },
+        { text: 'three', strong: true },
+        { text: ' design roles, led marketing design for the ' },
+        { text: 'Partnerships, Startups,', strong: true },
+        { text: ' and ' },
+        { text: 'Marketplace teams.', strong: true },
+      ],
+      [
+        { text: 'Collaborated with ' },
+        { text: '100+', strong: true },
+        { text: ' global stakeholders across regions and business functions.' },
+      ],
+      [
+        { text: 'Drove branding and creative direction for flagship programs including ' },
+        { text: 'Freshstart, Orbitshift Podcast,', strong: true },
+        { text: ' and ' },
+        { text: 'Forge.', strong: true },
+      ],
+      [
+        { text: 'Played a key role in the ' },
+        { text: 'Freshworks global rebranding', strong: true },
+        { text: ' initiative, helping scale visual consistency across digital touchpoints.' },
+      ],
+      [
+        { text: 'Designed integrated ' },
+        { text: 'marketing campaigns, event branding, landing pages,', strong: true },
+        { text: ' and digital experiences for global audiences.' },
+      ],
+      [
+        { text: 'Recognized for creative excellence through awards including ' },
+        { text: 'Best Rookie (2019)', strong: true },
+        { text: ' and ' },
+        { text: 'Certificate of Innovation (2020).', strong: true },
+      ],
     ],
   },
   {
     name: 'RR Donnelley',
     font: 'sora',
     logo: '/images/career/logo-rd.png',
-    title: 'Visual Designer',
-    period: '(add dates)',
-    bullets: ['Placeholder — awaiting copy.'],
+    title: 'Graphic Designer',
+    period: 'August 2017 - October 2018',
+    bullets: [
+      [
+        { text: 'Designed executive presentations and visual communication materials for ' },
+        { text: 'Fortune 500 clients.', strong: true },
+      ],
+      [
+        { text: 'Created custom ' },
+        { text: 'illustrations, infographics,', strong: true },
+        { text: ' and ' },
+        { text: 'layouts', strong: true },
+        { text: ' for business-critical communications.' },
+      ],
+      [
+        { text: 'Collaborated with animation teams to develop ' },
+        { text: 'storyboards', strong: true },
+        { text: ' and ' },
+        { text: 'motion design assets.', strong: true },
+      ],
+      [
+        { text: 'Translated complex information into ' },
+        { text: 'visually engaging', strong: true },
+        { text: ' and ' },
+        { text: 'easy-to-understand presentations.', strong: true },
+      ],
+      [
+        { text: 'Maintained brand consistency while managing ' },
+        { text: 'high-volume', strong: true },
+        { text: ' creative requests.' },
+      ],
+      [
+        { text: 'Delivered creative solutions for global clients including ' },
+        { text: 'First Data, Cisco,', strong: true },
+        { text: ' and ' },
+        { text: 'McKinsey & Company.', strong: true },
+      ],
+    ],
   },
   {
     name: '2adpro',
     font: 'sora',
     logo: '/images/career/logo-2adpro.svg',
-    title: 'Graphic Designer',
-    period: '(add dates)',
-    bullets: ['Placeholder — awaiting copy.'],
+    title: 'Junior Designer',
+    period: 'April 2016 - July 2017',
+    bullets: [
+      [
+        { text: 'Created ' },
+        { text: 'print', strong: true },
+        { text: ' and ' },
+        { text: 'digital advertisements', strong: true },
+        { text: ' for leading publications across the ' },
+        { text: 'ANZ market.', strong: true },
+      ],
+      [
+        { text: 'Adapted creative assets across industries while adhering to ' },
+        { text: 'strict brand guidelines.', strong: true },
+      ],
+      [{ text: 'Produced ' }, { text: 'high-volume advertising creatives', strong: true }, { text: ' with accuracy and attention to detail.' }],
+      [
+        { text: 'Collaborated with production teams', strong: true },
+        { text: ' to ensure timely delivery of campaign assets.' },
+      ],
+      [
+        { text: 'Developed strong foundations in ' },
+        { text: 'layout design, typography,', strong: true },
+        { text: ' and visual storytelling.' },
+      ],
+      [
+        { text: 'Gained expertise in ' },
+        { text: 'production workflows', strong: true },
+        { text: ' and ' },
+        { text: 'market-specific', strong: true },
+        { text: ' creative execution.' },
+      ],
+    ],
   },
 ];
 
@@ -263,9 +390,9 @@ export const TOOLKIT: ToolIcon[] = [
 
 export const AI_TOOLS: ToolIcon[] = [
   { name: 'ChatGPT', icon: '/images/aiworkflow/image 20.png' },
-  { name: 'Midjourney', icon: '/images/aiworkflow/image 21.png' },
-  { name: 'Claude', icon: '/images/aiworkflow/image 22.png' },
-  { name: 'Magnific', icon: '/images/aiworkflow/image 24.png' },
+  { name: 'Claude', icon: '/images/aiworkflow/image 21.png' },
+  { name: 'Perplexity', icon: '/images/aiworkflow/image 22.png' },
+  { name: 'Midjourney', icon: '/images/aiworkflow/image 24.png' },
   { name: 'Figma AI', icon: '/images/aiworkflow/image 25.png' },
   { name: 'Stitch', icon: '/images/aiworkflow/image 26.png' },
 ];
@@ -289,11 +416,20 @@ export const INTRO_WORDS: IntroWordSpec[] = [
   { text: 'Shriram.', variant: 'strong' },
 ];
 
-export const INTRO_QUOTE_WORDS = ['see', 'design'];
+export interface QuoteWord {
+  text: string;
+  /** Tailwind text colour utility for this word. */
+  colorClass: string;
+}
+
+export const INTRO_QUOTE_WORDS: QuoteWord[] = [
+  { text: 'see', colorClass: 'text-green' },
+  { text: 'design', colorClass: 'text-orange' },
+];
 
 export interface IntroTile {
   label: string;
-  icon: 'sparkle' | 'compass';
+  icon: 'sparkle' | 'compass' | 'briefcase';
   body: string;
   bold: string;
   boldPosition: 'start' | 'end';
@@ -301,34 +437,26 @@ export interface IntroTile {
 
 export const INTRO_TILES: IntroTile[] = [
   {
-    label: 'EXPLORING',
+    label: 'Currently Exploring',
     icon: 'sparkle',
     bold: 'Motion systems',
     boldPosition: 'start',
     body: 'and speculative rebrands.',
   },
   {
-    label: 'AFTER HOURS',
+    label: 'After Hours',
     icon: 'compass',
     body: 'Window seats, street signage, and',
     bold: '14 countries',
     boldPosition: 'end',
   },
+  {
+    label: 'Open To',
+    icon: 'briefcase',
+    bold: 'Lead Visual design',
+    boldPosition: 'start',
+    body: 'roles',
+  },
 ];
 
 export const INTRO_SLIDES = ['At the desk', 'On the road', 'Studio setup', 'Speaking', 'Sketchbook', 'Window seat'];
-
-export interface AboutChunkSpec {
-  text: string;
-  variant: 'body' | 'strong' | 'orange' | 'green';
-}
-
-export const ABOUT_CHUNKS: AboutChunkSpec[] = [
-  { text: 'Nine years', variant: 'strong' },
-  { text: 'across', variant: 'body' },
-  { text: 'SaaS and enterprise', variant: 'orange' },
-  { text: 'product design —', variant: 'body' },
-  { text: 'leading UI/UX inside marketing and product teams, and contributing to', variant: 'body' },
-  { text: 'rebrands, dashboards and design systems', variant: 'green' },
-  { text: 'on multiple projects.', variant: 'body' },
-];

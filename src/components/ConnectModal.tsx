@@ -1,6 +1,8 @@
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { CONNECT_LINKS } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { Overlay } from './Overlay';
 
 interface ConnectModalProps {
   onClose: () => void;
@@ -17,8 +19,6 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
   const [form, setForm] = useState<FormState>({ name: '', email: '', message: '' });
   const [sent, setSent] = useState(false);
 
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
-
   const updateField = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setSent(false);
@@ -33,14 +33,12 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
     'rounded-[10px] border border-white/10 bg-surface px-3.5 py-3.25 font-body text-[14.5px] text-white outline-none transition-colors duration-180 focus:border-teal';
 
   return (
-    <div
-      onClick={onClose}
-      className="animate-fadeup fixed inset-0 z-70 grid place-items-start justify-items-center overflow-y-auto bg-black/50 p-8"
+    <Overlay
+      z="z-70"
+      onClose={onClose}
+      scrimClassName="bg-black/50 p-8"
+      className="m-auto flex w-[min(620px,100%)] flex-col gap-5.5 rounded-[20px] bg-[linear-gradient(155deg,rgba(40,42,48,.97),rgba(20,21,25,.95)_40%,rgba(28,30,35,.96))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-3xl backdrop-saturate-150"
     >
-      <div
-        onClick={stop}
-        className="m-auto flex w-[min(620px,100%)] flex-col gap-5.5 rounded-[20px] bg-[linear-gradient(155deg,rgba(40,42,48,.97),rgba(20,21,25,.95)_40%,rgba(28,30,35,.96))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-3xl backdrop-saturate-150"
-      >
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
             <div className="font-body text-[11px] tracking-[0.16em] text-teal">LET&rsquo;S CONNECT</div>
@@ -86,13 +84,22 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
             />
           </label>
           <div className="flex flex-wrap items-center gap-4">
-            <button
+            <motion.button
               type="submit"
-              className="cursor-pointer rounded-[10px] border-none bg-orange px-6 py-3.5 font-heading text-[14.5px] font-medium text-bg transition-transform duration-180 hover:-translate-y-0.5"
+              className="cursor-pointer rounded-[10px] border-none bg-orange px-6 py-3.5 font-heading text-[14.5px] font-medium text-bg"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.18 }}
             >
               {sent ? 'Sent' : 'Send message'}
-            </button>
-            <span className="font-body text-[13px] text-green">{sent ? "Thanks — I'll reply within a day." : ''}</span>
+            </motion.button>
+            <motion.span
+              className="font-body text-[13px] text-green"
+              animate={{ opacity: sent ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              Thanks — I&rsquo;ll reply within a day.
+            </motion.span>
           </div>
         </form>
 
@@ -107,7 +114,6 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
             </a>
           ))}
         </div>
-      </div>
-    </div>
+    </Overlay>
   );
 }

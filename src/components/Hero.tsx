@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { HERO_STATS } from '../data/content';
 import { useStatCycle } from '../hooks/useStatCycle';
@@ -10,6 +11,14 @@ interface HeroProps {
 // Toggle to try the floating image tiles straight (no tilt) vs the original
 // slight-angle look. Flip back to `true` to restore the angled tiles.
 const GRID_TILE_ROTATION_ENABLED = false;
+
+const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
+
+/** Ambient boxes float in around the card, each a beat after the last. */
+const BOX_IN = {
+  initial: { opacity: 0, scale: 0.94, filter: 'blur(6px)' },
+  animate: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+};
 
 export function Hero({ flipOnHover }: HeroProps) {
   const [flipped, setFlipped] = useState(false);
@@ -33,34 +42,35 @@ export function Hero({ flipOnHover }: HeroProps) {
       className="relative flex h-screen w-full items-center justify-center overflow-hidden box-border px-0 py-[clamp(16px,3vh,40px)]"
     >
       <div className="pointer-events-none absolute inset-0 z-0 max-[900px]:hidden" aria-hidden="true">
-        {gridSlots.map((slot, i) => {
-          const scatterX = slot.anchor.left != null ? -120 : 120;
-          const scatterY = Number.parseFloat(slot.anchor.top) < 50 ? -80 : 80;
-          const rotate = GRID_TILE_ROTATION_ENABLED ? slot.anchor.rotate : 0;
-          return (
-            <div
-              key={i}
-              className={
-                slot.scattered
-                  ? 'absolute overflow-hidden rounded-xl border border-white/8 bg-[#15171b] shadow-[0_18px_40px_rgba(0,0,0,.5)] transition-[opacity,transform] duration-480 ease-[cubic-bezier(.4,0,.7,1)]'
-                  : 'absolute overflow-hidden rounded-xl border border-white/8 bg-[#15171b] shadow-[0_18px_40px_rgba(0,0,0,.5)] transition-opacity duration-400 ease-[cubic-bezier(.2,.7,.2,1)]'
-              }
-              style={{
-                top: slot.anchor.top,
-                left: slot.anchor.left,
-                right: slot.anchor.right,
-                width: slot.anchor.width,
-                aspectRatio: '16 / 10',
-                transform: slot.scattered
-                  ? `translate(${scatterX}px, ${scatterY}px) rotate(${rotate * 2.4}deg) scale(0.7)`
-                  : `translate(0, 0) rotate(${rotate}deg) scale(1)`,
-                opacity: slot.visible ? 1 : 0,
-              }}
-            >
-              <img src={slot.src} alt="" className="size-full object-cover opacity-70" />
-            </div>
-          );
-        })}
+        <AnimatePresence>
+          {gridSlots.map((slot) => {
+            // Tiles scatter outward: left-anchored ones exit left, right-anchored
+            // right, and each drifts vertically toward its nearer edge.
+            const scatterX = slot.anchor.left != null ? -120 : 120;
+            const scatterY = Number.parseFloat(slot.anchor.top) < 50 ? -80 : 80;
+            const rotate = GRID_TILE_ROTATION_ENABLED ? slot.anchor.rotate : 0;
+
+            return (
+              <motion.div
+                key={slot.key}
+                className="absolute overflow-hidden rounded-xl border border-white/8 bg-[#15171b] shadow-[0_18px_40px_rgba(0,0,0,.5)]"
+                style={{
+                  top: slot.anchor.top,
+                  left: slot.anchor.left,
+                  right: slot.anchor.right,
+                  width: slot.anchor.width,
+                  aspectRatio: '16 / 10',
+                }}
+                initial={{ opacity: 0, x: scatterX, y: scatterY, rotate: rotate * 2.4, scale: 0.7 }}
+                animate={{ opacity: 1, x: 0, y: 0, rotate, scale: 1 }}
+                exit={{ opacity: 0, x: scatterX, y: scatterY, rotate: rotate * 2.4, scale: 0.7 }}
+                transition={{ duration: 0.48, ease: [0.4, 0, 0.7, 1] }}
+              >
+                <img src={slot.src} alt="" className="size-full object-cover opacity-70" />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       <div className="relative z-1 flex h-full max-h-full flex-col items-center justify-center gap-[clamp(8px,1.5vh,16px)]">
@@ -82,9 +92,11 @@ export function Hero({ flipOnHover }: HeroProps) {
               }
             }}
           >
-            <div
-              className="relative size-full [transform-style:preserve-3d] transition-transform duration-[850ms] ease-[cubic-bezier(.7,0,.2,1)]"
-              style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+            <motion.div
+              className="relative size-full"
+              style={{ transformStyle: 'preserve-3d' }}
+              animate={{ rotateY: flipped ? 180 : 0 }}
+              transition={{ duration: 0.85, ease: [0.7, 0, 0.2, 1] }}
             >
               {/* Front — design side */}
               <div
@@ -138,73 +150,97 @@ export function Hero({ flipOnHover }: HeroProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Ambient info boxes */}
-          <div
-            className="animate-boxin pointer-events-none absolute top-11 -left-14 z-6 flex items-center gap-2.5 rounded-xl border border-white/8 bg-surface px-4.5 py-3.5 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
-            style={{ animationDelay: '.15s' }}
+          <motion.div
+            className="pointer-events-none absolute top-11 -left-14 z-6 flex items-center gap-2.5 rounded-xl border border-white/8 bg-surface px-4.5 py-3.5 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
+            {...BOX_IN}
+            transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT }}
           >
             <span className="grid size-[18px] flex-none place-items-center rounded-full border-[1.5px] border-grey font-body text-[10px]/[1] text-grey">
               ···
             </span>
             <span className="whitespace-nowrap font-body text-[13.5px] text-white">
               &ldquo;
-              <span className="font-heading font-semibold" style={{ color: accent }}>
+              <motion.span
+                className="font-heading font-semibold"
+                animate={{ color: accent }}
+                transition={{ duration: 0.4 }}
+              >
                 {flipped ? 'Mid-flight' : 'Mid-iteration'}
-              </span>
+              </motion.span>
               {flipped ? ', mid-thought' : ' on a new layout'}&rdquo;
             </span>
-          </div>
+          </motion.div>
 
-          <div
-            className="animate-boxin pointer-events-none absolute top-[112px] -right-[70px] z-6 flex items-center gap-2.5 rounded-full border border-white/8 bg-surface px-4.5 py-2.75 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
-            style={{ animationDelay: '.3s' }}
+          <motion.div
+            className="pointer-events-none absolute top-[112px] -right-[70px] z-6 flex items-center gap-2.5 rounded-full border border-white/8 bg-surface px-4.5 py-2.75 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
+            {...BOX_IN}
+            transition={{ duration: 0.7, delay: 0.3, ease: EASE_OUT }}
           >
             <span className="whitespace-nowrap font-body text-[13.5px] text-white">
               &ldquo;
-              <span className="font-heading font-semibold" style={{ color: accent }}>
+              <motion.span
+                className="font-heading font-semibold"
+                animate={{ color: accent }}
+                transition={{ duration: 0.4 }}
+              >
                 {flipped ? 'Currently' : 'Available'}
-              </span>
+              </motion.span>
               {flipped ? ' abroad' : ' for work'}&rdquo;
             </span>
-            <span
+            <motion.span
               className="grid size-[18px] flex-none place-items-center rounded-full font-sans text-[11px]/[1] font-bold text-[#0d1211]"
-              style={{ background: accent }}
+              animate={{ backgroundColor: accent }}
+              transition={{ duration: 0.4 }}
             >
               ✓
-            </span>
-          </div>
+            </motion.span>
+          </motion.div>
 
-          <div
-            className="animate-boxin pointer-events-none absolute top-[264px] -left-16 z-6 w-44 rounded-xl border border-white/8 bg-surface px-[19px] py-4.25 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
-            style={{ animationDelay: '.45s' }}
+          <motion.div
+            className="pointer-events-none absolute top-[264px] -left-16 z-6 w-44 rounded-xl border border-white/8 bg-surface px-[19px] py-4.25 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
+            {...BOX_IN}
+            transition={{ duration: 0.7, delay: 0.45, ease: EASE_OUT }}
           >
             <div className="relative mb-2.5 h-6.5 w-5.5 rounded-[3px] border-[1.5px] border-[#cfcfcf]">
               <span className="absolute -top-1 left-1.5 h-1.5 w-2.5 rounded-t-[2px] border-[1.5px] border-b-0 border-[#cfcfcf] bg-surface" />
             </div>
-            <div
-              className="font-heading text-[clamp(16px,4vw,26px)]/[1.15] font-bold tracking-[-0.02em] whitespace-nowrap transition-opacity duration-400"
-              style={{ color: accent }}
-            >
-              {stat.value}
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={stat.value}
+                className="font-heading text-[clamp(16px,4vw,26px)]/[1.15] font-bold tracking-[-0.02em] whitespace-nowrap"
+                style={{ color: accent }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28, ease: EASE_OUT }}
+              >
+                {stat.value}
+              </motion.div>
+            </AnimatePresence>
             <div className="mt-1 font-body text-[13px]/[1.4] text-white">{stat.label}</div>
-          </div>
+          </motion.div>
 
-          <div
-            className="animate-boxin pointer-events-none absolute top-[280px] -right-[58px] z-6 w-[140px] rounded-xl border border-white/8 bg-surface px-4.5 py-3.75 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
-            style={{ animationDelay: '.6s' }}
+          <motion.div
+            className="pointer-events-none absolute top-[280px] -right-[58px] z-6 w-[140px] rounded-xl border border-white/8 bg-surface px-4.5 py-3.75 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
+            {...BOX_IN}
+            transition={{ duration: 0.7, delay: 0.6, ease: EASE_OUT }}
           >
             <span className="font-body text-[13.5px]/[1.4] text-white">
               &ldquo;
-              <span className="font-heading font-semibold" style={{ color: accent }}>
+              <motion.span
+                className="font-heading font-semibold"
+                animate={{ color: accent }}
+                transition={{ duration: 0.4 }}
+              >
                 {flipped ? 'Window seat' : 'Wireframe'}
-              </span>
+              </motion.span>
               {flipped ? ' to worldview' : ' to workflow'}&rdquo;
             </span>
-          </div>
+          </motion.div>
         </div>
       </div>
       <span className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-grey">

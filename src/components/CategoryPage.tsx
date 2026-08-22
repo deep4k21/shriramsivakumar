@@ -1,5 +1,7 @@
+import { motion } from 'motion/react';
 import type { Category } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { Overlay } from './Overlay';
 
 interface CategoryPageProps {
   category: Category;
@@ -10,17 +12,14 @@ interface CategoryPageProps {
 
 export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }: CategoryPageProps) {
   useBodyScrollLock(true);
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
-    <div
-      onClick={onClose}
-      className="animate-fadeup fixed inset-0 z-55 grid place-items-start justify-items-center overflow-y-auto bg-black/72 px-6 py-10 backdrop-blur-md"
+    <Overlay
+      z="z-55"
+      onClose={onClose}
+      className="m-auto w-[min(1240px,100%)] overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
     >
-      <div
-        onClick={stop}
-        className="m-auto w-[min(1240px,100%)] overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
-      >
+      <div>
         <div className="sticky top-0 z-2 flex items-start justify-between gap-6 border-b border-white/8 bg-black/92 px-10 py-6.5 backdrop-blur-xl">
           <div className="flex flex-col gap-2.5">
             <div className="font-body text-[11px] tracking-[0.16em] text-teal">
@@ -59,11 +58,13 @@ export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }
             </div>
             <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
               {category.projects.map((p, pi) => (
-                <button
+                <motion.button
                   key={p}
                   type="button"
                   onClick={() => onOpenProject(pi)}
-                  className="flex cursor-pointer flex-col overflow-hidden rounded-[14px] border border-white/7 bg-surface p-0 text-left transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-orange/50"
+                  className="flex cursor-pointer flex-col overflow-hidden rounded-[14px] border border-white/7 bg-surface p-0 text-left"
+                  whileHover={{ y: -4, borderColor: 'rgba(255,154,92,0.5)' }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="grid h-[150px] place-items-center bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171a1e_9px,#171a1e_18px)]">
                     <span className="font-body text-[10px] tracking-[0.14em] text-[#5a5a5a]">PROJECT SHOT</span>
@@ -74,12 +75,12 @@ export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }
                     </div>
                     <div className="font-body text-[12.5px] text-teal">Open case study →</div>
                   </div>
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

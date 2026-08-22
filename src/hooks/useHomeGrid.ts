@@ -63,11 +63,10 @@ const RIGHT_ANCHORS: SlotAnchor[] = [
 const ANCHORS_BY_SIDE: Record<Side, SlotAnchor[]> = { left: LEFT_ANCHORS, right: RIGHT_ANCHORS };
 
 export interface HomeGridSlot {
+  /** Stable identity for AnimatePresence — changes whenever the tile's content does. */
+  key: string;
   src: string;
   anchor: SlotAnchor;
-  visible: boolean;
-  /** true while the slot is flying/fading out toward the scatter position */
-  scattered: boolean;
 }
 
 function pickIndices(count: number, exclude: Set<number>, total: number): number[] {
@@ -90,6 +89,9 @@ function pickAnchors(side: Side, count: number, exclude: Set<SlotAnchor> = new S
   return picked;
 }
 
+let keySeq = 0;
+const nextKey = () => `tile-${++keySeq}`;
+
 /** Builds slots split evenly across both sides (slotCount must be even). */
 function buildSlots(mode: HomeGridMode, slotCount: number): HomeGridSlot[] {
   const paths = IMAGE_SETS[mode];
@@ -98,37 +100,26 @@ function buildSlots(mode: HomeGridMode, slotCount: number): HomeGridSlot[] {
   const leftAnchors = pickAnchors('left', perSide);
   const rightAnchors = pickAnchors('right', perSide);
   const anchors = [...leftAnchors, ...rightAnchors];
-  return imageIdx.map((idx, i) => ({ src: paths[idx], anchor: anchors[i], visible: true, scattered: false }));
+  return imageIdx.map((idx, i) => ({ key: nextKey(), src: paths[idx], anchor: anchors[i] }));
 }
 
-const FADE_OUT_MS = 400;
-const SCATTER_OUT_MS = 480;
-const SCATTER_IN_DELAY_MS = 120;
-
+/**
+ * The floating tiles behind the hero card.
+ *
+ * Each slot carries a fresh `key` whenever its content changes, so
+ * `AnimatePresence` in the view animates the old tile out and the new one in —
+ * no visibility flags or hand-rolled timing here.
+ */
 export function useHomeGrid(mode: HomeGridMode, slotCount = 6, swapIntervalMs = 1500) {
   const [slots, setSlots] = useState<HomeGridSlot[]>(() => buildSlots(mode, slotCount));
   const modeRef = useRef(mode);
   const nextSlotRef = useRef(0);
 
-  // Scatter-out / scatter-in when the mode (design <-> travel) changes.
+  // Flipping the hero card swaps the whole set for the other mode's images.
   useEffect(() => {
     if (modeRef.current === mode) return;
     modeRef.current = mode;
-
-    setSlots((prev) => prev.map((s) => ({ ...s, scattered: true, visible: false })));
-
-    const inTimer = setTimeout(() => {
-      // Mount the new set already scattered + invisible, then settle it on the
-      // next frame so the browser animates the fly-in instead of snapping.
-      setSlots(buildSlots(mode, slotCount).map((s) => ({ ...s, scattered: true, visible: false })));
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setSlots((prev) => prev.map((s) => ({ ...s, scattered: false, visible: true })));
-        });
-      });
-    }, SCATTER_OUT_MS + SCATTER_IN_DELAY_MS);
-
-    return () => clearTimeout(inTimer);
+    setSlots(buildSlots(mode, slotCount));
   }, [mode, slotCount]);
 
   // Steady-state: rotate one slot at a time to a fresh image + position.
@@ -144,25 +135,19 @@ export function useHomeGrid(mode: HomeGridMode, slotCount = 6, swapIntervalMs = 
       const swapSlot = nextSlotRef.current % slotCount;
       nextSlotRef.current += 1;
 
-      setSlots((prev) => prev.map((s, i) => (i === swapSlot ? { ...s, visible: false } : s)));
-
-      setTimeout(() => {
-        setSlots((prev) => {
-          const paths = IMAGE_SETS[modeRef.current];
-          const usedIdx = new Set(prev.map((s) => paths.indexOf(s.src)).filter((idx) => idx !== -1));
-          const [nextIdx] = pickIndices(1, usedIdx, paths.length);
-          if (nextIdx === undefined) return prev;
-          const side = prev[swapSlot].anchor.side;
-          const usedAnchors = new Set(prev.filter((s) => s.anchor.side === side).map((s) => s.anchor));
-          const [nextAnchor] = pickAnchors(side, 1, usedAnchors);
-          if (nextAnchor === undefined) return prev;
-          return prev.map((s, i) =>
-            i === swapSlot
-              ? { src: paths[nextIdx], anchor: nextAnchor, visible: true, scattered: false }
-              : s,
-          );
-        });
-      }, FADE_OUT_MS);
+      setSlots((prev) => {
+        const paths = IMAGE_SETS[modeRef.current];
+        const usedIdx = new Set(prev.map((s) => paths.indexOf(s.src)).filter((idx) => idx !== -1));
+        const [nextIdx] = pickIndices(1, usedIdx, paths.length);
+        if (nextIdx === undefined) return prev;
+        const side = prev[swapSlot].anchor.side;
+        const usedAnchors = new Set(prev.filter((s) => s.anchor.side === side).map((s) => s.anchor));
+        const [nextAnchor] = pickAnchors(side, 1, usedAnchors);
+        if (nextAnchor === undefined) return prev;
+        return prev.map((s, i) =>
+          i === swapSlot ? { key: nextKey(), src: paths[nextIdx], anchor: nextAnchor } : s,
+        );
+      });
     }, swapIntervalMs);
 
     return () => clearInterval(id);

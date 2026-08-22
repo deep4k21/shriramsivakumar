@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'motion/react';
 import { useCallback, useState } from 'react';
 import { BackgroundGrid } from './components/BackgroundGrid';
 import { Sidebar } from './components/Sidebar';
@@ -10,10 +11,9 @@ import { CategoryPage } from './components/CategoryPage';
 import { ProjectPage } from './components/ProjectPage';
 import { ConnectModal } from './components/ConnectModal';
 import { useActiveSection } from './hooks/useActiveSection';
-import { useScrollProgress } from './hooks/useScrollProgress';
+import { useNavVisible } from './hooks/useNavVisible';
 import { usePointerGlow } from './hooks/usePointerGlow';
 import { useEscapeKey } from './hooks/useEscapeKey';
-import { useScrollPastCareer } from './hooks/useScrollPastCareer';
 import { CATEGORIES } from './data/content';
 import './styles/global.css';
 
@@ -37,8 +37,8 @@ const DEFAULT_CONFIG: SiteConfig = {
 };
 
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
-  const { active, aboutIn } = useActiveSection();
-  const { introP, portP, navOn } = useScrollProgress();
+  const { active } = useActiveSection();
+  const navOn = useNavVisible();
   usePointerGlow(config.gridRadius);
 
   const [view, setView] = useState<View | null>(null);
@@ -60,8 +60,6 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const closeConnect = useCallback(() => setConnectOpen(false), []);
   const openConnect = useCallback(() => setConnectOpen(true), []);
 
-  useScrollPastCareer(openConnect);
-
   useEscapeKey(
     useCallback(() => {
       setView((v) => (v && v.projectIdx != null ? { categoryIdx: v.categoryIdx, projectIdx: null } : null));
@@ -79,29 +77,37 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
 
       <main className="min-w-0">
         <Hero flipOnHover={config.flipOnHover} />
-        <Intro progress={introP} />
-        <About aboutIn={aboutIn} />
-        <Portfolio portP={portP} onOpenCategory={openCategory} />
+        <Intro />
+        <About />
+        <Portfolio onOpenCategory={openCategory} />
         <Career />
       </main>
 
-      {view && (
-        <CategoryPage
-          category={CATEGORIES[view.categoryIdx]}
-          categoryIndex={view.categoryIdx}
-          onClose={closeView}
-          onOpenProject={(projectIdx) => openProject(view.categoryIdx, projectIdx)}
-        />
-      )}
-      {view?.projectIdx != null && (
-        <ProjectPage
-          category={CATEGORIES[view.categoryIdx]}
-          initialProjectIdx={view.projectIdx}
-          onBackToCategory={backToCategory}
-          onClose={closeView}
-        />
-      )}
-      {connectOpen && <ConnectModal onClose={closeConnect} />}
+      <AnimatePresence>
+        {view && (
+          <CategoryPage
+            key="category"
+            category={CATEGORIES[view.categoryIdx]}
+            categoryIndex={view.categoryIdx}
+            onClose={closeView}
+            onOpenProject={(projectIdx) => openProject(view.categoryIdx, projectIdx)}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {view?.projectIdx != null && (
+          <ProjectPage
+            key="project"
+            category={CATEGORIES[view.categoryIdx]}
+            initialProjectIdx={view.projectIdx}
+            onBackToCategory={backToCategory}
+            onClose={closeView}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {connectOpen && <ConnectModal key="connect" onClose={closeConnect} />}
+      </AnimatePresence>
     </div>
   );
 }
