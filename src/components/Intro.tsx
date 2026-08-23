@@ -58,7 +58,7 @@ export function Intro() {
     <section ref={ref} id="intro" className="relative h-[300vh] border-t border-white/6">
       <div className="sticky top-0 box-border flex h-screen flex-col justify-center overflow-hidden px-gutter py-[clamp(24px,4vh,48px)] pl-gutter-nav">
         <div
-          className="grid w-full items-start gap-[clamp(36px,4.5vw,76px)]"
+          className="grid w-full items-center gap-[clamp(36px,4.5vw,76px)]"
           style={{
             gridTemplateColumns: 'minmax(320px, 1fr) minmax(280px, 408px)',
             transform: `scale(${fit.toFixed(3)})`,

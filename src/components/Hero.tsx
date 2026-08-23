@@ -2,15 +2,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { HERO_STATS } from '../data/content';
 import { useStatCycle } from '../hooks/useStatCycle';
-import { useHomeGrid } from '../hooks/useHomeGrid';
+import { CELL_H, useHomeGrid } from '../hooks/useHomeGrid';
 
 interface HeroProps {
   flipOnHover: boolean;
 }
-
-// Toggle to try the floating image tiles straight (no tilt) vs the original
-// slight-angle look. Flip back to `true` to restore the angled tiles.
-const GRID_TILE_ROTATION_ENABLED = false;
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
@@ -24,7 +20,11 @@ export function Hero({ flipOnHover }: HeroProps) {
   const [flipped, setFlipped] = useState(false);
   const statIdx = useStatCycle(HERO_STATS.length);
   const stat = HERO_STATS[statIdx];
-  const gridSlots = useHomeGrid(flipped ? 'travel' : 'design');
+  // Eight of the twelve checkerboard cells are filled at a time. The spare
+  // cells are what make the rotation visible: each swap can move an image to a
+  // position that was empty, so tiles appear and disappear around the grid
+  // rather than only changing picture in place.
+  const gridSlots = useHomeGrid(flipped ? 'travel' : 'design', 8, 2600);
 
   const accent = flipped ? '#47C89A' : '#FF9A5C';
 
@@ -44,29 +44,29 @@ export function Hero({ flipOnHover }: HeroProps) {
       <div className="pointer-events-none absolute inset-0 z-0 max-[900px]:hidden" aria-hidden="true">
         <AnimatePresence>
           {gridSlots.map((slot) => {
-            // Tiles scatter outward: left-anchored ones exit left, right-anchored
-            // right, and each drifts vertically toward its nearer edge.
-            const scatterX = slot.anchor.left != null ? -120 : 120;
-            const scatterY = Number.parseFloat(slot.anchor.top) < 50 ? -80 : 80;
-            const rotate = GRID_TILE_ROTATION_ENABLED ? slot.anchor.rotate : 0;
-
             return (
               <motion.div
                 key={slot.key}
-                className="absolute overflow-hidden rounded-xl border border-white/8 bg-[#15171b] shadow-[0_18px_40px_rgba(0,0,0,.5)]"
+                // Sharp-cornered cells on the checkerboard: no radius, no
+                // border or shadow, so they read as a flat pattern behind the
+                // card rather than as a second layer of floating cards.
+                className="absolute overflow-hidden"
                 style={{
                   top: slot.anchor.top,
                   left: slot.anchor.left,
                   right: slot.anchor.right,
                   width: slot.anchor.width,
-                  aspectRatio: '16 / 10',
+                  height: CELL_H,
                 }}
-                initial={{ opacity: 0, x: scatterX, y: scatterY, rotate: rotate * 2.4, scale: 0.7 }}
-                animate={{ opacity: 1, x: 0, y: 0, rotate, scale: 1 }}
-                exit={{ opacity: 0, x: scatterX, y: scatterY, rotate: rotate * 2.4, scale: 0.7 }}
-                transition={{ duration: 0.48, ease: [0.4, 0, 0.7, 1] }}
+                // The cells hold their place in the pattern, so swapping is a
+                // slow cross-fade in place rather than a scatter — movement
+                // would break the grid the images are meant to form.
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.6, ease: 'easeInOut' }}
               >
-                <img src={slot.src} alt="" className="size-full object-cover opacity-70" />
+                <img src={slot.src} alt="" className="size-full object-cover opacity-20" />
               </motion.div>
             );
           })}
@@ -74,7 +74,7 @@ export function Hero({ flipOnHover }: HeroProps) {
       </div>
 
       <div className="relative z-1 flex h-full max-h-full flex-col items-center justify-center gap-[clamp(8px,1.5vh,16px)]">
-        <div className="relative box-content w-[400px] max-w-[calc(100vw-40px)] px-[60px] py-[clamp(10px,2.5vh,26px)]">
+        <div className="relative box-content w-[356px] max-w-[calc(100vw-40px)] px-[60px] py-[clamp(10px,2.5vh,26px)]">
           <div
             className="cursor-pointer [perspective:1500px]"
             style={{ width: '100%', height: 'clamp(340px, 58vh, 530px)' }}
@@ -105,7 +105,8 @@ export function Hero({ flipOnHover }: HeroProps) {
               >
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-[linear-gradient(0deg,rgba(255,154,92,.32),rgba(255,154,92,0)_75%)]" />
                 <div className="relative flex flex-col items-center gap-[clamp(8px,1.5vh,16px)]">
-                  <div className="font-heading text-[clamp(22px,4vh,34px)] font-bold tracking-[-0.02em] text-white">
+                  {/* Held on one line — the narrower card wraps it otherwise. */}
+                  <div className="whitespace-nowrap font-heading text-[clamp(20px,3.4vh,29px)] font-bold tracking-[-0.02em] text-white">
                     Shriram Sivakumar
                   </div>
                   <div className="rounded-[9px] border border-white/12 bg-black/30 px-5 py-2.5 font-body text-sm font-medium text-teal">

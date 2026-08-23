@@ -4,6 +4,7 @@ import { CATEGORIES } from '../data/content';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD } from '../styles/card';
+import { CardGlow } from './CardGlow';
 import { CategoryExpanded } from './CategoryExpanded';
 import { StylusNoteIcon } from './Icons';
 
@@ -27,19 +28,27 @@ const EASE = cubicBezier(0.33, 1, 0.68, 1);
  *  3. CARDS  — the four category cards fly in from off-stage and settle into
  *              the quadrants around the mark.
  *
- * The phases deliberately overlap a little so the panel is already shrinking as
- * the copy fades, and the cards begin their approach before it fully settles.
+ * The phases overlap substantially: the panel is already shrinking as the copy
+ * fades, and the cards are well into their approach while the mark is still
+ * travelling to the centre. That shared middle is the point — the two movements
+ * read as one composition assembling itself, rather than as a sequence of
+ * separate steps with a dead beat between them.
  */
-const HEAD = { start: 0.0, end: 0.14 } as const;
-const SHRINK = { start: 0.16, end: 0.42 } as const;
-const CARDS = { start: 0.38, end: 0.78 } as const;
+/**
+ * The phases span the whole window — everything is settled by CARDS.end, so any
+ * progress left over past it would be scroll that moves nothing before the next
+ * section arrives.
+ */
+const HEAD = { start: 0.0, end: 0.2 } as const;
+const SHRINK = { start: 0.24, end: 0.68 } as const;
+const CARDS = { start: 0.4, end: 0.98 } as const;
 
 /**
  * How long the headline takes to clear once the collapse begins. The icon holds
  * on the eyebrow line until this is done, so the copy is gone before the mark
  * starts travelling — otherwise the two read as competing movements.
  */
-const HEAD_FADE = 0.06;
+const HEAD_FADE = 0.1;
 
 /** Panel size as a share of the stage, at full size and once collapsed. */
 const PANEL_FULL = 1;
@@ -165,10 +174,11 @@ function CategoryCard({
   hidden: boolean;
 }) {
   const cat = CATEGORIES[index];
-  // Stagger the four arrivals across the cards phase, leaving each enough of
-  // the window to complete its own travel.
-  const span = (CARDS.end - CARDS.start) * 0.62;
-  const start = CARDS.start + index * ((CARDS.end - CARDS.start - span) / 3);
+  // All four converge together over the whole cards phase rather than arriving
+  // in sequence — the mosaic reads as one composition assembling around the
+  // mark, not as four separate entrances.
+  const start = CARDS.start;
+  const span = CARDS.end - CARDS.start;
   const range: [number, number] = [start, start + span];
 
   const { origin, wide } = MOSAIC[index];
@@ -198,8 +208,9 @@ function CategoryCard({
         animate={{ opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.25 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}
-        whileHover={hidden ? undefined : { borderColor: 'rgba(255,154,92,0.5)' }}
       >
+      {/* Replaces the old flat border tint — the travelling light is the hover cue. */}
+      {!hidden && <CardGlow color="#FF9A5C" />}
       <div className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#5a5a5a]">
         {String(index + 1).padStart(2, '0')} / {String(CATEGORIES.length).padStart(2, '0')}
       </div>

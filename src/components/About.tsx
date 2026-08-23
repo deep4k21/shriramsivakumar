@@ -5,6 +5,7 @@ import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD } from '../styles/card';
+import { CardGlow } from './CardGlow';
 import { BriefcaseIcon, ChipIcon, CompassIcon, SparkleIcon, WrenchIcon } from './Icons';
 
 const QUOTE_END = 0.3;
@@ -101,7 +102,12 @@ function IntroTile({
   const reveal = useRevealStyle(progress, { start, end });
 
   return (
-    <motion.div data-about-tile className={`flex flex-col gap-2 ${CARD} px-6.5 py-6`} style={reveal}>
+    <motion.div
+      data-about-tile
+      className={`group relative flex flex-col gap-2 overflow-hidden ${CARD} px-6.5 py-6`}
+      style={reveal}
+    >
+      <CardGlow />
       <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
         <Icon size={16} />
         {tile.label}
@@ -204,7 +210,8 @@ export function About() {
             className="grid gap-[clamp(14px,1.6vw,22px)]"
             style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', ...toolkitReveal }}
           >
-            <div className={`flex flex-col gap-4 ${CARD} px-7 py-6.5`}>
+            <div className={`group relative flex flex-col gap-4 overflow-hidden ${CARD} px-7 py-6.5`}>
+              <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
                   <WrenchIcon size={16} />
@@ -220,7 +227,8 @@ export function About() {
                 ))}
               </div>
             </div>
-            <div className={`flex flex-col gap-4 ${CARD} px-7 py-6.5`}>
+            <div className={`group relative flex flex-col gap-4 overflow-hidden ${CARD} px-7 py-6.5`}>
+              <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
                   <ChipIcon size={16} />

@@ -39,26 +39,52 @@ interface SlotAnchor {
   top: string;
   left?: string;
   right?: string;
-  rotate: number;
-  width: number;
+  /** Width as a share of the hero, so the pattern holds at any viewport. */
+  width: string;
   side: Side;
 }
 
-const LEFT_ANCHORS: SlotAnchor[] = [
-  { top: '2%', left: '1%', rotate: -6, width: 176, side: 'left' },
-  { top: '56%', left: '0%', rotate: 4, width: 172, side: 'left' },
-  { top: '28%', left: '6%', rotate: -3, width: 148, side: 'left' },
-  { top: '80%', left: '13%', rotate: 5, width: 140, side: 'left' },
-  { top: '2%', left: '24%', rotate: 4, width: 128, side: 'left' },
+/**
+ * The tiles sit on a checkerboard: a 5×5 grid where alternating cells are
+ * filled, leaving the centre 3×3 clear for the hero card.
+ *
+ * Columns 0–1 land left of the card, 3–4 right; the middle column only carries
+ * tiles in the top and bottom rows, where the card is not in the way. Rows and
+ * columns are expressed in percentages so the pattern scales with the hero.
+ */
+/**
+ * Columns 1 and 3 stop short of the card and column 2 only carries tiles in the
+ * top and bottom rows, so nothing crosses it. Rows 1 and 3 likewise clear the
+ * card's vertical band.
+ *
+ * The clearance is generous because the card is a fixed pixel width: on a
+ * narrower viewport it covers a larger share of the hero, so columns tuned
+ * tightly to one width bite into it at another.
+ */
+const COL = ['0%', '17.5%', '37%', '65%', '83%'];
+const ROW = ['2%', '20%', '42%', '64%', '82%'];
+const CELL_W = '17%';
+/** Cell height as a share of the hero, matching the reference's wide cells. */
+export const CELL_H = '16%';
+
+/** [col, row] of every filled cell, read off the reference checkerboard. */
+const FILLED_CELLS: Array<[number, number]> = [
+  [0, 0], [2, 0], [4, 0],
+  [1, 1], [3, 1],
+  [0, 2], [4, 2],
+  [1, 3], [3, 3],
+  [0, 4], [2, 4], [4, 4],
 ];
 
-const RIGHT_ANCHORS: SlotAnchor[] = [
-  { top: '6%', right: '2%', rotate: 5, width: 160, side: 'right' },
-  { top: '60%', right: '1%', rotate: -5, width: 164, side: 'right' },
-  { top: '32%', right: '5%', rotate: 6, width: 154, side: 'right' },
-  { top: '80%', right: '13%', rotate: -4, width: 144, side: 'right' },
-  { top: '2%', right: '24%', rotate: -5, width: 132, side: 'right' },
-];
+function cellAnchor([col, row]: [number, number]): SlotAnchor {
+  const side: Side = col < 2 ? 'left' : col > 2 ? 'right' : row < 2 ? 'left' : 'right';
+  return { top: ROW[row], left: COL[col], width: CELL_W, side };
+}
+
+const CELL_ANCHORS = FILLED_CELLS.map(cellAnchor);
+
+const LEFT_ANCHORS: SlotAnchor[] = CELL_ANCHORS.filter((a) => a.side === 'left');
+const RIGHT_ANCHORS: SlotAnchor[] = CELL_ANCHORS.filter((a) => a.side === 'right');
 
 const ANCHORS_BY_SIDE: Record<Side, SlotAnchor[]> = { left: LEFT_ANCHORS, right: RIGHT_ANCHORS };
 
