@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { ROLES } from '../data/content';
+import { CARD } from '../styles/card';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
@@ -12,7 +13,7 @@ export function Career() {
     <section id="career" className="flex flex-col gap-9 border-t border-white/6 px-gutter pt-19 pb-24 pl-gutter-nav">
       <div className="font-body text-[11px] tracking-[0.18em] text-teal">03 · CAREER JOURNEY</div>
 
-      <div className="flex flex-col gap-1.75 rounded-[10px] border border-[#89919F] bg-[#15161A] backdrop-blur-md px-8 py-7">
+      <div data-career-first-card className={`flex flex-col gap-1.75 ${CARD} px-8 py-7`}>
         <div className="font-body text-[11px] tracking-[0.16em] text-teal">ACADEMIC</div>
         <div className="font-heading text-[22px] font-semibold tracking-[-0.01em] text-white">
           B.Sc., Visual Communication
@@ -20,7 +21,7 @@ export function Career() {
         <div className="font-body text-[15px] text-grey">SRM Institute of Science and Technology, Chennai</div>
       </div>
 
-      <div className="flex flex-col rounded-[10px] border border-[#89919F] bg-[#15161A] backdrop-blur-md">
+      <div className={`flex flex-col ${CARD}`}>
         <div className="flex items-stretch gap-1.5 overflow-x-auto overflow-y-hidden px-1.5 pt-1.5">
           {ROLES.map((r, i) => {
             const on = companyIdx === i;

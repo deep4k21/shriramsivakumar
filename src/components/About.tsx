@@ -4,15 +4,26 @@ import { AI_TOOLS, INTRO_QUOTE_WORDS, INTRO_TILES, TOOLKIT, type QuoteWord } fro
 import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
+import { CARD } from '../styles/card';
 import { BriefcaseIcon, ChipIcon, CompassIcon, SparkleIcon, WrenchIcon } from './Icons';
 
 const QUOTE_END = 0.3;
-const TILES_START = 0.32;
-const TILES_END = 0.56;
+/**
+ * The tiles reveal in step with the travelling ghosts rather than as one block.
+ *
+ * The middle tile ("After Hours") is where stage one of the ghost lands, so it
+ * arrives early — stage one finishes at intro progress 1.6, which is this
+ * section's 0.1. The two flanking tiles are stage two's destinations and match
+ * its window (STAGE_TWO in AboutTravelGhosts), so each outline arrives just as
+ * its tile does.
+ */
+const TILE_MID_START = 0.02;
+const TILE_MID_END = 0.14;
+const TILE_SIDE_START = 0.34;
+const TILE_SIDE_END = 0.6;
 const TOOLKIT_START = 0.6;
 const TOOLKIT_END = 0.84;
 
-const CARD = 'rounded-[10px] border border-[#89919F] bg-[#15161A] backdrop-blur-md';
 
 const TILE_ICON = {
   sparkle: SparkleIcon,
@@ -71,6 +82,45 @@ function SplitFlapWord({ word }: { word: QuoteWord }) {
   );
 }
 
+/**
+ * One intro tile, revealing on its own window so it can be timed to the ghost
+ * outline that lands on it.
+ */
+function IntroTile({
+  tile,
+  progress,
+  start,
+  end,
+}: {
+  tile: (typeof INTRO_TILES)[number];
+  progress: ReturnType<typeof useSectionScroll>['progress'];
+  start: number;
+  end: number;
+}) {
+  const Icon = TILE_ICON[tile.icon];
+  const reveal = useRevealStyle(progress, { start, end });
+
+  return (
+    <motion.div data-about-tile className={`flex flex-col gap-2 ${CARD} px-6.5 py-6`} style={reveal}>
+      <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
+        <Icon size={16} />
+        {tile.label}
+      </div>
+      <div className="font-body text-sm/[1.55] text-grey">
+        {tile.boldPosition === 'start' ? (
+          <>
+            <span className="font-bold text-teal">{tile.bold}</span> {tile.body}
+          </>
+        ) : (
+          <>
+            {tile.body} <span className="font-bold text-teal">{tile.bold}</span>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 function ToolIcon({ name, icon }: { name: string; icon: string }) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -114,7 +164,6 @@ export function About() {
     blur: 7,
     from: 0.06,
   });
-  const tilesReveal = useRevealStyle(progress, { start: TILES_START, end: TILES_END });
   const toolkitReveal = useRevealStyle(progress, { start: TOOLKIT_START, end: TOOLKIT_END });
 
   return (
@@ -133,33 +182,23 @@ export function About() {
             &rdquo;
           </motion.h2>
 
-          <motion.div
+          <div
             className="grid gap-[clamp(14px,1.6vw,22px)]"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', ...tilesReveal }}
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
           >
-            {INTRO_TILES.map((tile) => {
-              const Icon = TILE_ICON[tile.icon];
+            {INTRO_TILES.map((tile, i) => {
+              const mid = i === 1;
               return (
-                <div key={tile.label} className={`flex flex-col gap-2 ${CARD} px-6.5 py-6`}>
-                  <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
-                    <Icon size={16} />
-                    {tile.label}
-                  </div>
-                  <div className="font-body text-sm/[1.55] text-grey">
-                    {tile.boldPosition === 'start' ? (
-                      <>
-                        <span className="font-bold text-teal">{tile.bold}</span> {tile.body}
-                      </>
-                    ) : (
-                      <>
-                        {tile.body} <span className="font-bold text-teal">{tile.bold}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <IntroTile
+                  key={tile.label}
+                  tile={tile}
+                  progress={progress}
+                  start={mid ? TILE_MID_START : TILE_SIDE_START}
+                  end={mid ? TILE_MID_END : TILE_SIDE_END}
+                />
               );
             })}
-          </motion.div>
+          </div>
 
           <motion.div
             className="grid gap-[clamp(14px,1.6vw,22px)]"

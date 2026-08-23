@@ -1,13 +1,15 @@
 import { AnimatePresence } from 'motion/react';
 import { useCallback, useState } from 'react';
 import { BackgroundGrid } from './components/BackgroundGrid';
+import { AboutTravelGhosts } from './components/AboutTravelGhosts';
+import { PortfolioTravelGhosts } from './components/PortfolioTravelGhosts';
+import { CARD_TRAVEL_ENABLED, CardTravelGhost } from './components/CardTravelGhost';
 import { Sidebar } from './components/Sidebar';
 import { Hero } from './components/Hero';
 import { Intro } from './components/Intro';
 import { About } from './components/About';
 import { Portfolio } from './components/Portfolio';
 import { Career } from './components/Career';
-import { CategoryPage } from './components/CategoryPage';
 import { ProjectPage } from './components/ProjectPage';
 import { ConnectModal } from './components/ConnectModal';
 import { useActiveSection } from './hooks/useActiveSection';
@@ -19,7 +21,7 @@ import './styles/global.css';
 
 interface View {
   categoryIdx: number;
-  projectIdx: number | null;
+  projectIdx: number;
 }
 
 export interface SiteConfig {
@@ -44,16 +46,8 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const [view, setView] = useState<View | null>(null);
   const [connectOpen, setConnectOpen] = useState(false);
 
-  const openCategory = useCallback(
-    (categoryIdx: number) => setView({ categoryIdx, projectIdx: null }),
-    [],
-  );
   const openProject = useCallback(
     (categoryIdx: number, projectIdx: number) => setView({ categoryIdx, projectIdx }),
-    [],
-  );
-  const backToCategory = useCallback(
-    () => setView((v) => (v ? { categoryIdx: v.categoryIdx, projectIdx: null } : v)),
     [],
   );
   const closeView = useCallback(() => setView(null), []);
@@ -62,7 +56,7 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
 
   useEscapeKey(
     useCallback(() => {
-      setView((v) => (v && v.projectIdx != null ? { categoryIdx: v.categoryIdx, projectIdx: null } : null));
+      setView(null);
       setConnectOpen(false);
     }, []),
   );
@@ -72,6 +66,13 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   return (
     <div className="block min-h-screen">
       <BackgroundGrid visible={config.showGrid} />
+      {CARD_TRAVEL_ENABLED && (
+        <>
+          <CardTravelGhost />
+          <AboutTravelGhosts />
+          <PortfolioTravelGhosts />
+        </>
+      )}
 
       <Sidebar active={active} visible={navOn} statusLabel={statusLabel} onOpenConnect={openConnect} />
 
@@ -79,28 +80,21 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         <Hero flipOnHover={config.flipOnHover} />
         <Intro />
         <About />
-        <Portfolio onOpenCategory={openCategory} />
+        <Portfolio onOpenProject={openProject} overlayOpen={view !== null} />
         <Career />
       </main>
 
+      {/*
+        Categories now expand in place inside the portfolio section, so only the
+        individual case study still opens as an overlay.
+      */}
       <AnimatePresence>
         {view && (
-          <CategoryPage
-            key="category"
-            category={CATEGORIES[view.categoryIdx]}
-            categoryIndex={view.categoryIdx}
-            onClose={closeView}
-            onOpenProject={(projectIdx) => openProject(view.categoryIdx, projectIdx)}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {view?.projectIdx != null && (
           <ProjectPage
             key="project"
             category={CATEGORIES[view.categoryIdx]}
             initialProjectIdx={view.projectIdx}
-            onBackToCategory={backToCategory}
+            onBackToCategory={closeView}
             onClose={closeView}
           />
         )}

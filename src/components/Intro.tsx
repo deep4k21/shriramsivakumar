@@ -9,6 +9,8 @@ import { DownloadCircleIcon } from './Icons';
 const HEAD_END = 0.62;
 const BODY_START = 0.66;
 const BODY_END = 0.86;
+/** The slide panel settles in as the section opens, before the copy reveals. */
+const PANEL_END = 0.14;
 
 /** Word reveals share the head window, one slot each, with "From" taking slot 0. */
 const WORD_SPAN = HEAD_END / (INTRO_WORDS.length + 1);
@@ -45,6 +47,7 @@ export function Intro() {
   const [slideIdx, setSlideIdx] = useState(0);
 
   const bodyReveal = useRevealStyle(progress, { start: BODY_START, end: BODY_END });
+  const panelReveal = useRevealStyle(progress, { start: 0, end: PANEL_END });
   const progressWidth = useTransform(progress, [0, 1], ['0%', '100%']);
   const progressOpacity = useTransform(progress, [0.8, 1], [1, 0], { clamp: true });
 
@@ -117,8 +120,9 @@ export function Intro() {
           </div>
 
           <motion.div
+            data-card-travel-target
             className="relative overflow-hidden rounded-[18px] border border-white/9 bg-surface"
-            style={bodyReveal}
+            style={panelReveal}
           >
             <div className="flex items-center gap-1.75 border-b border-white/7 px-4 py-3.25">
               <span className="size-2.25 rounded-full bg-orange" />
