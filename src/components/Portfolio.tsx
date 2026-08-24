@@ -50,9 +50,31 @@ const CARDS = { start: 0.4, end: 0.98 } as const;
  */
 const HEAD_FADE = 0.1;
 
-/** Panel size as a share of the stage, at full size and once collapsed. */
+/**
+ * The head panel is a tall, narrow box rather than the full stage: it is inset
+ * horizontally so it reads as a vertical panel carrying the headline.
+ */
+const PANEL_INSET = '11%';
+
+/**
+ * Panel scale at full size and once collapsed.
+ *
+ * `PANEL_SMALL` is expressed against the *panel's* own width, while the mosaic
+ * hole is a share of the stage — so the collapsed mark only lands in that hole
+ * if the two are converted through the panel's width. MARK_OF_STAGE is the
+ * share of the stage the mark ends up covering, and the mosaic uses it.
+ */
 const PANEL_FULL = 1;
-const PANEL_SMALL = 0.26;
+const MARK_OF_STAGE = 0.26;
+const PANEL_WIDTH_OF_STAGE = 1 - 2 * (parseFloat(PANEL_INSET) / 100);
+/**
+ * The axes collapse by different amounts: the panel is inset horizontally but
+ * full-height, so a uniform scale that lands the mark's width in the mosaic
+ * hole would leave it far too tall. `scaleY` is the plain share of the stage,
+ * `scaleX` is that share converted through the panel's narrower width.
+ */
+const PANEL_SMALL_X = MARK_OF_STAGE / PANEL_WIDTH_OF_STAGE;
+const PANEL_SMALL_Y = MARK_OF_STAGE;
 
 /** Fallback used for the first paint, before the spacer can be measured. */
 const ICON_HOME_FALLBACK = { left: 5.7, top: 27.2 };
@@ -214,15 +236,14 @@ function CategoryCard({
       <div className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#5a5a5a]">
         {String(index + 1).padStart(2, '0')} / {String(CATEGORIES.length).padStart(2, '0')}
       </div>
-      <div className="font-heading text-[clamp(17px,1.5vw,24px)]/[1.2] font-semibold tracking-[-0.02em] text-orange">
+      <div className="font-heading text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em] text-orange">
         {cat.title}
       </div>
 
       {/*
-        On the wide tiles the copy and the link share a row: they are short
-        enough that stacking them plus a spacer overflows the tile on a less
-        tall viewport, which pushes the link out of sight. Side by side, the
-        content fits the height it is given and the link still lands right.
+        On the wide tiles the copy and the link share a row pinned to the bottom
+        of the card, so the link sits on the same baseline as the tall tiles'
+        rather than floating mid-card above a band of empty space.
 
         The tall tiles keep the stacked layout, where a spacer pins the link to
         the bottom of the column.
@@ -234,11 +255,11 @@ function CategoryCard({
             : 'flex min-h-0 flex-1 flex-col'
         }
       >
-        <p className="m-0 max-w-[34ch] font-body text-[clamp(12.5px,0.85vw,14px)]/[1.6] text-grey text-pretty">
+        <p className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-grey text-pretty">
           {cat.lead} <span className="font-bold text-white">{cat.leadBold}</span>
         </p>
         {!wide && <div className="flex-1" />}
-          <div className="flex flex-none items-center gap-2.25 font-body text-[12.5px] text-teal">
+          <div className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)] text-teal">
             Open <span className="font-bold">{cat.short}</span> <span className="text-[15px]">→</span>
           </div>
         </div>
@@ -277,15 +298,39 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   // percentage of this panel, so it would drift as the panel contracts even
   // before its own travel begins — holding both keeps the mark still until the
   // copy is gone.
-  const panelScale = useTransform(
-    progress,
-    [SHRINK.start + HEAD_FADE, SHRINK.end],
-    [PANEL_FULL, PANEL_SMALL],
-    { clamp: true, ease: EASE },
+  const scaleRange: [number, number] = [SHRINK.start + HEAD_FADE, SHRINK.end];
+  const panelScaleX = useTransform(progress, scaleRange, [PANEL_FULL, PANEL_SMALL_X], {
+    clamp: true,
+    ease: EASE,
+  });
+  const panelScaleY = useTransform(progress, scaleRange, [PANEL_FULL, PANEL_SMALL_Y], {
+    clamp: true,
+    ease: EASE,
+  });
+  // Counter-scaled per axis so the radius stays visually constant at the card
+  // spec's 10px, and the corner stays round rather than stretching into an
+  // ellipse once the two scales diverge.
+  const panelRadius = useTransform(
+    [panelScaleX, panelScaleY] as const,
+    ([sx, sy]: number[]) => `${10 / sx}px / ${10 / sy}px`,
   );
-  // Counter-scale the radius so it stays visually constant at the card spec's
-  // 10px while the panel contracts, rather than shrinking with it.
-  const panelRadius = useTransform(panelScale, (s) => `${10 / s}px`);
+  /*
+   * The card's own 1px border is scaled with the box, so at the collapsed size
+   * it renders at ~0.26px vertically and the horizontal edges disappear.
+   * Counter-scaling the border does not fix it: the browser rounds computed
+   * border widths to whole pixels, so 3.85px becomes 3px and the top and bottom
+   * still land at 0.78px.
+   *
+   * An inset box-shadow is not rounded that way, so the edge is drawn as a
+   * shadow spread instead — counter-scaled per axis so all four sides stay a
+   * visually constant 1px through the collapse.
+   */
+  const panelEdge = useTransform(
+    [panelScaleX, panelScaleY] as const,
+    ([sx, sy]: number[]) =>
+      `inset 0 ${1 / sy}px 0 0 #89919F, inset 0 -${1 / sy}px 0 0 #89919F,` +
+      ` inset ${1 / sx}px 0 0 0 #89919F, inset -${1 / sx}px 0 0 0 #89919F`,
+  );
 
   // Headline lives on the full-size panel and clears out before the collapse.
   const headOpacity = useTransform(
@@ -320,7 +365,10 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   });
   // Grows from the eyebrow's 14px to a mark sized for the collapsed panel,
   // counter-scaled so the panel's own contraction doesn't shrink it with it.
-  const iconSize = useTransform([progress, panelScale] as const, ([p, s]: number[]) => {
+  // Counters the *larger* remaining scale so the icon never overflows the
+  // narrower axis of the collapsed mark.
+  const iconSize = useTransform([progress, panelScaleX, panelScaleY] as const, ([p, sx, sy]: number[]) => {
+    const s = Math.max(sx, sy);
     const [from, to] = iconTravel;
     const t = Math.min(1, Math.max(0, (p - from) / (to - from)));
     return (14 + (58 - 14) * t) / s;
@@ -328,16 +376,21 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
 
   return (
     <section ref={ref} id="portfolio" className="relative h-[420vh] border-t border-white/6">
-      <div className="sticky top-0 box-border flex h-screen items-center justify-center overflow-hidden px-gutter py-[clamp(28px,4vh,56px)] pl-gutter-nav">
+      <div className="sticky top-0 box-border flex h-screen items-center justify-center overflow-hidden px-gutter py-[clamp(16px,2.2vh,32px)] pl-gutter-nav">
         {/*
           One fixed-aspect stage holds both the panel and the card grid, so the
           panel's collapsed size and the grid's centre hole are defined against
           the same box and stay aligned at any viewport.
         */}
+        {/*
+          The stage fills the pinned viewport rather than sitting in a fixed
+          box: the mosaic and the collapsed mark are both sized against it, so
+          giving it the full height and width is what removes the dead margin
+          around the section.
+        */}
         <div
           data-portfolio-stage
-          className="relative w-full max-w-300"
-          style={{ height: 'min(68vh, 600px)' }}
+          className="relative size-full max-w-none"
         >
           {/*
             The stage panel: headline first, then collapsed to the mark.
@@ -347,8 +400,15 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
           */}
           <motion.div
             data-portfolio-panel
-            className={`absolute inset-0 z-10 grid place-items-center overflow-hidden ${CARD}`}
-            style={{ scale: panelScale, borderRadius: panelRadius }}
+            className={`absolute inset-y-0 z-10 grid place-items-center overflow-hidden ${CARD} border-0`}
+            style={{
+              left: PANEL_INSET,
+              right: PANEL_INSET,
+              scaleX: panelScaleX,
+              scaleY: panelScaleY,
+              borderRadius: panelRadius,
+              boxShadow: panelEdge,
+            }}
             initial={{ opacity: 0, y: 40 }}
             animate={entered ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
             transition={{ duration: 0.7, ease: EASE }}
@@ -407,13 +467,13 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
             The mosaic: a 4×4 grid where each tile claims a different-shaped
             block around the centre, leaving the middle cell free for the
             collapsed panel. The middle column and row are sized against
-            PANEL_SMALL so that hole matches the mark.
+            MARK_OF_STAGE so that hole matches the mark.
           */}
           <div
             className="grid size-full gap-[clamp(14px,1.6vw,24px)]"
             style={{
-              gridTemplateColumns: `1fr ${PANEL_SMALL * 100}% 1fr`,
-              gridTemplateRows: `1fr ${PANEL_SMALL * 100}% 1fr`,
+              gridTemplateColumns: `1fr ${MARK_OF_STAGE * 100}% 1fr`,
+              gridTemplateRows: `1fr ${MARK_OF_STAGE * 100}% 1fr`,
             }}
           >
             {CATEGORIES.map((cat, i) => (

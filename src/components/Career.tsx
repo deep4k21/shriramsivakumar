@@ -10,8 +10,15 @@ export function Career() {
   const [companyIdx, setCompanyIdx] = useState(0);
   const role = ROLES[companyIdx];
 
+  // One viewport tall, with the content centred in it: the section was a fixed
+  // 810px, which left a gap below on a tall screen and overflowed a short one.
+  // `h-screen` plus `justify-center` lets it fill the viewport and stay
+  // balanced instead of relying on fixed top and bottom padding.
   return (
-    <section id="career" className="flex flex-col gap-9 border-t border-white/6 px-gutter pt-19 pb-24 pl-gutter-nav">
+    <section
+      id="career"
+      className="flex h-screen min-h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden border-t border-white/6 px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav"
+    >
       <div className="font-body text-[11px] tracking-[0.18em] text-teal">03 · CAREER JOURNEY</div>
 
       <div
