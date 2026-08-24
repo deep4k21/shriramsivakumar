@@ -1,4 +1,10 @@
-import { AnimatePresence, cubicBezier, motion, useTransform, type MotionValue } from 'motion/react';
+import {
+  AnimatePresence,
+  cubicBezier,
+  motion,
+  useTransform,
+  type MotionValue,
+} from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 import { CATEGORIES } from '../data/content';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -49,6 +55,25 @@ const CARDS = { start: 0.4, end: 0.98 } as const;
  * starts travelling — otherwise the two read as competing movements.
  */
 const HEAD_FADE = 0.1;
+
+/**
+ * How far the page can scroll from where a category was opened before it
+ * retracts — a little under half a viewport, so a small nudge is tolerated but
+ * a deliberate scroll away closes the card while it is still on screen.
+ *
+ * This is a scroll *distance*, not a position in the section: the section is
+ * 420vh and the stage stays pinned for all of it, so scrolling up from the end
+ * leaves 3200px of travel where a bounds-based check would keep the card open
+ * with the mosaic scrubbing behind it.
+ */
+const RETRACT_DISTANCE_VH = 0.45;
+
+/**
+ * The section-progress band the card also stays inside. Scrolling down has a
+ * hard edge — the section simply ends — so this closes the card right at that
+ * boundary instead of waiting out the full scroll distance.
+ */
+const RETRACT_EXIT = 1.03;
 
 /**
  * The head panel is a tall, narrow box rather than the full stage: it is inset
@@ -292,6 +317,41 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   // mid-section and would fall out of the observed band, hiding itself and
   // everything on it. The stage holds its size and position for the whole pin.
   const entered = useEnteredView('[data-portfolio-stage]');
+
+  // Collapse an expanded category as soon as the reader scrolls away from the
+  // section in either direction. Left open, the mosaic behind it keeps scrubbing
+  // while an unrelated panel sits over the top, and the panel itself reads as
+  // dead scroll on the way back to About.
+  //
+  // Measured as distance scrolled from where the card was opened, rather than
+  // from the section's bounds. The stage is sticky and the section is 420vh, so
+  // section-relative checks leave a long stretch — 3200px scrolling up from the
+  // end — where the card stays open over a scrubbing mosaic.
+  useEffect(() => {
+    if (openIdx === null) return;
+
+    const openedAt = window.scrollY;
+    const limit = window.innerHeight * RETRACT_DISTANCE_VH;
+
+    const check = () => {
+      if (Math.abs(window.scrollY - openedAt) > limit) {
+        setOpenIdx(null);
+        return;
+      }
+
+      // Scrolling down also has a hard edge at the end of the section, which
+      // arrives sooner than the distance limit — the cards finish settling just
+      // before it, so there is nothing left to scroll past.
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      if (span > 0 && -r.top / span > RETRACT_EXIT) setOpenIdx(null);
+    };
+
+    window.addEventListener('scroll', check, { passive: true });
+    return () => window.removeEventListener('scroll', check);
+  }, [openIdx, ref]);
 
   // The panel collapses from filling the stage to a small centred mark, holding
   // at full size until the headline has cleared. The icon is positioned as a
