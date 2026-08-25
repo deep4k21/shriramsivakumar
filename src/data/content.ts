@@ -9,6 +9,31 @@ export interface ProcessRow {
   slot: string;
 }
 
+/** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
+export interface ColorChip {
+  color: string;
+  /** Defaults to a faint white border in the UI; only set this for a chip that needs a different one. */
+  border?: string;
+}
+
+/**
+ * Everything the project overlay needs is per-project, not per-category:
+ * different projects in the same category can have unrelated problems and
+ * solutions. Categories that haven't been given individual project detail yet
+ * have every project share the same values, matching how the site looked
+ * before this existed.
+ */
+export interface Project {
+  name: string;
+  software: string[];
+  problem: string;
+  solution: string;
+  chips: ColorChip[];
+  typeface: string;
+  processRows: ProcessRow[];
+  endNote: string;
+}
+
 export interface Category {
   id: string;
   title: string;
@@ -18,16 +43,11 @@ export interface Category {
   lead: string;
   leadBold: string;
   stats: CategoryStat[];
-  projects: string[];
-  software: string[];
-  problem: string;
-  solution: string;
-  chips: string[];
-  typeface: string;
-  endNote: string;
+  projects: Project[];
 }
 
-export const PROCESS_ROWS: ProcessRow[] = [
+/** The process rows shared by every project that hasn't been given its own. */
+const DEFAULT_PROCESS_ROWS: ProcessRow[] = [
   {
     label: 'DISCOVERY',
     text: 'Mapped the existing flow with the teams who use it daily, and wrote down where it broke.',
@@ -44,6 +64,11 @@ export const PROCESS_ROWS: ProcessRow[] = [
     slot: 'COMPONENTS',
   },
 ];
+
+/** Wraps a flat hex list into chips with the standard border. */
+function chipsFrom(colors: string[]): ColorChip[] {
+  return colors.map((color) => ({ color }));
+}
 
 export const CATEGORIES: Category[] = [
   {
@@ -65,15 +90,18 @@ export const CATEGORIES: Category[] = [
       'Analytics console',
       'Design system v3',
       'Client onboarding flow',
-    ],
-    software: ['Figma', 'Framer', 'After Effects'],
-    problem:
-      'A dense operational workflow spread across disconnected tools, with no shared language between the teams using it.',
-    solution:
-      'A single console built on a component library, so every new screen inherits the same behaviour and hierarchy.',
-    chips: ['#00B8C9', '#FF9A5C', '#47C89A', '#16181D'],
-    typeface: 'Sora / Roboto',
-    endNote: 'The system outlived the project — later teams shipped screens without design review.',
+    ].map((name) => ({
+      name,
+      software: ['Figma', 'Framer', 'After Effects'],
+      problem:
+        'A dense operational workflow spread across disconnected tools, with no shared language between the teams using it.',
+      solution:
+        'A single console built on a component library, so every new screen inherits the same behaviour and hierarchy.',
+      chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#16181D']),
+      typeface: 'Sora / Roboto',
+      processRows: DEFAULT_PROCESS_ROWS,
+      endNote: 'The system outlived the project — later teams shipped screens without design review.',
+    })),
   },
   {
     id: 'brand-identity',
@@ -89,19 +117,87 @@ export const CATEGORIES: Category[] = [
       { value: '10+', label: 'MARKETS' },
     ],
     projects: [
-      'A SaaS rebrand',
-      'Sub-brand architecture',
-      'Identity guidelines',
-      'A sub logo system',
-      'Event identity',
+      {
+        name: 'A SaaS rebrand',
+        software: ['Illustrator', 'Figma', 'InDesign'],
+        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        solution:
+          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
+        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora',
+        processRows: DEFAULT_PROCESS_ROWS,
+        endNote: 'Guidelines written for the people applying them, not for the deck.',
+      },
+      // 2nd project: previously "Sub-brand architecture" — swapped with it so
+      // this sits 2nd and that sits 4th, per instruction.
+      {
+        name: 'A sub logo system',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          'A startup partnership programme lived inside a larger SaaS brand with no mark of its own — nothing signalled that it belonged to the family, or that it stood for something distinct within it.',
+        solution:
+          'One shape that reads two ways: hands joined in partnership, and a rocket for the startups being backed.',
+        chips: [
+          { color: '#6EE2F5', border: 'rgba(255,255,255,0.15)' },
+          { color: '#4D54F0', border: 'rgba(255,255,255,0.15)' },
+          { color: '#322A78', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Neue Haas Unica',
+        processRows: [
+          {
+            label: 'ORIGIN',
+            text: 'Started from the parent brand’s existing community icon — three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.',
+            slot: 'SOURCE ICON',
+          },
+          {
+            label: 'TRANSLATION',
+            text: 'Morphed that icon toward the parent brand’s signature drop shape, so the sub-mark would sit inside the existing visual family rather than beside it.',
+            slot: 'SHAPE STUDIES',
+          },
+          {
+            label: 'INVERSION',
+            text: 'Inverting the colour direction turned the drop’s negative space into a rocket silhouette. Partnership and startup became the same shape.',
+            slot: 'FINAL MARK',
+          },
+        ],
+        endNote:
+          'The rocket wasn’t the plan. It appeared once the colour inverted — and two ideas resolved into one shape.',
+      },
+      {
+        name: 'Identity guidelines',
+        software: ['Illustrator', 'Figma', 'InDesign'],
+        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        solution:
+          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
+        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora',
+        processRows: DEFAULT_PROCESS_ROWS,
+        endNote: 'Guidelines written for the people applying them, not for the deck.',
+      },
+      // 4th project — previously 2nd, swapped with "A sub logo system" above.
+      {
+        name: 'Sub-brand architecture',
+        software: ['Illustrator', 'Figma', 'InDesign'],
+        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        solution:
+          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
+        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora',
+        processRows: DEFAULT_PROCESS_ROWS,
+        endNote: 'Guidelines written for the people applying them, not for the deck.',
+      },
+      {
+        name: 'Event identity',
+        software: ['Illustrator', 'Figma', 'InDesign'],
+        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        solution:
+          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
+        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora',
+        processRows: DEFAULT_PROCESS_ROWS,
+        endNote: 'Guidelines written for the people applying them, not for the deck.',
+      },
     ],
-    software: ['Illustrator', 'Figma', 'InDesign'],
-    problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
-    solution:
-      'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
-    chips: ['#FF9A5C', '#101010', '#47C89A', '#FFFFFF'],
-    typeface: 'Sora',
-    endNote: 'Guidelines written for the people applying them, not for the deck.',
   },
   {
     id: 'marketing-campaigns',
@@ -122,13 +218,16 @@ export const CATEGORIES: Category[] = [
       'E-magazine series',
       'Performance creatives',
       'Regional launch kit',
-    ],
-    software: ['Photoshop', 'Illustrator', 'Premiere Pro'],
-    problem: 'A regional launch needed one story that worked on a booth wall, a landing page and a paid feed.',
-    solution: 'A modular creative kit — one idea, three formats, built to be re-cut by local teams.',
-    chips: ['#47C89A', '#FF9A5C', '#101010', '#00B8C9'],
-    typeface: 'Sora / Roboto',
-    endNote: 'Measured on pipeline, not impressions.',
+    ].map((name) => ({
+      name,
+      software: ['Photoshop', 'Illustrator', 'Premiere Pro'],
+      problem: 'A regional launch needed one story that worked on a booth wall, a landing page and a paid feed.',
+      solution: 'A modular creative kit — one idea, three formats, built to be re-cut by local teams.',
+      chips: chipsFrom(['#47C89A', '#FF9A5C', '#101010', '#00B8C9']),
+      typeface: 'Sora / Roboto',
+      processRows: DEFAULT_PROCESS_ROWS,
+      endNote: 'Measured on pipeline, not impressions.',
+    })),
   },
   {
     id: 'what-if',
@@ -149,13 +248,16 @@ export const CATEGORIES: Category[] = [
       'A retail concept',
       'A sports mark study',
       'A broadcast package',
-    ],
-    software: ['Figma', 'Illustrator', 'Rive'],
-    problem: 'A category convention nobody had questioned in twenty years.',
-    solution: 'A speculative system that keeps the recognition and rebuilds everything behind it.',
-    chips: ['#00B8C9', '#FFFFFF', '#101010', '#FF9A5C'],
-    typeface: 'Sora',
-    endNote: 'Speculative work, done to think — not a claim of ownership.',
+    ].map((name) => ({
+      name,
+      software: ['Figma', 'Illustrator', 'Rive'],
+      problem: 'A category convention nobody had questioned in twenty years.',
+      solution: 'A speculative system that keeps the recognition and rebuilds everything behind it.',
+      chips: chipsFrom(['#00B8C9', '#FFFFFF', '#101010', '#FF9A5C']),
+      typeface: 'Sora',
+      processRows: DEFAULT_PROCESS_ROWS,
+      endNote: 'Speculative work, done to think — not a claim of ownership.',
+    })),
   },
 ];
 

@@ -5,6 +5,7 @@ import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { DownloadCircleIcon } from './Icons';
+import { ResumeFlight } from './ResumeFlight';
 
 const HEAD_END = 0.62;
 const BODY_START = 0.66;
@@ -45,9 +46,20 @@ export function Intro() {
   const { ref, progress } = useSectionScroll<HTMLElement>();
   const fit = usePortfolioFit('#intro > div');
   const [slideIdx, setSlideIdx] = useState(0);
+  const [flightPath, setFlightPath] = useState<{
+    from: { x: number; y: number };
+    to: { x: number; y: number };
+  } | null>(null);
 
   const bodyReveal = useRevealStyle(progress, { start: BODY_START, end: BODY_END });
   const panelReveal = useRevealStyle(progress, { start: 0, end: PANEL_END });
+  // Appears alongside "From" (slot 0), a beat after the word itself so the
+  // doodle reads as pointing at the heading rather than competing with the text.
+  const doodleReveal = useRevealStyle(progress, {
+    start: WORD_SPAN * 0.4,
+    end: WORD_SPAN * 1.3,
+    shift: 12,
+  });
   const progressWidth = useTransform(progress, [0, 1], ['0%', '100%']);
   const progressOpacity = useTransform(progress, [0.8, 1], [1, 0], { clamp: true });
 
@@ -55,7 +67,8 @@ export function Intro() {
   const nextSlide = () => setSlideIdx((i) => (i + 1) % INTRO_SLIDES.length);
 
   return (
-    <section ref={ref} id="intro" className="relative h-[300vh] border-t border-white/6">
+    <>
+      <section ref={ref} id="intro" className="relative h-[300vh] border-t border-white/6">
       <div className="sticky top-0 box-border flex h-screen flex-col justify-center overflow-hidden px-gutter py-[clamp(24px,4vh,48px)] pl-gutter-nav">
         <div
           className="grid w-full items-center gap-[clamp(36px,4.5vw,76px)]"
@@ -71,9 +84,24 @@ export function Intro() {
             </RevealWord>
 
             <h1
-              className="m-0 flex max-w-[15ch] flex-wrap text-[clamp(36px,4.6vw,72px)] leading-[1.08] tracking-[-0.03em]"
+              className="relative m-0 flex max-w-[15ch] flex-wrap text-[clamp(36px,4.6vw,72px)] leading-[1.08] tracking-[-0.03em]"
               style={{ columnGap: '0.26em', rowGap: '0.02em' }}
             >
+              {/*
+                A hand-drawn plane and its arcing arrow, sitting over the
+                heading's own line: starting above the "L" of "Layovers" and
+                arcing down to land near "layouts,". Positioned against the
+                heading rather than "From" above it, since that's the line it
+                needs to track. Purely decorative, so it sits outside the
+                reveal-word grid rather than taking a slot of its own.
+              */}
+              <motion.img
+                src="/images/doodles/plane-arrow.svg"
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute top-[-0.7em] left-[160px] w-[clamp(160px,14vw,230px)] max-w-full"
+                style={doodleReveal}
+              />
               {INTRO_WORDS.map((word, i) => (
                 <RevealWord
                   key={word.text}
@@ -109,6 +137,26 @@ export function Intro() {
 
               <motion.a
                 href="#"
+                onClick={(e) => {
+                  // `href="#"` would otherwise jump the page to the top the
+                  // instant this fires, which shifts everything mid-measure
+                  // and sends the plane from the wrong spot. There's no real
+                  // resume file wired up yet, so this is a no-op destination
+                  // for now regardless.
+                  e.preventDefault();
+
+                  // The plane launches from wherever the button actually is,
+                  // so the animation still starts in the right place if the
+                  // page has scrolled or the layout has reflowed.
+                  const r = e.currentTarget.getBoundingClientRect();
+                  setFlightPath({
+                    from: { x: r.right - 22, y: r.top + r.height / 2 },
+                    to: { x: window.innerWidth - 28, y: 24 },
+                  });
+                  // Clears the path once the flight has finished, so the same
+                  // click can trigger it again rather than leaving it "used up".
+                  window.setTimeout(() => setFlightPath(null), 1000);
+                }}
                 className="inline-flex items-center gap-4 rounded-2xl border border-teal bg-[#005961]/10 py-4 pr-5 pl-6 font-heading text-lg font-bold text-teal"
                 whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}
                 transition={{ duration: 0.2 }}
@@ -205,6 +253,8 @@ export function Intro() {
           </span>
         </motion.div>
       </div>
-    </section>
+      </section>
+      <ResumeFlight path={flightPath} />
+    </>
   );
 }

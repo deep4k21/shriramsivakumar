@@ -470,8 +470,15 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
               boxShadow: panelEdge,
             }}
             initial={{ opacity: 0, y: 40 }}
-            animate={entered ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.7, ease: EASE }}
+            animate={
+              entered && openIdx === null ? { opacity: 1, y: 0 } : { opacity: 0, y: openIdx === null ? 40 : 0 }
+            }
+            // A category expanding over the stage shares this panel's space,
+            // and its own background is translucent (part of the card glass
+            // style), so the mark stays faintly visible underneath through the
+            // whole morph unless it is hidden here — the fade is quick since
+            // it just needs to clear before the expanding panel arrives.
+            transition={{ duration: openIdx === null ? 0.7 : 0.15, ease: EASE }}
           >
             {/*
               Counter-scaling shrinks this box along with the panel, so its

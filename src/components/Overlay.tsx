@@ -13,7 +13,10 @@ interface OverlayProps {
   children: ReactNode;
 }
 
-const DEFAULT_SCRIM = 'bg-black/72 px-6 py-10 backdrop-blur-md';
+// Generous padding so the dimmed page stays visible around the panel, and
+// `place-items-center` so a viewport-capped dialog sits centred rather than
+// pinned to the top.
+const DEFAULT_SCRIM = 'bg-black/45 p-[clamp(24px,5vh,64px)] backdrop-blur-md';
 
 /**
  * Shared full-screen overlay: the scrim fades, the panel rises and scales in,
@@ -23,7 +26,7 @@ export function Overlay({ z, onClose, className, scrimClassName = DEFAULT_SCRIM,
   return (
     <motion.div
       onClick={onClose}
-      className={`fixed inset-0 ${z} grid place-items-start justify-items-center overflow-y-auto ${scrimClassName}`}
+      className={`fixed inset-0 ${z} grid place-items-center overflow-y-auto ${scrimClassName}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

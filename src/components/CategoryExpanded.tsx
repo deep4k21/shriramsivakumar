@@ -31,6 +31,18 @@ export function CategoryExpanded({
       className={`absolute inset-0 z-30 flex flex-col overflow-hidden ${CARD}`}
     >
       {/*
+        A fully opaque backing layer, independent of the shared `CARD` style's
+        translucent fill. `CARD` is 85% opaque so About/Career/the mosaic tiles
+        read as glass, but this panel shares a `layoutId` with the tile it grew
+        from — when the project overlay above it mounts or unmounts, Framer
+        Motion's layout bookkeeping for that shared id can momentarily desync
+        the tile's own opacity animation and leave it visible again underneath.
+        An opaque layer here means that can never bleed through, regardless of
+        what the tile underneath is doing.
+      */}
+      <div className="absolute inset-0 -z-10 bg-[#0c0d10]" />
+
+      {/*
         The stage is a fixed height, so the content is sized to fit inside the
         expanded box rather than growing it past the section. `overflow-y-auto`
         is the safety net for short viewports, not the primary layout.
@@ -107,7 +119,7 @@ export function CategoryExpanded({
             >
               {category.projects.map((p, pi) => (
                 <motion.button
-                  key={p}
+                  key={p.name}
                   type="button"
                   onClick={() => onOpenProject(pi)}
                   className="flex cursor-pointer flex-col overflow-hidden rounded-[10px] border border-white/7 bg-surface p-0 text-left"
@@ -121,7 +133,7 @@ export function CategoryExpanded({
                   </div>
                   <div className="flex flex-col gap-1.5 px-[clamp(12px,1.1vw,18px)] py-[clamp(12px,1.6vh,20px)]">
                     <div className="font-heading text-[clamp(13px,1vw,15.5px)]/[1.35] font-semibold tracking-[-0.01em] text-white text-balance">
-                      {p}
+                      {p.name}
                     </div>
                     <div className="font-body text-[12px] text-teal">Open case study →</div>
                   </div>

@@ -59,7 +59,7 @@ export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }
             <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
               {category.projects.map((p, pi) => (
                 <motion.button
-                  key={p}
+                  key={p.name}
                   type="button"
                   onClick={() => onOpenProject(pi)}
                   className="flex cursor-pointer flex-col overflow-hidden rounded-[14px] border border-white/7 bg-surface p-0 text-left"
@@ -71,7 +71,7 @@ export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }
                   </div>
                   <div className="flex flex-col gap-2 px-5.5 py-5">
                     <div className="font-heading text-[16.5px]/[1.35] font-semibold tracking-[-0.01em] text-white">
-                      {p}
+                      {p.name}
                     </div>
                     <div className="font-body text-[12.5px] text-teal">Open case study →</div>
                   </div>

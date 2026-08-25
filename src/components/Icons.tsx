@@ -124,3 +124,11 @@ export function DownloadCircleIcon({ size = 33, className }: IconProps) {
     </svg>
   );
 }
+
+export function PlaneIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M21.5 12.5a1 1 0 0 0-.6-.92l-6.4-2.9-.6-6.2a1 1 0 0 0-1.66-.66L10 4.2 6.3 3.06a1 1 0 0 0-1.1.34L3.6 5.06a1 1 0 0 0 .3 1.5l4.2 2.3-2.1 2.1-2.6-.3a1 1 0 0 0-.85.34L1.2 12.1a1 1 0 0 0 .18 1.46l3.4 2.4 2.4 3.4a1 1 0 0 0 1.46.18l1.1-1.35a1 1 0 0 0 .34-.85l-.3-2.6 2.1-2.1 2.3 4.2a1 1 0 0 0 1.5.3l1.66-1.6a1 1 0 0 0 .34-1.1l-1.14-3.7 3.86-1.74a1 1 0 0 0 .6-.9Z" />
+    </svg>
+  );
+}

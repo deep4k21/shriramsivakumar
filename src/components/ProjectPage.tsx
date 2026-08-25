@@ -1,7 +1,6 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import type { Category } from '../data/content';
-import { PROCESS_ROWS } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 
@@ -16,7 +15,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   useBodyScrollLock(true);
   const [projectIdx, setProjectIdx] = useState(initialProjectIdx);
   const pIdx = projectIdx % category.projects.length;
-  const projectName = category.projects[pIdx];
+  const project = category.projects[pIdx];
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
 
@@ -24,26 +23,30 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
     <Overlay
       z="z-60"
       onClose={onClose}
-      className="m-auto w-[min(1500px,100%)] overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
+      // Capped to well inside the viewport, so the dimmed page frames it the way a
+      // dialog should. Content scrolls within the panel rather than growing it
+      // past the screen and scrolling the scrim instead.
+      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
     >
-      <div>
+      {/* The scroll container, so the sticky header stays put while the body moves. */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="sticky top-0 z-2 flex flex-col gap-4.5 border-b border-white/8 bg-black/92 px-8 py-5.5 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
               <motion.div
-                key={projectName}
+                key={project.name}
                 className="font-heading text-[26px] font-semibold tracking-[-0.02em] text-white"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, ease: [0.2, 0.7, 0.2, 1] }}
               >
-                {projectName}
+                {project.name}
               </motion.div>
             </div>
             <div className="flex items-center gap-3.5">
               <div className="flex flex-wrap justify-end gap-1.75">
-                {category.software.map((s) => (
+                {project.software.map((s) => (
                   <span
                     key={s}
                     className="rounded-[7px] border border-orange/18 bg-orange/8 px-2.75 py-1.5 font-heading text-[11.5px] font-medium text-orange"
@@ -67,7 +70,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               const on = i === pIdx;
               return (
                 <motion.button
-                  key={p}
+                  key={p.name}
                   type="button"
                   onClick={() => setProjectIdx(i)}
                   className="cursor-pointer rounded-[7px] border px-3.5 py-2 font-body text-xs"
@@ -78,7 +81,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   }}
                   transition={{ duration: 0.18 }}
                 >
-                  {p}
+                  {p.name}
                 </motion.button>
               );
             })}
@@ -87,41 +90,54 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
 
         <div className="flex flex-col gap-6.5 p-8">
           <div className="grid h-[340px] w-full place-items-center rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
-            <span className="font-body text-[11px] tracking-[0.14em] text-grey">HERO BANNER — {projectName}</span>
+            <span className="font-body text-[11px] tracking-[0.14em] text-grey">HERO BANNER — {project.name}</span>
           </div>
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
             <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">PROBLEM</div>
-              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{category.problem}</p>
+              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.problem}</p>
             </div>
             <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">SOLUTION</div>
-              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{category.solution}</p>
+              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.solution}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-5.5 rounded-[14px] bg-surface px-6.5 py-5.5">
             <span className="font-body text-[11px] tracking-[0.16em] text-teal">BRAND SYSTEM</span>
             <div className="flex gap-2">
-              {category.chips.map((c) => (
-                <span key={c} className="size-7.5 rounded-lg border border-white/12" style={{ background: c }} />
+              {project.chips.map((c) => (
+                <span
+                  key={c.color}
+                  className="size-7.5 rounded-lg border"
+                  style={{ background: c.color, borderColor: c.border ?? 'rgba(255,255,255,0.12)' }}
+                />
               ))}
             </div>
-            <span className="font-heading text-[13.5px] font-medium text-white">{category.typeface}</span>
+            <span className="font-heading text-[13.5px] font-medium text-white">{project.typeface}</span>
           </div>
 
-          {PROCESS_ROWS.map((row) => (
+          {/*
+            Both columns top-align and the row's height follows its own
+            content, rather than the text sitting flush with the top of a
+            fixed-height image and leaving empty space below it once the copy
+            runs out. `items-start` does the alignment; dropping the fixed
+            height on the image slot in favour of a min-height lets it (and so
+            the row) size to whichever is taller instead of forcing every row
+            to match the image's height.
+          */}
+          {project.processRows.map((row) => (
             <div
               key={row.label}
-              className="grid gap-6 border-t border-white/7 py-6.5"
+              className="grid items-start gap-6 border-t border-white/7 py-5"
               style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
             >
               <div className="flex flex-col gap-2">
                 <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
                 <p className="m-0 max-w-[420px] font-body text-[15px]/[1.7] text-grey">{row.text}</p>
               </div>
-              <div className="grid h-[220px] place-items-center rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
+              <div className="grid min-h-[160px] place-items-center self-start rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
                 <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
               </div>
             </div>
@@ -129,7 +145,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
 
           <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">
             <div className="mb-2 font-body text-[11px] tracking-[0.16em] text-teal">END NOTE</div>
-            <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{category.endNote}</p>
+            <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{project.endNote}</p>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">

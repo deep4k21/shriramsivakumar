@@ -70,7 +70,7 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         <>
           <CardTravelGhost />
           <AboutTravelGhosts />
-          <PortfolioTravelGhosts />
+          <PortfolioTravelGhosts onOpenConnect={openConnect} />
         </>
       )}
 
@@ -82,6 +82,13 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         <About />
         <Portfolio onOpenProject={openProject} overlayOpen={view !== null} />
         <Career />
+
+        {/*
+          Runway past the last section. Career ends exactly at the document
+          bottom, so without this there is no scroll left for the closing ghost
+          to travel through on its way into the connect modal.
+        */}
+        <div data-connect-runway aria-hidden="true" className="h-[70vh]" />
       </main>
 
       {/*
