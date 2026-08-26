@@ -7,6 +7,27 @@ export interface ProcessRow {
   label: string;
   text: string;
   slot: string;
+  /** Caps the image slot's height (e.g. "380px") instead of the template default. */
+  slotMaxHeight?: string;
+  /**
+   * Renders the slot as an interactive picture-in-picture prototype instead
+   * of a static placeholder: a static image with an inset "LIVE PROTOTYPE"
+   * panel that swaps to fill the slot on click. Omit for a standard slot.
+   */
+  prototype?: ProjectPrototype;
+}
+
+export interface PrototypePlatform {
+  /** e.g. "Desktop", "Tablet", "Mobile" — shown on the segmented control when there's more than one platform. */
+  label: string;
+  /** Embed URL for the live prototype (never opened in a new tab). */
+  embedUrl: string;
+}
+
+export interface ProjectPrototype {
+  /** Label under the static image side, e.g. "MOCKUPS". */
+  imageLabel: string;
+  platforms: PrototypePlatform[];
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
@@ -105,23 +126,65 @@ export const CATEGORIES: Category[] = [
       { value: '5', label: 'INDUSTRIES' },
     ],
     projects: [
-      'Enterprise dashboard suite',
-      'Field operations mobile app',
-      'Analytics console',
-      'Design system v3',
-      'Client onboarding flow',
-    ].map((name) => ({
-      name,
-      software: ['Figma', 'Framer', 'After Effects'],
-      problem:
-        'A dense operational workflow spread across disconnected tools, with no shared language between the teams using it.',
-      solution:
-        'A single console built on a component library, so every new screen inherits the same behaviour and hierarchy.',
-      chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#16181D']),
-      typeface: 'Sora / Roboto',
-      processRows: DEFAULT_PROCESS_ROWS,
-      endNote: 'The system outlived the project — later teams shipped screens without design review.',
-    })),
+      {
+        name: 'A healthcare dashboard',
+        software: ['Figma', 'Illustrator'],
+        problem:
+          'A self-directed exploration: clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.',
+        solution: "A dashboard ranked by urgency instead of organised by category — the day's shape readable in one glance.",
+        chips: [
+          { color: '#16697A', border: 'rgba(255,255,255,0.15)' },
+          { color: '#489FB5', border: 'rgba(255,255,255,0.15)' },
+          { color: '#8ABCC7', border: 'rgba(255,255,255,0.15)' },
+          { color: '#EEF3F3', border: 'rgba(255,255,255,0.15)' },
+          { color: '#F6AF4E', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Roboto',
+        processRows: [
+          {
+            label: 'PREMISE',
+            text: 'I set myself a standard healthcare dashboard brief — patient list, scheduling, records, messaging, analytics — and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.',
+            slot: 'PERSONA',
+            slotMaxHeight: '380px',
+          },
+          {
+            label: 'TRIAGE',
+            text: "The physician I wrote for doesn't need more capability, she needs less noise. So alerts and messages each split into critical and routine, four counters set the day's shape, and analytics — the flashiest thing in the brief — got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
+            slot: 'WIREFRAMES — DESKTOP / TABLET / MOBILE',
+            slotMaxHeight: '380px',
+          },
+          {
+            label: 'INTERFACE',
+            text: 'Blues carry the calm; a single amber is withheld for what genuinely needs attention. The mark argues the same thing — an H and D whose negative space forms a cross. Simple on the surface, structured underneath.',
+            slot: 'MOCKUPS',
+            slotMaxHeight: '620px',
+            prototype: {
+              imageLabel: 'MOCKUPS',
+              platforms: [
+                { label: 'Desktop', embedUrl: 'about:blank' },
+                { label: 'Tablet', embedUrl: 'about:blank' },
+                { label: 'Mobile', embedUrl: 'about:blank' },
+              ],
+            },
+          },
+        ],
+        endNote: 'The brief asked for five features. The exercise was deciding which four could be quieter.',
+      },
+      ...['Field operations mobile app', 'Analytics console', 'Design system v3', 'Client onboarding flow'].map(
+        (name) => ({
+          name,
+          software: ['Figma', 'Framer', 'After Effects'],
+          problem:
+            'A dense operational workflow spread across disconnected tools, with no shared language between the teams using it.',
+          solution:
+            'A single console built on a component library, so every new screen inherits the same behaviour and hierarchy.',
+          chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#16181D']),
+          typeface: 'Sora / Roboto',
+          processRows: DEFAULT_PROCESS_ROWS,
+          endNote: 'The system outlived the project — later teams shipped screens without design review.',
+        }),
+      ),
+    ],
   },
   {
     id: 'brand-identity',

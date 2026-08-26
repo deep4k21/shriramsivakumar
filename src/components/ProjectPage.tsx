@@ -1,9 +1,10 @@
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Category } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 import { ProjectMetricsRow } from './ProjectMetricsRow';
+import { PrototypePiP } from './PrototypePiP';
 
 interface ProjectPageProps {
   category: Category;
@@ -21,6 +22,14 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   // differs from its (shorter, tab-strip) name; otherwise the name doubles as both.
   const displayTitle = project.title ?? project.name;
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // Switching projects (tab strip or "Next project") starts the new one from
+  // the top, rather than leaving the reader wherever the previous project's
+  // scroll position happened to land.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [pIdx]);
+
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
 
   return (
@@ -33,8 +42,8 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
       className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
     >
       {/* The scroll container, so the sticky header stays put while the body moves. */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-2 flex flex-col gap-4.5 border-b border-white/8 bg-black/92 px-8 py-5.5 backdrop-blur-xl">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+        <div className="sticky top-0 z-20 flex flex-col gap-4.5 border-b border-white/8 bg-black/92 px-8 py-5.5 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
@@ -141,9 +150,21 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
                 <p className="m-0 max-w-[420px] font-body text-[15px]/[1.7] text-grey">{row.text}</p>
               </div>
-              <div className="grid min-h-[160px] place-items-center self-start rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
-                <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
-              </div>
+              {row.prototype ? (
+                <div
+                  className="self-start"
+                  style={{ height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }}
+                >
+                  <PrototypePiP prototype={row.prototype} />
+                </div>
+              ) : (
+                <div
+                  className="grid min-h-[160px] place-items-center self-start rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
+                  style={row.slotMaxHeight ? { maxHeight: row.slotMaxHeight } : undefined}
+                >
+                  <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
+                </div>
+              )}
             </div>
           ))}
 
