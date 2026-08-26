@@ -140,33 +140,58 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             the row) size to whichever is taller instead of forcing every row
             to match the image's height.
           */}
-          {project.processRows.map((row) => (
-            <div
-              key={row.label}
-              className="grid items-start gap-6 border-t border-white/7 py-5"
-              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
-            >
-              <div className="flex flex-col gap-2">
-                <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
-                <p className="m-0 max-w-[420px] font-body text-[15px]/[1.7] text-grey">{row.text}</p>
+          {project.processRows.map((row) => {
+            const slot = row.prototype ? (
+              <div
+                className="w-full"
+                style={
+                  row.slotAspectVideo
+                    ? { aspectRatio: '16 / 9' }
+                    : row.stacked
+                      ? // Fits within the modal's viewport alongside its sticky
+                        // header, rather than the prototype forcing a tall box
+                        // that pushes most of the row off-screen.
+                        { height: row.slotMaxHeight ?? 'min(56vh, 620px)' }
+                      : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
+                }
+              >
+                <PrototypePiP prototype={row.prototype} />
               </div>
-              {row.prototype ? (
-                <div
-                  className="self-start"
-                  style={{ height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }}
-                >
-                  <PrototypePiP prototype={row.prototype} />
+            ) : (
+              <div
+                className="grid min-h-[160px] place-items-center rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
+                style={row.slotAspectVideo ? { aspectRatio: '16 / 9', minHeight: 0 } : row.slotMaxHeight ? { maxHeight: row.slotMaxHeight } : undefined}
+              >
+                <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
+              </div>
+            );
+
+            return (
+              <div
+                key={row.label}
+                className={
+                  row.stacked
+                    ? 'flex flex-col gap-5 border-t border-white/7 py-5'
+                    : 'grid items-start gap-6 border-t border-white/7 py-5'
+                }
+                style={row.stacked ? undefined : { gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
+              >
+                <div className="flex flex-col gap-2">
+                  <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
+                  <p
+                    className={
+                      row.stacked
+                        ? 'm-0 font-body text-[15px]/[1.7] text-grey'
+                        : 'm-0 max-w-[420px] font-body text-[15px]/[1.7] text-grey'
+                    }
+                  >
+                    {row.text}
+                  </p>
                 </div>
-              ) : (
-                <div
-                  className="grid min-h-[160px] place-items-center self-start rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
-                  style={row.slotMaxHeight ? { maxHeight: row.slotMaxHeight } : undefined}
-                >
-                  <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
-                </div>
-              )}
-            </div>
-          ))}
+                <div className={row.stacked ? 'w-full' : 'self-start'}>{slot}</div>
+              </div>
+            );
+          })}
 
           {/* Optional — omitted entirely (no row, no reserved spacing) for projects without metrics. */}
           {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}

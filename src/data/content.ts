@@ -9,25 +9,23 @@ export interface ProcessRow {
   slot: string;
   /** Caps the image slot's height (e.g. "380px") instead of the template default. */
   slotMaxHeight?: string;
+  /** Locks the image slot to a 16:9 aspect ratio (width-driven) instead of the template default. */
+  slotAspectVideo?: boolean;
   /**
-   * Renders the slot as an interactive picture-in-picture prototype instead
-   * of a static placeholder: a static image with an inset "LIVE PROTOTYPE"
-   * panel that swaps to fill the slot on click. Omit for a standard slot.
+   * Stacks the row as text-on-top, full-width slot below, instead of the
+   * standard two-column (text-left, slot-right) layout.
+   */
+  stacked?: boolean;
+  /**
+   * Renders the slot as an embedded live prototype instead of a static
+   * placeholder. Never opens in a new tab. Omit for a standard slot.
    */
   prototype?: ProjectPrototype;
 }
 
-export interface PrototypePlatform {
-  /** e.g. "Desktop", "Tablet", "Mobile" — shown on the segmented control when there's more than one platform. */
-  label: string;
+export interface ProjectPrototype {
   /** Embed URL for the live prototype (never opened in a new tab). */
   embedUrl: string;
-}
-
-export interface ProjectPrototype {
-  /** Label under the static image side, e.g. "MOCKUPS". */
-  imageLabel: string;
-  platforms: PrototypePlatform[];
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
@@ -145,27 +143,20 @@ export const CATEGORIES: Category[] = [
             label: 'PREMISE',
             text: 'I set myself a standard healthcare dashboard brief — patient list, scheduling, records, messaging, analytics — and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.',
             slot: 'PERSONA',
-            slotMaxHeight: '380px',
+            slotAspectVideo: true,
           },
           {
             label: 'TRIAGE',
             text: "The physician I wrote for doesn't need more capability, she needs less noise. So alerts and messages each split into critical and routine, four counters set the day's shape, and analytics — the flashiest thing in the brief — got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
             slot: 'WIREFRAMES — DESKTOP / TABLET / MOBILE',
-            slotMaxHeight: '380px',
+            slotAspectVideo: true,
           },
           {
             label: 'INTERFACE',
             text: 'Blues carry the calm; a single amber is withheld for what genuinely needs attention. The mark argues the same thing — an H and D whose negative space forms a cross. Simple on the surface, structured underneath.',
             slot: 'MOCKUPS',
-            slotMaxHeight: '620px',
-            prototype: {
-              imageLabel: 'MOCKUPS',
-              platforms: [
-                { label: 'Desktop', embedUrl: 'about:blank' },
-                { label: 'Tablet', embedUrl: 'about:blank' },
-                { label: 'Mobile', embedUrl: 'about:blank' },
-              ],
-            },
+            stacked: true,
+            prototype: { embedUrl: 'about:blank' },
           },
         ],
         endNote: 'The brief asked for five features. The exercise was deciding which four could be quieter.',
