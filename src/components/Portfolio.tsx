@@ -18,6 +18,9 @@ import { StylusNoteIcon } from './Icons';
 
 interface PortfolioProps {
   onOpenProject: (categoryIndex: number, projectIndex: number) => void;
+  /** The expanded category, or null. Lifted to App so the sidebar can open one too. */
+  openIdx: number | null;
+  setOpenIdx: (idx: number | null) => void;
   /**
    * True while a case study is open over the page. Escape should step back one
    * level at a time, so the expanded category ignores it while that is up.
@@ -48,7 +51,7 @@ const EASE = cubicBezier(0.33, 1, 0.68, 1);
  * section arrives.
  */
 const HEAD = { start: 0.0, end: 0.2 } as const;
-const SHRINK = { start: 0.24, end: 0.68 } as const;
+const SHRINK = { start: 0.18, end: 0.55 } as const;
 const CARDS = { start: 0.4, end: 0.98 } as const;
 
 /**
@@ -294,24 +297,23 @@ function CategoryCard({
   );
 }
 
-export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
+export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: PortfolioProps) {
   const { ref, progress } = useSectionScroll<HTMLElement>();
 
   // Clears the mosaic before the ghost leaves the collapsed mark for career at
   // progress 1.02 (TO_CAREER in PortfolioTravelGhosts). The mark itself is the
   // ghost's source, so it keeps its own choreography and is exempt.
-  const exit = useExitStyle(progress, { start: 0.9, end: 0.99 });
+  const exit = useExitStyle(progress, { start: 0.94, end: 1 });
 
-  // Which tile is expanded over the stage, if any. Kept here rather than in App
-  // because the expansion lives inside this section rather than over the page.
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const closeCategory = useCallback(() => setOpenIdx(null), []);
+  // Which tile is expanded over the stage. Owned by App rather than here: the
+  // sidebar's category list opens these too, so both need the same state.
+  const closeCategory = useCallback(() => setOpenIdx(null), [setOpenIdx]);
   // Only collapse on Escape when nothing is layered above, so the key steps
   // back one level rather than closing the case study and the category at once.
   useEscapeKey(
     useCallback(() => {
       if (!overlayOpen) setOpenIdx(null);
-    }, [overlayOpen]),
+    }, [overlayOpen, setOpenIdx]),
   );
 
   // The panel is on screen well before the section pins — it slides up into
@@ -362,7 +364,7 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
 
     window.addEventListener('scroll', check, { passive: true });
     return () => window.removeEventListener('scroll', check);
-  }, [openIdx, ref]);
+  }, [openIdx, ref, setOpenIdx]);
 
   // The panel collapses from filling the stage to a small centred mark, holding
   // at full size until the headline has cleared. The icon is positioned as a

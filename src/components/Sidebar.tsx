@@ -1,12 +1,17 @@
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { NAV_ITEMS } from '../data/content';
+import { CATEGORIES, NAV_ITEMS } from '../data/content';
 
 interface SidebarProps {
   active: string;
   visible: boolean;
   statusLabel: string;
   onOpenConnect: () => void;
+  /** The portfolio category currently expanded, if any. */
+  activeCategory: number | null;
+  onOpenCategory: (idx: number) => void;
+  /** Scrolls to a section's settled position rather than its top edge. */
+  onNavigate: (id: string) => void;
 }
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
@@ -24,7 +29,15 @@ function RailLabel({ show, className, children }: { show: boolean; className: st
   );
 }
 
-export function Sidebar({ active, visible, statusLabel, onOpenConnect }: SidebarProps) {
+export function Sidebar({
+  active,
+  visible,
+  statusLabel,
+  onOpenConnect,
+  activeCategory,
+  onOpenCategory,
+  onNavigate,
+}: SidebarProps) {
   const [hover, setHover] = useState(false);
 
   const isNavItemActive = (id: string) =>
@@ -51,32 +64,100 @@ export function Sidebar({ active, visible, statusLabel, onOpenConnect }: Sidebar
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
           const on = isNavItemActive(item.id);
+          const isPortfolio = item.id === 'portfolio';
           return (
-            <motion.a
+            <div
               key={item.id}
-              href={item.href}
-              title={item.label}
-              className="flex items-center gap-3 rounded-[9px] px-1 py-2 font-body"
-              animate={{
-                backgroundColor: on ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,0)',
-                color: on ? '#ffffff' : '#808080',
-              }}
-              whileHover={{ backgroundColor: 'rgba(255,255,255,.06)', color: '#ffffff' }}
-              transition={{ duration: 0.18 }}
+              // The portfolio item and its category list share one outlined
+              // block while the section is active, the way the design groups
+              // them — so the ring is drawn here rather than on the link.
+              className={
+                isPortfolio && on
+                  ? 'flex flex-col gap-1 rounded-[13px] border border-white/10 p-1'
+                  : 'contents'
+              }
             >
-              <span className="grid w-7 flex-none place-items-center">
-                <motion.img
-                  src={item.icon}
-                  alt=""
-                  className="size-4.5"
-                  animate={{ opacity: on ? 1 : 0.55 }}
-                  transition={{ duration: 0.18 }}
-                />
-              </span>
-              <RailLabel show={hover} className="font-body text-[12.5px]">
-                {item.label}
-              </RailLabel>
-            </motion.a>
+              <motion.a
+                href={item.href}
+                title={item.label}
+                onClick={(e) => {
+                  // The default anchor jump lands on the section's top edge,
+                  // which for a pinned section is the state before any of its
+                  // content has revealed — so the reader arrives on what looks
+                  // like an empty screen. Scroll to where it has settled
+                  // instead.
+                  e.preventDefault();
+                  onNavigate(item.id);
+                }}
+                className="flex items-center gap-3 rounded-[9px] px-1 py-2 font-body"
+                animate={{
+                  backgroundColor: on ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,0)',
+                  color: on ? '#ffffff' : '#808080',
+                }}
+                whileHover={{ backgroundColor: 'rgba(255,255,255,.06)', color: '#ffffff' }}
+                transition={{ duration: 0.18 }}
+              >
+                <span className="grid w-7 flex-none place-items-center">
+                  <motion.img
+                    src={item.icon}
+                    alt=""
+                    className="size-4.5"
+                    animate={{ opacity: on ? 1 : 0.55 }}
+                    transition={{ duration: 0.18 }}
+                  />
+                </span>
+                <RailLabel show={hover} className="font-body text-[12.5px]">
+                  {item.label}
+                </RailLabel>
+              </motion.a>
+
+              {/*
+                The categories, listed only while portfolio is the active
+                section. Collapsing the height rather than unmounting keeps the
+                open and close symmetrical.
+              */}
+              <AnimatePresence initial={false}>
+                {isPortfolio && on && (
+                  <motion.div
+                    className="flex flex-col gap-1 overflow-hidden"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.28, ease: EASE_OUT }}
+                  >
+                    {CATEGORIES.map((cat, i) => {
+                      const open = activeCategory === i;
+                      return (
+                        <motion.button
+                          key={cat.id}
+                          type="button"
+                          title={cat.title}
+                          onClick={() => onOpenCategory(i)}
+                          className="flex cursor-pointer items-center gap-3 rounded-[9px] bg-transparent px-1 py-1.5 text-left font-body"
+                          animate={{
+                            backgroundColor: open ? 'rgba(255,154,92,.1)' : 'rgba(255,255,255,0)',
+                            color: open ? '#FF9A5C' : '#808080',
+                          }}
+                          whileHover={{ backgroundColor: 'rgba(255,255,255,.06)', color: '#ffffff' }}
+                          transition={{ duration: 0.18 }}
+                        >
+                          <span className="grid w-7 flex-none place-items-center">
+                            <motion.span
+                              className="size-1.75 rounded-full"
+                              animate={{ backgroundColor: open ? '#FF9A5C' : '#4a4a4a' }}
+                              transition={{ duration: 0.18 }}
+                            />
+                          </span>
+                          <RailLabel show={hover} className="font-body text-[11.5px]">
+                            {cat.short}
+                          </RailLabel>
+                        </motion.button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           );
         })}
         <motion.button

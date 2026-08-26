@@ -8,9 +8,16 @@ import { useSectionScroll } from '../hooks/useSectionScroll';
 import { DownloadCircleIcon } from './Icons';
 import { ResumeFlight } from './ResumeFlight';
 
-const HEAD_END = 0.62;
-const BODY_START = 0.66;
-const BODY_END = 0.86;
+/*
+ * The reveal is compressed into the first half of the window so the section has
+ * a real settled stretch afterwards: fully revealed, not yet fading, with the
+ * reader free to sit on it. Previously the copy finished at 0.86 and the exit
+ * began at 0.88, leaving barely 2% of the window at rest — the content arrived
+ * and immediately started leaving.
+ */
+const HEAD_END = 0.42;
+const BODY_START = 0.44;
+const BODY_END = 0.62;
 /** The slide panel settles in as the section opens, before the copy reveals. */
 const PANEL_END = 0.14;
 
@@ -64,7 +71,7 @@ export function Intro() {
   // Clears the copy off screen before the ghost outline departs for about at
   // progress 1.0. Opens just after BODY_END so it isn't fighting the body's own
   // reveal.
-  const exit = useExitStyle(progress, { start: 0.88, end: 0.98 });
+  const exit = useExitStyle(progress, { start: 0.94, end: 1 });
   // The panel's own box goes too, a beat behind its contents: once the outline
   // has lifted off, leaving the card sitting there reads as a duplicate of the
   // thing that is now flying away. It stays in the DOM at full size — the ghost

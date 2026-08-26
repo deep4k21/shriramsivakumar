@@ -40,6 +40,42 @@ const DEFAULT_CONFIG: SiteConfig = {
   availableForWork: true,
 };
 
+/**
+ * The stretch of the portfolio's scroll window where the mosaic is both settled
+ * and still fully opaque. Measured, not assumed:
+ *
+ *   - the mark finishes collapsing at `SHRINK.end` (0.68), but the tiles keep
+ *     growing into the space it leaves until ~0.85 — landing before that drags
+ *     them through the last of the resize, which reads as the cards shifting;
+ *   - Portfolio's own exit fade starts at 0.9, so anything past that arrives
+ *     part-way faded out.
+ *
+ * That leaves 0.85–0.88 as the band where the section is actually at rest and
+ * at full strength. `_TARGET` is where a sidebar click scrolls to when the
+ * reader is outside it.
+ */
+const MOSAIC_SETTLED_FROM = 0.82;
+const MOSAIC_SETTLED_TO = 0.89;
+const MOSAIC_SETTLED_TARGET = 0.86;
+
+/**
+ * Where in each section's scroll window its content has finished revealing.
+ *
+ * Every pinned section is several viewports tall, and its *top* is the state
+ * before anything has revealed — so a plain `#id` anchor drops the reader on a
+ * blank screen. These are the fractions of each window where the section is
+ * actually showing what it is for.
+ *
+ * `home` and `career` reveal immediately, so they take their own top.
+ */
+const SECTION_SETTLED: Record<string, number> = {
+  home: 0,
+  intro: 0.92,
+  about: 0.86,
+  portfolio: MOSAIC_SETTLED_TARGET,
+  career: 0.35,
+};
+
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const { active } = useActiveSection();
   const navOn = useNavVisible();
@@ -47,6 +83,9 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
 
   const [view, setView] = useState<View | null>(null);
   const [connectOpen, setConnectOpen] = useState(false);
+  // The expanded portfolio category. Owned here rather than inside Portfolio so
+  // the sidebar's category list can open one directly.
+  const [portfolioCategory, setPortfolioCategory] = useState<number | null>(null);
   // Mirrors `connectOpen` for the Escape handler, which must not re-create
   // itself on every open/close.
   const connectOpenRef = useRef(connectOpen);
@@ -58,6 +97,57 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
     [],
   );
   const closeView = useCallback(() => setView(null), []);
+
+  /**
+   * Sidebar navigation: scrolls to where a section has settled rather than to
+   * its top edge, so the reader never lands on a pinned section's blank
+   * pre-reveal state.
+   */
+  const navigateToSection = useCallback(
+    (id: string) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const span = Math.max(0, el.offsetHeight - window.innerHeight);
+      smoothScrollTo(top + span * (SECTION_SETTLED[id] ?? 0));
+    },
+    [smoothScrollTo],
+  );
+
+  /**
+   * Opens a category from the sidebar.
+   *
+   * The mosaic is fully settled across a stretch of the portfolio's window, not
+   * at a single point — so if the reader is already anywhere in that stretch,
+   * the category opens immediately and the page does not move at all. Scrolling
+   * to a nominal "settled" offset instead would drag the tiles through the last
+   * of their resize on the way, which reads as the cards shifting before the
+   * panel appears.
+   *
+   * Only when they are outside that range does it travel, and the expansion is
+   * then deferred until the scroll lands: Portfolio dismisses an open category
+   * once the reader scrolls far enough from where it opened, so setting it
+   * first would have the travel itself close it again.
+   */
+  const openPortfolioCategory = useCallback(
+    (idx: number) => {
+      const el = document.getElementById('portfolio');
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const span = el.offsetHeight - window.innerHeight;
+      const progress = span > 0 ? (window.scrollY - top) / span : 0;
+
+      if (progress >= MOSAIC_SETTLED_FROM && progress <= MOSAIC_SETTLED_TO) {
+        setPortfolioCategory(idx);
+        return;
+      }
+
+      smoothScrollTo(top + span * MOSAIC_SETTLED_TARGET);
+      // Matches the scroll's own duration, so the tile opens as it arrives.
+      window.setTimeout(() => setPortfolioCategory(idx), 780);
+    },
+    [smoothScrollTo],
+  );
   const openConnect = useCallback(() => setConnectOpen(true), []);
 
   /**
@@ -113,13 +203,26 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         </>
       )}
 
-      <Sidebar active={active} visible={navOn} statusLabel={statusLabel} onOpenConnect={openConnect} />
+      <Sidebar
+        active={active}
+        visible={navOn}
+        statusLabel={statusLabel}
+        onOpenConnect={openConnect}
+        activeCategory={portfolioCategory}
+        onOpenCategory={openPortfolioCategory}
+        onNavigate={navigateToSection}
+      />
 
       <main className="min-w-0">
         <Hero flipOnHover={config.flipOnHover} />
         <Intro />
         <About />
-        <Portfolio onOpenProject={openProject} overlayOpen={view !== null} />
+        <Portfolio
+          onOpenProject={openProject}
+          overlayOpen={view !== null}
+          openIdx={portfolioCategory}
+          setOpenIdx={setPortfolioCategory}
+        />
         <Career />
 
         {/*

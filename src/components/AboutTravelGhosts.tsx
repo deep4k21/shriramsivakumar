@@ -28,7 +28,7 @@ const ARC_STRENGTH = 0.5;
  * Stage 2 runs on the about window, where its tiles hold position.
  */
 const STAGE_ONE = { start: 1.0, end: 1.6 } as const;
-const STAGE_TWO = { start: 0.34, end: 0.6 } as const;
+const STAGE_TWO = { start: 0.24, end: 0.42 } as const;
 
 function readRect(el: Element | null): Rect | null {
   if (!el) return null;

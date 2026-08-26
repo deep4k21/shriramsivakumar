@@ -21,10 +21,10 @@ const QUOTE_END = 0.3;
  */
 const TILE_MID_START = 0.02;
 const TILE_MID_END = 0.14;
-const TILE_SIDE_START = 0.34;
-const TILE_SIDE_END = 0.6;
-const TOOLKIT_START = 0.6;
-const TOOLKIT_END = 0.84;
+const TILE_SIDE_START = 0.24;
+const TILE_SIDE_END = 0.42;
+const TOOLKIT_START = 0.42;
+const TOOLKIT_END = 0.6;
 
 
 const TILE_ICON = {
@@ -227,7 +227,7 @@ export function About() {
   // These elements already animate opacity on the way in, so the exit is folded
   // into a single transform per element rather than layering a second `opacity`
   // motion value over the first — only one can win on a given style prop.
-  const exit = useExitStyle(progress, { start: 0.88, end: 0.98 });
+  const exit = useExitStyle(progress, { start: 0.94, end: 1 });
   const quoteExitOpacity = useTransform(
     [quoteReveal.opacity, exit.opacity],
     ([reveal, out]: number[]) => reveal * out,
