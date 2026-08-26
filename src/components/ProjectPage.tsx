@@ -117,18 +117,27 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-5.5 rounded-[14px] bg-surface px-6.5 py-5.5">
-            <span className="font-body text-[11px] tracking-[0.16em] text-teal">BRAND SYSTEM</span>
-            <div className="flex gap-2">
-              {project.chips.map((c) => (
-                <span
-                  key={c.color}
-                  className="size-7.5 rounded-lg border"
-                  style={{ background: c.color, borderColor: c.border ?? 'rgba(255,255,255,0.12)' }}
-                />
-              ))}
+          <div className="flex flex-wrap items-center gap-6">
+            <span className="font-heading text-[15.5px] font-semibold tracking-[-0.01em] text-teal">Brand system</span>
+            <div
+              className="flex flex-1 flex-wrap items-center gap-6 rounded-2xl px-6.5 py-4.5"
+              style={{ background: '#15171C' }}
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-3.5">
+                <span className="font-body text-[13px] text-[#9AA1AC]">Color</span>
+                <div className="flex min-w-0 flex-1 items-stretch gap-3">
+                  {project.chips.map((c) => (
+                    <span key={c.color} className="h-12 flex-1 rounded-lg" style={{ background: c.color }} />
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center gap-3.5">
+                <span className="font-body text-[13px] text-[#9AA1AC]">Typeface</span>
+                <span className="font-heading text-[13.5px] font-semibold tracking-[-0.005em] text-[#F2F4F7]">
+                  {project.typeface}
+                </span>
+              </div>
             </div>
-            <span className="font-heading text-[13.5px] font-medium text-white">{project.typeface}</span>
           </div>
 
           {/*
