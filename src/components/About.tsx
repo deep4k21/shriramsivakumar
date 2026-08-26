@@ -1,8 +1,9 @@
-import { motion } from 'motion/react';
+import { motion, useTransform } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { AI_TOOLS, INTRO_QUOTE_WORDS, INTRO_TILES, TOOLKIT, type QuoteWord } from '../data/content';
 import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
+import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD } from '../styles/card';
 import { CardGlow } from './CardGlow';
@@ -49,8 +50,17 @@ function useQuoteCycle<T>(words: T[], intervalMs = 2600) {
 
 const FLAP_HALF_S = 0.22;
 
+/**
+ * Width of the fixed slot the doodles sit in, in `em` against the heading.
+ *
+ * Held at the widest of the two so the reserved space never changes as the word
+ * cycles — the drawings differ in both width and height, and letting the slot
+ * track each one would shift the closing quote from side to side.
+ */
+const DOODLE_SLOT_EM = Math.max(...INTRO_QUOTE_WORDS.map((w) => w.doodleEm));
+
 /** Airport-departure-board flip: the word rotates away, swaps, then rotates back. */
-function SplitFlapWord({ word }: { word: QuoteWord }) {
+function SplitFlapWord({ word, trailing }: { word: QuoteWord; trailing?: string }) {
   const [shown, setShown] = useState(word);
   const [phase, setPhase] = useState<'idle' | 'out'>('idle');
 
@@ -60,7 +70,7 @@ function SplitFlapWord({ word }: { word: QuoteWord }) {
   }, [word, shown]);
 
   return (
-    <span className="inline-block" style={{ perspective: 600 }}>
+    <span className="inline-flex items-center gap-[0.32em]" style={{ perspective: 600 }}>
       <motion.span
         className={`inline-block font-heading font-bold ${shown.colorClass}`}
         style={{ transformStyle: 'preserve-3d', transformOrigin: 'center bottom' }}
@@ -79,6 +89,35 @@ function SplitFlapWord({ word }: { word: QuoteWord }) {
       >
         {shown.text}
       </motion.span>
+      {trailing ? <span className="-ml-[0.28em] text-white">{trailing}</span> : null}
+      {/*
+        The doodle belongs to the word, so it swaps with it — but it sits
+        outside the flipping span rather than inside, or it would rotate edge-on
+        with the letters. It cross-fades on the same `shown` swap instead, which
+        keeps the two in step without the doodle tumbling.
+
+        It is also taken out of flow: the two drawings are different heights, so
+        in flow the taller one grows the heading and shoves everything below it
+        down as the word cycles. An absolutely positioned box, vertically
+        centred on the text, keeps the heading's height fixed — only the width
+        of this spacer participates in layout, and that is held constant.
+      */}
+      <span
+        aria-hidden="true"
+        className="relative inline-block flex-none self-stretch"
+        style={{ width: `${DOODLE_SLOT_EM}em` }}
+      >
+        <motion.img
+          key={shown.doodle}
+          src={shown.doodle}
+          alt=""
+          className="pointer-events-none absolute top-1/2 left-0 max-w-none -translate-y-1/2 select-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase === 'out' ? 0 : 1 }}
+          transition={{ duration: FLAP_HALF_S, ease: [0.25, 1, 0.5, 1] }}
+          style={{ width: `${shown.doodleEm}em` }}
+        />
+      </span>
     </span>
   );
 }
@@ -100,12 +139,21 @@ function IntroTile({
 }) {
   const Icon = TILE_ICON[tile.icon];
   const reveal = useRevealStyle(progress, { start, end });
+  // The tiles are the ghosts' source for the hop into portfolio (about progress
+  // 1.02), so they clear just before it — otherwise the tile sits there as a
+  // duplicate of the outline now flying away. Layout is untouched, so the ghost
+  // can still measure this element live while it's invisible.
+  const boxExit = useExitStyle(progress, { start: 0.95, end: 1, shift: 0 });
+  const opacity = useTransform(
+    [reveal.opacity, boxExit.opacity],
+    ([revealIn, out]: number[]) => revealIn * out,
+  );
 
   return (
     <motion.div
       data-about-tile
       className={`group relative flex flex-col gap-2 overflow-hidden ${CARD} px-6.5 py-6`}
-      style={reveal}
+      style={{ ...reveal, opacity }}
     >
       <CardGlow />
       <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
@@ -142,7 +190,9 @@ function ToolIcon({ name, icon }: { name: string; icon: string }) {
       <motion.img
         src={icon}
         alt={name}
-        className="size-10 cursor-pointer rounded-lg object-contain"
+        // No pointer cursor: hovering only reveals the name tooltip, there is
+        // nothing here to click.
+        className="size-10 rounded-lg object-contain"
         whileHover={{ y: -3, scale: 1.06 }}
         transition={{ duration: 0.18 }}
       />
@@ -171,6 +221,21 @@ export function About() {
     from: 0.06,
   });
   const toolkitReveal = useRevealStyle(progress, { start: TOOLKIT_START, end: TOOLKIT_END });
+  // Clears as the section unpins and the ghost outlines move on. The tiles
+  // themselves are ghost targets, so they keep their own reveal and stay put.
+  //
+  // These elements already animate opacity on the way in, so the exit is folded
+  // into a single transform per element rather than layering a second `opacity`
+  // motion value over the first — only one can win on a given style prop.
+  const exit = useExitStyle(progress, { start: 0.88, end: 0.98 });
+  const quoteExitOpacity = useTransform(
+    [quoteReveal.opacity, exit.opacity],
+    ([reveal, out]: number[]) => reveal * out,
+  );
+  const toolkitExitOpacity = useTransform(
+    [toolkitReveal.opacity, exit.opacity],
+    ([reveal, out]: number[]) => reveal * out,
+  );
 
   return (
     <section ref={ref} id="about" className="relative h-[300vh] border-t border-white/6">
@@ -181,11 +246,14 @@ export function About() {
         >
           <motion.h2
             className="m-0 font-heading text-[clamp(30px,4vw,52px)] font-bold tracking-[-0.02em] text-white"
-            style={quoteReveal}
+            style={{ ...quoteReveal, opacity: quoteExitOpacity }}
           >
-            &ldquo;The more I{' '}
-            <SplitFlapWord word={quoteWord} />
-            &rdquo;
+            {/*
+              The closing quote is passed in so it stays glued to the word,
+              with the doodle sitting after the whole quoted phrase rather than
+              between the word and its own punctuation.
+            */}
+            &ldquo;The more I <SplitFlapWord word={quoteWord} trailing="&rdquo;" />
           </motion.h2>
 
           <div
@@ -208,7 +276,11 @@ export function About() {
 
           <motion.div
             className="grid gap-[clamp(14px,1.6vw,22px)]"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', ...toolkitReveal }}
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              ...toolkitReveal,
+              opacity: toolkitExitOpacity,
+            }}
           >
             <div className={`group relative flex flex-col gap-4 overflow-hidden ${CARD} px-7 py-6.5`}>
               <CardGlow />

@@ -665,7 +665,7 @@ export interface IntroWordSpec {
 export const INTRO_WORDS: IntroWordSpec[] = [
   { text: 'Layovers', variant: 'teal' },
   { text: 'to', variant: 'teal' },
-  { text: 'layouts,', variant: 'teal' },
+  { text: 'Layouts,', variant: 'teal' },
   { text: 'I’m', variant: 'strong' },
   { text: 'Shriram.', variant: 'strong' },
 ];
@@ -674,11 +674,19 @@ export interface QuoteWord {
   text: string;
   /** Tailwind text colour utility for this word. */
   colorClass: string;
+  /** Hand-drawn doodle sitting beside the word, swapping with it. */
+  doodle: string;
+  /**
+   * The doodle's width, in `em` against the heading — so it scales with the
+   * type. Per-word because the two drawings have different proportions and
+   * would not read as the same size at a shared width.
+   */
+  doodleEm: number;
 }
 
 export const INTRO_QUOTE_WORDS: QuoteWord[] = [
-  { text: 'see', colorClass: 'text-green' },
-  { text: 'design', colorClass: 'text-orange' },
+  { text: 'see', colorClass: 'text-green', doodle: '/images/doodles/see.svg', doodleEm: 2.9 },
+  { text: 'design', colorClass: 'text-orange', doodle: '/images/doodles/design.svg', doodleEm: 2.1 },
 ];
 
 export interface IntroTile {
@@ -695,12 +703,12 @@ export const INTRO_TILES: IntroTile[] = [
     icon: 'sparkle',
     bold: 'Motion systems',
     boldPosition: 'start',
-    body: 'and speculative rebrands.',
+    body: 'and speculative rebrands — how a mark behaves once it stops sitting still.',
   },
   {
     label: 'After Hours',
     icon: 'compass',
-    body: 'Window seats, street signage, and',
+    body: 'Window seats, street signage, and the way a city writes itself down. So far across',
     bold: '14 countries',
     boldPosition: 'end',
   },
@@ -709,7 +717,7 @@ export const INTRO_TILES: IntroTile[] = [
     icon: 'briefcase',
     bold: 'Lead Visual design',
     boldPosition: 'start',
-    body: 'roles',
+    body: 'roles where the system matters as much as the screen it ends up on.',
   },
 ];
 

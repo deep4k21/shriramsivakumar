@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { HERO_STATS } from '../data/content';
+import { useExitStyle } from '../hooks/useExitStyle';
+import { useHeroProgress } from '../hooks/useHeroProgress';
 import { useStatCycle } from '../hooks/useStatCycle';
 import { CELL_H, useHomeGrid } from '../hooks/useHomeGrid';
 
@@ -28,6 +30,13 @@ export function Hero({ flipOnHover }: HeroProps) {
 
   const accent = flipped ? '#47C89A' : '#FF9A5C';
 
+  // The hero → intro ghost leaves the flip card as the hero scrolls away, so
+  // the hero's own content clears behind it. The card's outer box keeps its
+  // layout — the ghost measures it live to know where it is departing from —
+  // and only its painted faces go.
+  const heroProgress = useHeroProgress();
+  const exit = useExitStyle(heroProgress, { start: 0.12, end: 0.42, shift: 0 });
+
   const handleClick = () => setFlipped((v) => !v);
   const handleEnter = () => {
     if (flipOnHover) setFlipped(true);
@@ -41,7 +50,11 @@ export function Hero({ flipOnHover }: HeroProps) {
       id="home"
       className="relative flex h-screen w-full items-center justify-center overflow-hidden box-border px-0 py-[clamp(16px,3vh,40px)]"
     >
-      <div className="pointer-events-none absolute inset-0 z-0 max-[900px]:hidden" aria-hidden="true">
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-0 max-[900px]:hidden"
+        aria-hidden="true"
+        style={exit}
+      >
         <AnimatePresence>
           {gridSlots.map((slot) => {
             return (
@@ -71,7 +84,7 @@ export function Hero({ flipOnHover }: HeroProps) {
             );
           })}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       <div className="relative z-1 flex h-full max-h-full flex-col items-center justify-center gap-[clamp(8px,1.5vh,16px)]">
         <div className="relative box-content w-[356px] max-w-[calc(100vw-40px)] px-[60px] py-[clamp(10px,2.5vh,26px)]">
@@ -94,7 +107,7 @@ export function Hero({ flipOnHover }: HeroProps) {
           >
             <motion.div
               className="relative size-full"
-              style={{ transformStyle: 'preserve-3d' }}
+              style={{ transformStyle: 'preserve-3d', opacity: exit.opacity }}
               animate={{ rotateY: flipped ? 180 : 0 }}
               transition={{ duration: 0.85, ease: [0.7, 0, 0.2, 1] }}
             >
@@ -154,7 +167,13 @@ export function Hero({ flipOnHover }: HeroProps) {
             </motion.div>
           </div>
 
-          {/* Ambient info boxes */}
+          {/*
+            Ambient info boxes. Wrapped so the exit fade applies once to the
+            group: each box drives its own `opacity` through `animate` for the
+            entry float-in, which a `style.opacity` on the box itself would
+            fight — the parent's opacity multiplies against theirs instead.
+          */}
+          <motion.div className="pointer-events-none absolute inset-0" style={exit}>
           <motion.div
             className="pointer-events-none absolute top-11 -left-14 z-6 flex items-center gap-2.5 rounded-xl border border-white/8 bg-surface px-4.5 py-3.5 shadow-[0_14px_34px_rgba(0,0,0,.5)] max-[640px]:hidden"
             {...BOX_IN}
@@ -242,11 +261,15 @@ export function Hero({ flipOnHover }: HeroProps) {
               {flipped ? ' to worldview' : ' to workflow'}&rdquo;
             </span>
           </motion.div>
+          </motion.div>
         </div>
       </div>
-      <span className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-grey">
+      <motion.span
+        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-grey"
+        style={exit}
+      >
         {flipOnHover ? 'HOVER TO FLIP' : 'CLICK THE CARD TO FLIP'}
-      </span>
+      </motion.span>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { motion, useTransform } from 'motion/react';
 import { useState } from 'react';
 import { INTRO_SLIDES, INTRO_WORDS } from '../data/content';
+import { useExitStyle } from '../hooks/useExitStyle';
 import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
@@ -60,6 +61,20 @@ export function Intro() {
     end: WORD_SPAN * 1.3,
     shift: 12,
   });
+  // Clears the copy off screen before the ghost outline departs for about at
+  // progress 1.0. Opens just after BODY_END so it isn't fighting the body's own
+  // reveal.
+  const exit = useExitStyle(progress, { start: 0.88, end: 0.98 });
+  // The panel's own box goes too, a beat behind its contents: once the outline
+  // has lifted off, leaving the card sitting there reads as a duplicate of the
+  // thing that is now flying away. It stays in the DOM at full size — the ghost
+  // measures this element live every frame to know where it is departing from —
+  // so only its paint is dropped, not its layout.
+  const panelBoxExit = useExitStyle(progress, { start: 0.95, end: 1, shift: 0 });
+  const panelOpacity = useTransform(
+    [panelReveal.opacity, panelBoxExit.opacity],
+    ([reveal, out]: number[]) => reveal * out,
+  );
   const progressWidth = useTransform(progress, [0, 1], ['0%', '100%']);
   const progressOpacity = useTransform(progress, [0.8, 1], [1, 0], { clamp: true });
 
@@ -78,63 +93,71 @@ export function Intro() {
             transformOrigin: 'center left',
           }}
         >
-          <div className="flex flex-col items-start gap-[clamp(18px,2.6vh,28px)]">
-            <RevealWord progress={progress} slot={0} className="font-body text-lg text-grey">
-              From
-            </RevealWord>
+          {/*
+            Three groups — heading, body copy, CTA — spaced evenly by one shared
+            gap. "From" belongs to the heading group rather than floating on its
+            own, so the pairing reads as the Figma has it.
+          */}
+          <motion.div className="flex flex-col items-start gap-[clamp(26px,4.4vh,46px)]" style={exit}>
+            <div className="flex flex-col items-start gap-[clamp(2px,0.4vh,6px)]">
+              <RevealWord
+                progress={progress}
+                slot={0}
+                className="font-heading text-[clamp(20px,2vw,30px)] font-bold text-grey"
+              >
+                From
+              </RevealWord>
 
-            <h1
-              className="relative m-0 flex max-w-[15ch] flex-wrap text-[clamp(36px,4.6vw,72px)] leading-[1.08] tracking-[-0.03em]"
-              style={{ columnGap: '0.26em', rowGap: '0.02em' }}
-            >
-              {/*
-                A hand-drawn plane and its arcing arrow, sitting over the
-                heading's own line: starting above the "L" of "Layovers" and
-                arcing down to land near "layouts,". Positioned against the
-                heading rather than "From" above it, since that's the line it
-                needs to track. Purely decorative, so it sits outside the
-                reveal-word grid rather than taking a slot of its own.
-              */}
-              <motion.img
-                src="/images/doodles/plane-arrow.svg"
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute top-[-0.7em] left-[160px] w-[clamp(160px,14vw,230px)] max-w-full"
-                style={doodleReveal}
-              />
-              {INTRO_WORDS.map((word, i) => (
-                <RevealWord
-                  key={word.text}
-                  progress={progress}
-                  slot={i + 1}
-                  className={
-                    word.variant === 'teal'
-                      ? 'font-body font-normal text-teal'
-                      : 'font-heading font-bold text-white'
-                  }
-                >
-                  {word.text}
-                </RevealWord>
-              ))}
-            </h1>
+              <h1
+                className="relative m-0 flex max-w-[17ch] flex-wrap text-[clamp(32px,3.9vw,58px)] leading-[1.14] tracking-[-0.03em]"
+                style={{ columnGap: '0.26em', rowGap: '0.02em' }}
+              >
+                {/*
+                  A hand-drawn plane and its arcing arrow, sitting over the
+                  heading's own line: the plane starts above "Layovers" and the
+                  arrow arcs down to land on "Layouts,". Sized and placed in `em`
+                  so it tracks the heading's own type scale at any viewport
+                  rather than drifting off the words. Purely decorative, so it
+                  sits outside the reveal-word grid rather than taking a slot.
+                */}
+                <motion.img
+                  src="/images/doodles/plane-arrow.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-[-1.4em] left-[2em] w-[4.8em] max-w-full"
+                  style={doodleReveal}
+                />
+                {INTRO_WORDS.map((word, i) => (
+                  <RevealWord
+                    key={word.text}
+                    progress={progress}
+                    slot={i + 1}
+                    className={
+                      word.variant === 'teal'
+                        ? 'font-body font-normal text-teal'
+                        : 'font-heading font-bold text-white'
+                    }
+                  >
+                    {word.text}
+                  </RevealWord>
+                ))}
+              </h1>
+            </div>
 
-            <motion.div
-              className="flex flex-col items-start gap-[clamp(36px,6vh,56px)]"
-              style={{ marginTop: 'clamp(24px,5vh,64px)', ...bodyReveal }}
-            >
-              <div className="flex flex-col gap-1">
-                <p className="m-0 font-body text-base/[1.75] font-bold">
-                  <span className="text-orange">Designer by profession,</span>{' '}
-                  <span className="text-green">traveler by instinct.</span>
-                </p>
-                <p className="m-0 font-body text-base/[1.75] text-grey text-pretty">
-                  Over <span className="font-bold text-white">9 years</span> designing SaaS products, UI/UX
-                  experiences, and scalable visual systems shaped by{' '}
-                  <span className="font-bold text-white">global perspective, curiosity,</span> and{' '}
-                  <span className="font-bold text-white">bold thinking.</span>
-                </p>
-              </div>
+            <motion.div className="flex max-w-[46ch] flex-col gap-2" style={bodyReveal}>
+              <p className="m-0 font-body text-[clamp(13.5px,1.05vw,15.5px)]/[1.7] font-bold">
+                <span className="text-orange">Designer by profession,</span>{' '}
+                <span className="text-green">traveler by instinct.</span>
+              </p>
+              <p className="m-0 font-body text-[clamp(13.5px,1.05vw,15.5px)]/[1.7] text-grey text-pretty">
+                Over <span className="font-bold text-white">9 years</span> designing SaaS products, UI/UX
+                experiences, and scalable visual systems shaped by{' '}
+                <span className="font-bold text-white">global perspective, curiosity,</span> and{' '}
+                <span className="font-bold text-white">bold thinking.</span>
+              </p>
+            </motion.div>
 
+            <motion.div style={bodyReveal}>
               <motion.a
                 href="#"
                 onClick={(e) => {
@@ -157,22 +180,29 @@ export function Intro() {
                   // click can trigger it again rather than leaving it "used up".
                   window.setTimeout(() => setFlightPath(null), 1000);
                 }}
-                className="inline-flex items-center gap-4 rounded-2xl border border-teal bg-[#005961]/10 py-4 pr-5 pl-6 font-heading text-lg font-bold text-teal"
+                className="inline-flex items-center gap-3.5 rounded-xl border border-teal bg-[#005961]/10 py-3 pr-4 pl-5 font-heading text-[clamp(14px,1.05vw,16px)] font-bold text-teal"
                 whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}
                 transition={{ duration: 0.2 }}
               >
                 Download my Resume
-                <DownloadCircleIcon size={33} className="flex-none text-teal" />
+                <DownloadCircleIcon size={26} className="flex-none text-teal" />
               </motion.a>
             </motion.div>
-          </div>
+          </motion.div>
 
           <motion.div
             data-card-travel-target
-            className="relative overflow-hidden rounded-[18px] border border-white/9 bg-surface"
-            style={panelReveal}
+            // Square, matching the Figma: the panel's overall footprint tracks
+            // the left column rather than the image area dictating a wider,
+            // shorter box. The image region flexes into whatever the chrome
+            // leaves, so the outer box stays 1:1 at any width.
+            className="relative flex aspect-square flex-col overflow-hidden rounded-[18px] border border-white/9 bg-surface"
+            style={{ ...panelReveal, opacity: panelOpacity }}
           >
-            <div className="flex items-center gap-1.75 border-b border-white/7 px-4 py-3.25">
+            <motion.div
+              className="flex flex-none items-center gap-1.75 border-b border-white/7 px-4 py-3.25"
+              style={exit}
+            >
               <span className="size-2.25 rounded-full bg-orange" />
               <span className="size-2.25 rounded-full bg-green" />
               <span className="size-2.25 rounded-full bg-teal" />
@@ -183,8 +213,8 @@ export function Intro() {
               <span className="font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
                 {slideIdx + 1} / {INTRO_SLIDES.length}
               </span>
-            </div>
-            <div className="relative w-full bg-[#0d0f12]" style={{ aspectRatio: '3 / 2' }}>
+            </motion.div>
+            <motion.div className="relative min-h-0 w-full flex-1 bg-[#0d0f12]" style={exit}>
               {INTRO_SLIDES.map((slide, i) => (
                 <motion.div
                   key={slide}
@@ -196,8 +226,11 @@ export function Intro() {
                   <span className="font-body text-[11px] tracking-[0.1em] text-[#5a5a5a]">{slide}</span>
                 </motion.div>
               ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-1.75 border-t border-white/7 px-4 py-3.5">
+            </motion.div>
+            <motion.div
+              className="flex flex-none flex-wrap items-center gap-1.75 border-t border-white/7 px-4 py-3.5"
+              style={exit}
+            >
               {INTRO_SLIDES.map((slide, i) => {
                 const on = i === slideIdx;
                 return (
@@ -237,7 +270,7 @@ export function Intro() {
               >
                 ›
               </button>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
 

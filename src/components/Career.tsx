@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { ROLES } from '../data/content';
+import { useExitStyle } from '../hooks/useExitStyle';
+import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD } from '../styles/card';
 import { CardGlow } from './CardGlow';
 
@@ -10,30 +12,50 @@ export function Career() {
   const [companyIdx, setCompanyIdx] = useState(0);
   const role = ROLES[companyIdx];
 
-  // One viewport tall, with the content centred in it: the section was a fixed
-  // 810px, which left a gap below on a tall screen and overflowed a short one.
-  // `h-screen` plus `justify-center` lets it fill the viewport and stay
-  // balanced instead of relying on fixed top and bottom padding.
-  return (
-    <section
-      id="career"
-      className="flex h-screen min-h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden border-t border-white/6 px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav"
-    >
-      <div className="font-body text-[11px] tracking-[0.18em] text-teal">03 · CAREER JOURNEY</div>
+  // Now that career pins, it has a scroll window of its own — the exit rides
+  // that rather than the runway, so the copy holds while the section is in full
+  // view and only clears as it unpins, matching every other section.
+  const { ref, progress } = useSectionScroll<HTMLElement>();
+  const exit = useExitStyle(progress, { start: 0.72, end: 0.94 });
+  // The academic card is the closing ghost's source, so its box clears a beat
+  // later than its contents — once the outline has lifted off, the card sitting
+  // there reads as a duplicate of what is now growing into the modal. Layout is
+  // untouched, so the ghost can still measure it while invisible.
+  const cardBoxExit = useExitStyle(progress, { start: 0.9, end: 1, shift: 0 });
 
-      <div
+  // Pinned like the other sections: a tall outer section gives the scroll
+  // something to travel through while the inner `sticky top-0` child holds the
+  // content still in full view. The content itself is one viewport tall and
+  // centred in it, so it stays balanced on any screen height.
+  return (
+    <section ref={ref} id="career" className="relative h-[200vh] border-t border-white/6">
+      <div className="sticky top-0 flex h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav">
+      <motion.div className="font-body text-[11px] tracking-[0.18em] text-teal" style={exit}>
+        03 · CAREER JOURNEY
+      </motion.div>
+
+      {/*
+        The academic card is the closing ghost's source, so the box itself holds
+        its position and opacity — only what's inside it clears.
+      */}
+      <motion.div
         data-career-first-card
         className={`group relative flex flex-col gap-1.75 overflow-hidden ${CARD} px-8 py-7`}
+        style={cardBoxExit}
       >
         <CardGlow />
-        <div className="font-body text-[11px] tracking-[0.16em] text-teal">ACADEMIC</div>
-        <div className="font-heading text-[22px] font-semibold tracking-[-0.01em] text-white">
-          B.Sc., Visual Communication
-        </div>
-        <div className="font-body text-[15px] text-grey">SRM Institute of Science and Technology, Chennai</div>
-      </div>
+        <motion.div className="flex flex-col gap-1.75" style={exit}>
+          <div className="font-body text-[11px] tracking-[0.16em] text-teal">ACADEMIC</div>
+          <div className="font-heading text-[22px] font-semibold tracking-[-0.01em] text-white">
+            B.Sc., Visual Communication
+          </div>
+          <div className="font-body text-[15px] text-grey">
+            SRM Institute of Science and Technology, Chennai
+          </div>
+        </motion.div>
+      </motion.div>
 
-      <div className={`group relative flex flex-col overflow-hidden ${CARD}`}>
+      <motion.div className={`group relative flex flex-col overflow-hidden ${CARD}`} style={exit}>
         <CardGlow />
         <div className="flex items-stretch gap-1.5 overflow-x-auto overflow-y-hidden px-1.5 pt-1.5">
           {ROLES.map((r, i) => {
@@ -111,6 +133,7 @@ export function Career() {
             </div>
           </motion.div>
         </AnimatePresence>
+      </motion.div>
       </div>
     </section>
   );

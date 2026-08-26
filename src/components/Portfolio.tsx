@@ -8,7 +8,9 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { CATEGORIES } from '../data/content';
 import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
+import { useStageAspect } from '../hooks/useStageAspect';
 import { CARD } from '../styles/card';
 import { CardGlow } from './CardGlow';
 import { CategoryExpanded } from './CategoryExpanded';
@@ -76,30 +78,31 @@ const RETRACT_DISTANCE_VH = 0.45;
 const RETRACT_EXIT = 1.03;
 
 /**
- * The head panel is a tall, narrow box rather than the full stage: it is inset
- * horizontally so it reads as a vertical panel carrying the headline.
+ * The full-size card's height, as a share of the stage.
+ *
+ * Kept well under 1 so the card reads as a contained panel with its content
+ * filling it, rather than a full-bleed sheet with a large empty middle. Its
+ * width follows from `PANEL_ASPECT`.
  */
-const PANEL_INSET = '11%';
+const PANEL_HEIGHT_OF_STAGE = 0.78;
+/** Width ÷ height of the full-size card — near-square, matching the card design. */
+const PANEL_ASPECT = 1.08;
 
 /**
  * Panel scale at full size and once collapsed.
  *
- * `PANEL_SMALL` is expressed against the *panel's* own width, while the mosaic
- * hole is a share of the stage — so the collapsed mark only lands in that hole
- * if the two are converted through the panel's width. MARK_OF_STAGE is the
- * share of the stage the mark ends up covering, and the mosaic uses it.
+ * The collapse targets are shares of the *stage*, while `scale` is a ratio
+ * against the card's own size — so each is divided by what the card already
+ * occupies on that axis. `MARK_OF_STAGE` is the share the mark ends up
+ * covering, and the mosaic's centre hole uses it too.
  */
 const PANEL_FULL = 1;
-const MARK_OF_STAGE = 0.26;
-const PANEL_WIDTH_OF_STAGE = 1 - 2 * (parseFloat(PANEL_INSET) / 100);
 /**
- * The axes collapse by different amounts: the panel is inset horizontally but
- * full-height, so a uniform scale that lands the mark's width in the mosaic
- * hole would leave it far too tall. `scaleY` is the plain share of the stage,
- * `scaleX` is that share converted through the panel's narrower width.
+ * The mark's height, as a share of the stage. Height is the reference because
+ * the stage is wider than it is tall — sizing from the short axis is what keeps
+ * the mark inside the stage at any viewport.
  */
-const PANEL_SMALL_X = MARK_OF_STAGE / PANEL_WIDTH_OF_STAGE;
-const PANEL_SMALL_Y = MARK_OF_STAGE;
+const MARK_OF_STAGE = 0.16;
 
 /** Fallback used for the first paint, before the spacer can be measured. */
 const ICON_HOME_FALLBACK = { left: 5.7, top: 27.2 };
@@ -256,8 +259,6 @@ function CategoryCard({
         transition={{ duration: 0.25 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}
       >
-      {/* Replaces the old flat border tint — the travelling light is the hover cue. */}
-      {!hidden && <CardGlow color="#FF9A5C" />}
       <div className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#5a5a5a]">
         {String(index + 1).padStart(2, '0')} / {String(CATEGORIES.length).padStart(2, '0')}
       </div>
@@ -296,6 +297,11 @@ function CategoryCard({
 export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   const { ref, progress } = useSectionScroll<HTMLElement>();
 
+  // Clears the mosaic before the ghost leaves the collapsed mark for career at
+  // progress 1.02 (TO_CAREER in PortfolioTravelGhosts). The mark itself is the
+  // ghost's source, so it keeps its own choreography and is exempt.
+  const exit = useExitStyle(progress, { start: 0.9, end: 0.99 });
+
   // Which tile is expanded over the stage, if any. Kept here rather than in App
   // because the expansion lives inside this section rather than over the page.
   const [openIdx, setOpenIdx] = useState<number | null>(null);
@@ -317,6 +323,11 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   // mid-section and would fall out of the observed band, hiding itself and
   // everything on it. The stage holds its size and position for the whole pin.
   const entered = useEnteredView('[data-portfolio-stage]');
+
+  // The stage's width ÷ height, measured live: it drives both the mosaic's
+  // centre hole and the panel's collapsed width, so the two stay agreed on
+  // where the square mark sits at any viewport.
+  const stageAspect = useStageAspect('[data-portfolio-stage]');
 
   // Collapse an expanded category as soon as the reader scrolls away from the
   // section in either direction. Left open, the mosaic behind it keeps scrubbing
@@ -359,14 +370,28 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
   // before its own travel begins — holding both keeps the mark still until the
   // copy is gone.
   const scaleRange: [number, number] = [SHRINK.start + HEAD_FADE, SHRINK.end];
-  const panelScaleX = useTransform(progress, scaleRange, [PANEL_FULL, PANEL_SMALL_X], {
-    clamp: true,
-    ease: EASE,
-  });
-  const panelScaleY = useTransform(progress, scaleRange, [PANEL_FULL, PANEL_SMALL_Y], {
-    clamp: true,
-    ease: EASE,
-  });
+  // A square mark on a stage that is wider than it is tall means the two axes
+  // cannot both be `MARK_OF_STAGE` — that is a share of different lengths on
+  // each axis, which is what left the collapsed card a rectangle. The height
+  // share is authoritative; the width share is whatever makes the same number
+  // of pixels on the wider axis.
+  const markWidthOfStage = MARK_OF_STAGE * (stageAspect === 0 ? 1 : 1 / stageAspect);
+  // The scales are ratios against the card's *own* full size, so both shares
+  // are divided by what the card already occupies on that axis.
+  const panelScaleY = useTransform(
+    progress,
+    scaleRange,
+    [PANEL_FULL, MARK_OF_STAGE / PANEL_HEIGHT_OF_STAGE],
+    { clamp: true, ease: EASE },
+  );
+  const panelWidthOfStage =
+    PANEL_HEIGHT_OF_STAGE * PANEL_ASPECT * (stageAspect === 0 ? 1 : 1 / stageAspect);
+  const panelScaleX = useTransform(
+    progress,
+    scaleRange,
+    [PANEL_FULL, markWidthOfStage / panelWidthOfStage],
+    { clamp: true, ease: EASE },
+  );
   // Counter-scaled per axis so the radius stays visually constant at the card
   // spec's 10px, and the corner stays round rather than stretching into an
   // ellipse once the two scales diverge.
@@ -385,11 +410,20 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
    * shadow spread instead — counter-scaled per axis so all four sides stay a
    * visually constant 1px through the collapse.
    */
+  /** `CARD`'s #15161A/85 fill, faded out with the rest of the collapsed mark. */
+  const panelFill = useTransform(exit.opacity, (a: number) => `rgba(21,22,26,${0.85 * a})`);
+
   const panelEdge = useTransform(
-    [panelScaleX, panelScaleY] as const,
-    ([sx, sy]: number[]) =>
-      `inset 0 ${1 / sy}px 0 0 #89919F, inset 0 -${1 / sy}px 0 0 #89919F,` +
-      ` inset ${1 / sx}px 0 0 0 #89919F, inset -${1 / sx}px 0 0 0 #89919F`,
+    [panelScaleX, panelScaleY, exit.opacity] as const,
+    ([sx, sy, a]: number[]) => {
+      // The edge fades with the mark it outlines, so the collapsed card doesn't
+      // linger next to the ghost that has already left it.
+      const c = `rgba(137,145,159,${a})`;
+      return (
+        `inset 0 ${1 / sy}px 0 0 ${c}, inset 0 -${1 / sy}px 0 0 ${c},` +
+        ` inset ${1 / sx}px 0 0 0 ${c}, inset -${1 / sx}px 0 0 0 ${c}`
+      );
+    },
   );
 
   // Headline lives on the full-size panel and clears out before the collapse.
@@ -460,14 +494,23 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
           */}
           <motion.div
             data-portfolio-panel
-            className={`absolute inset-y-0 z-10 grid place-items-center overflow-hidden ${CARD} border-0`}
+            // Sized from the stage's short axis and centred, rather than
+            // stretched to the full height between horizontal insets: the card
+            // is a contained near-square panel, so its content fills it instead
+            // of floating in a tall empty sheet.
+            className={`absolute top-1/2 left-1/2 z-10 grid -translate-x-1/2 -translate-y-1/2 place-items-center overflow-hidden ${CARD} border-0`}
             style={{
-              left: PANEL_INSET,
-              right: PANEL_INSET,
+              height: `${PANEL_HEIGHT_OF_STAGE * 100}%`,
+              width: `${PANEL_HEIGHT_OF_STAGE * PANEL_ASPECT * 100 * (stageAspect === 0 ? 1 : 1 / stageAspect)}%`,
               scaleX: panelScaleX,
               scaleY: panelScaleY,
               borderRadius: panelRadius,
               boxShadow: panelEdge,
+              // `CARD`'s fill has to go with the edge and the mark, or the
+              // collapsed card stays visible as a filled block beside the ghost
+              // that has already left it. Driven here rather than through
+              // `opacity`, which `animate` owns for the entry reveal.
+              backgroundColor: panelFill,
             }}
             initial={{ opacity: 0, y: 40 }}
             animate={
@@ -481,37 +524,65 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
             transition={{ duration: openIdx === null ? 0.7 : 0.15, ease: EASE }}
           >
             {/*
+              The hover light lives on this card rather than the mosaic tiles:
+              it is the one thing on the stage that is a single object through
+              the whole collapse, so the cue belongs to it.
+            */}
+            <CardGlow radius={10} color="#00B8C9" />
+            {/*
               Counter-scaling shrinks this box along with the panel, so its
               width is pinned to the stage in viewport units rather than `ch` —
               otherwise the measure collapses to one word per line as the panel
               contracts.
             */}
+            {/*
+              Laid out against the reference card (Portfolio_card.svg), measured
+              off its render: the eyebrow sits at 6.6% down, the opening
+              statement at 19.4%, the doodle fills the middle, and the closing
+              statement is right-aligned at the bottom.
+
+              Positions and type size are percentages of the card, not the
+              viewport, so the whole composition holds its proportions as the
+              card scales — `cqw` against the card's own container query.
+            */}
             <motion.div
               data-portfolio-head
-              className="absolute left-[clamp(24px,4vw,64px)] flex flex-col gap-3.5 text-teal"
-              style={{ opacity: headOpacity, y: headY, width: 'min(90ch, 82vw)' }}
+              className="absolute inset-0 [container-type:size]"
+              style={{ opacity: headOpacity, y: headY }}
             >
-              {/*
-                The icon itself is rendered outside this block so it can travel
-                independently — this reserves the space it occupies on the
-                eyebrow line so the label doesn't shift when it leaves.
-              */}
-              <div className="flex items-center gap-2.25 font-heading text-[11px] font-medium tracking-[0.18em]">
-                <span data-icon-home className="inline-block size-3.5 flex-none" />
+              <div className="absolute top-[6.4%] left-[6.6%] flex items-center gap-[1.2cqw] font-heading text-[1.9cqw] font-medium tracking-[0.18em] text-teal">
+                {/*
+                  The icon itself is rendered outside this block so it can
+                  travel independently — this reserves the space it occupies on
+                  the eyebrow line so the label doesn't shift when it leaves.
+                */}
+                <span data-icon-home className="inline-block size-[2.2cqw] flex-none" />
                 02 · PORTFOLIO
               </div>
+
+              <div className="absolute top-[17.5%] left-[6.6%] font-heading text-[6.4cqw]/[1.22] font-bold tracking-[-0.02em] text-white">
+                <span className="text-teal">Every Project</span> started
+                <br />
+                with <span className="text-green">Curiosity.</span>
+              </div>
+
               {/*
-                Two sentences, one line each — they read as a pair, not as
-                prose, so each is held on its own line rather than being left to
-                wrap wherever the box happens to end.
+                The doodle occupies the band between the two statements: the
+                thought leaves the first, travels the dashed path, and arrives
+                as the burst above the second. Decorative, so it is hidden from
+                assistive tech and never intercepts a click meant for the card.
               */}
-              <div className="font-heading text-[clamp(24px,2.9vw,40px)]/[1.3] font-semibold tracking-[-0.015em]">
-                <div className="whitespace-nowrap">
-                  Every project started with <span className="font-bold">curiosity</span>.
-                </div>
-                <div className="whitespace-nowrap">
-                  Every solution was shaped by <span className="font-bold">design</span>.
-                </div>
+              <img
+                src="/images/doodles/portfolio-center-doodle.svg"
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute top-[33%] left-[19%] h-[44%] w-auto select-none"
+              />
+
+              <div className="absolute right-[6.6%] bottom-[6.4%] text-right font-heading text-[6.4cqw]/[1.22] font-bold tracking-[-0.02em] text-white">
+                <span className="text-teal">Every solution</span>
+                <br />
+                was shaped by <span className="text-orange">Design.</span>
               </div>
             </motion.div>
 
@@ -522,7 +593,11 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
             */}
             <motion.div
               className="absolute -translate-x-1/2 -translate-y-1/2 text-teal"
-              style={{ left: iconLeft, top: iconTop }}
+              // Clears alongside the mosaic, just before the outline departs for
+              // career: the mark is the ghost's source, so leaving it lit would
+              // duplicate the shape that is now travelling away. The panel keeps
+              // its layout so the ghost can still measure it.
+              style={{ left: iconLeft, top: iconTop, opacity: exit.opacity }}
             >
               <motion.div style={{ width: iconSize }}>
                 <StylusNoteIcon className="block h-auto w-full" />
@@ -536,11 +611,15 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
             collapsed panel. The middle column and row are sized against
             MARK_OF_STAGE so that hole matches the mark.
           */}
-          <div
+          <motion.div
             className="grid size-full gap-[clamp(14px,1.6vw,24px)]"
             style={{
-              gridTemplateColumns: `1fr ${MARK_OF_STAGE * 100}% 1fr`,
+              // The hole is square: its height is the share of the stage, and
+              // its width is the same pixel count expressed against the wider
+              // axis. Both `26%` would make it as rectangular as the stage.
+              gridTemplateColumns: `1fr ${markWidthOfStage * 100}% 1fr`,
               gridTemplateRows: `1fr ${MARK_OF_STAGE * 100}% 1fr`,
+              ...exit,
             }}
           >
             {CATEGORIES.map((cat, i) => (
@@ -553,7 +632,7 @@ export function Portfolio({ onOpenProject, overlayOpen }: PortfolioProps) {
                 />
               </div>
             ))}
-          </div>
+          </motion.div>
 
           {/*
             The opened category fills the stage in place. It shares a layoutId
