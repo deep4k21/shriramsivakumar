@@ -75,9 +75,13 @@ export function Sidebar({
               // The portfolio item and its category list share one outlined
               // block while the section is active, the way the design groups
               // them — so the ring is drawn here rather than on the link.
+              //
+              // The negative inline margin cancels the box's own border and
+              // padding, which would otherwise inset its rows by 5px and leave
+              // this group's icons off-centre against every other rail item.
               className={
                 isPortfolio && on
-                  ? 'flex flex-col gap-1 rounded-[13px] border border-white/10 p-1'
+                  ? '-mx-[5px] flex flex-col gap-1 rounded-[13px] border border-white/10 p-1'
                   : 'contents'
               }
             >
