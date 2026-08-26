@@ -48,6 +48,10 @@ export function Sidebar({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className="fixed top-1/2 left-[22px] z-30 box-border flex -translate-y-1/2 flex-col gap-1.5 overflow-hidden rounded-2xl border border-white/7 bg-surface/96 p-3 shadow-[0_18px_44px_rgba(0,0,0,.5)]"
+      // Starts hidden. Without this the rail paints at its natural opacity on
+      // the first frame and then animates *down* to 0, so it flashes over the
+      // hero on load before disappearing.
+      initial={{ width: 62, opacity: 0 }}
       animate={{ width: hover ? 212 : 62, opacity: visible ? 1 : 0 }}
       transition={{ duration: 0.3, ease: EASE_OUT }}
       style={{ pointerEvents: visible ? 'auto' : 'none' }}

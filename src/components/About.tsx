@@ -282,7 +282,15 @@ export function About() {
               opacity: toolkitExitOpacity,
             }}
           >
-            <div className={`group relative flex flex-col gap-4 overflow-hidden ${CARD} px-7 py-6.5`}>
+            {/*
+              A min-height rather than a fixed one: the content keeps its own
+              size and sits at the top, with the extra space falling below it —
+              and a card whose icons ever wrap to another row can still grow
+              past it instead of clipping.
+            */}
+            <div
+              className={`group relative flex min-h-[clamp(300px,36vh,420px)] flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 py-6.5`}
+            >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
@@ -299,7 +307,9 @@ export function About() {
                 ))}
               </div>
             </div>
-            <div className={`group relative flex flex-col gap-4 overflow-hidden ${CARD} px-7 py-6.5`}>
+            <div
+              className={`group relative flex min-h-[clamp(300px,36vh,420px)] flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 py-6.5`}
+            >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
