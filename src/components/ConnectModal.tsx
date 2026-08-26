@@ -86,7 +86,8 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
           <div className="flex flex-wrap items-center gap-4">
             <motion.button
               type="submit"
-              className="cursor-pointer rounded-[10px] border-none bg-orange px-6 py-3.5 font-heading text-[14.5px] font-medium text-bg"
+              // Matches the resume button in Intro — see the note in ProjectPage.
+              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-6 py-3.5 font-heading text-[14.5px] font-bold text-teal"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
               transition={{ duration: 0.18 }}

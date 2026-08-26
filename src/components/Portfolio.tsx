@@ -214,6 +214,21 @@ const MOSAIC = [
   { area: '3 / 2 / 4 / 4', origin: { x: 1.15, y: 0.8 }, wide: true },
 ] as const;
 
+/**
+ * One accent per tile: the three brand colours plus a violet so the four read
+ * as a set rather than a repeat.
+ *
+ * `ink` is the text colour used once the fill has landed — chosen against each
+ * accent rather than assumed, since the light fills need dark type to stay
+ * legible and the darker one needs the opposite.
+ */
+export const CARD_ACCENT = [
+  { fill: '#00B8C9', ink: '#08191C' },
+  { fill: '#FF9A5C', ink: '#241004' },
+  { fill: '#47C89A', ink: '#062016' },
+  { fill: '#A374FF', ink: '#150A2B' },
+] as const;
+
 function CategoryCard({
   progress,
   index,
@@ -227,6 +242,19 @@ function CategoryCard({
   hidden: boolean;
 }) {
   const cat = CATEGORIES[index];
+  const accent = CARD_ACCENT[index % CARD_ACCENT.length];
+
+  /*
+   * The fill grows from wherever the pointer entered, so the colour reads as
+   * having been pushed into the card by the cursor rather than cross-fading in.
+   *
+   * The origin is captured on enter and held for the whole transition — letting
+   * it track the pointer would drag the circle's centre around mid-grow, which
+   * looks like the fill sliding rather than expanding. A radius of 150% of the
+   * card's diagonal guarantees the far corner is covered from any origin.
+   */
+  const [fill, setFill] = useState<{ x: number; y: number } | null>(null);
+  const filled = fill !== null;
   // All four converge together over the whole cards phase rather than arriving
   // in sequence — the mosaic reads as one composition assembling around the
   // mark, not as four separate entrances.
@@ -257,17 +285,63 @@ function CategoryCard({
             onOpen();
           }
         }}
+        onPointerEnter={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          setFill({ x: e.clientX - r.left, y: e.clientY - r.top });
+        }}
+        onPointerLeave={() => setFill(null)}
         className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden ${CARD} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
         animate={{ opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.25 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}
       >
-      <div className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#5a5a5a]">
+      {/*
+        The colour itself: a circle centred on the pointer's entry point,
+        scaling up to cover the card. It sits behind the copy (`-z-10` against
+        the content's own stacking) and is `pointer-events-none` so it never
+        interrupts the click that opens the category.
+      */}
+      <motion.span
+        aria-hidden="true"
+        className="pointer-events-none absolute rounded-full"
+        style={{
+          backgroundColor: accent.fill,
+          // Sized to the card's diagonal so the far corner is reached from any
+          // origin; positioned so the circle's own centre sits on the pointer.
+          width: '250%',
+          aspectRatio: '1',
+          left: fill ? fill.x : '50%',
+          top: fill ? fill.y : '50%',
+          x: '-50%',
+          y: '-50%',
+        }}
+        initial={false}
+        animate={{ scale: filled ? 1 : 0, opacity: filled ? 1 : 0 }}
+        transition={{
+          scale: { duration: 0.52, ease: [0.22, 0.61, 0.24, 1] },
+          opacity: { duration: filled ? 0.12 : 0.3 },
+        }}
+      />
+
+      {/*
+        Everything below sits above the fill and recolours to the accent's ink
+        once it has landed, so the card reads as one solid block of colour
+        rather than the old grey type over a new background.
+      */}
+      <motion.div
+        className="relative font-heading text-[10.5px] font-medium tracking-[0.14em]"
+        animate={{ color: filled ? accent.ink : '#5a5a5a' }}
+        transition={{ duration: 0.18 }}
+      >
         {String(index + 1).padStart(2, '0')} / {String(CATEGORIES.length).padStart(2, '0')}
-      </div>
-      <div className="font-heading text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em] text-orange">
+      </motion.div>
+      <motion.div
+        className="relative font-heading text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em]"
+        animate={{ color: filled ? accent.ink : '#FF9A5C' }}
+        transition={{ duration: 0.18 }}
+      >
         {cat.title}
-      </div>
+      </motion.div>
 
       {/*
         On the wide tiles the copy and the link share a row pinned to the bottom
@@ -280,17 +354,32 @@ function CategoryCard({
       <div
         className={
           wide
-            ? 'flex min-h-0 flex-1 items-end justify-between gap-6'
-            : 'flex min-h-0 flex-1 flex-col'
+            ? 'relative flex min-h-0 flex-1 items-end justify-between gap-6'
+            : 'relative flex min-h-0 flex-1 flex-col'
         }
       >
-        <p className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-grey text-pretty">
-          {cat.lead} <span className="font-bold text-white">{cat.leadBold}</span>
-        </p>
+        <motion.p
+          className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
+          animate={{ color: filled ? accent.ink : '#808080' }}
+          transition={{ duration: 0.18 }}
+        >
+          {cat.lead}{' '}
+          <motion.span
+            className="font-bold"
+            animate={{ color: filled ? accent.ink : '#ffffff' }}
+            transition={{ duration: 0.18 }}
+          >
+            {cat.leadBold}
+          </motion.span>
+        </motion.p>
         {!wide && <div className="flex-1" />}
-          <div className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)] text-teal">
+          <motion.div
+            className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)]"
+            animate={{ color: filled ? accent.ink : '#00B8C9' }}
+            transition={{ duration: 0.18 }}
+          >
             Open <span className="font-bold">{cat.short}</span> <span className="text-[15px]">→</span>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </motion.div>
@@ -649,6 +738,7 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
                 categoryIndex={openIdx}
                 onClose={closeCategory}
                 onOpenProject={(projectIdx) => onOpenProject(openIdx, projectIdx)}
+                accent={CARD_ACCENT[openIdx % CARD_ACCENT.length]}
               />
             )}
           </AnimatePresence>

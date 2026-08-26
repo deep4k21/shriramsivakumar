@@ -211,17 +211,22 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <button
+            <motion.button
               type="button"
               onClick={onBackToCategory}
-              className="cursor-pointer rounded-[10px] border border-white/14 bg-transparent px-5 py-3 font-body text-[13.5px] text-grey transition-colors duration-180 hover:text-white"
+              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-5 py-3 font-heading text-[13.5px] font-bold text-teal"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.18 }}
             >
               ← Back to {category.short}
-            </button>
+            </motion.button>
             <motion.button
               type="button"
               onClick={handleNext}
-              className="cursor-pointer rounded-[10px] border-none bg-orange px-5.5 py-3 font-heading text-[13.5px] font-medium text-bg"
+              // Matches the resume button in Intro: a teal outline rather than a
+              // solid orange fill. The old `text-bg` was being overridden to
+              // grey, which on orange left the label almost unreadable.
+              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-5.5 py-3 font-heading text-[13.5px] font-bold text-teal"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.18 }}
             >

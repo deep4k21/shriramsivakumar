@@ -53,16 +53,26 @@ a:hover {
   color: #fff;
 }
 
-input,
-textarea,
-button {
-  font-family: var(--font-body);
-  color: inherit;
+/*
+ * These live in Tailwind's `base` layer so any colour utility on the element
+ * still wins. Left unlayered, the element selector matched Tailwind's own
+ * specificity and beat `text-teal` on source order, leaving those labels grey.
+ */
+@layer base {
+  input,
+  textarea,
+  button {
+    font-family: var(--font-body);
+    color: inherit;
+  }
 }
 
-button {
-  font: inherit;
-}
+/*
+ * No `button { font: inherit }` here. The `font` shorthand resets every font
+ * longhand it doesn't name — weight and size included — so it silently beat any
+ * `font-bold` or `text-[…]` utility on a button, and the family is already set
+ * above. Buttons that need a different colour to their parent set it themselves.
+ */
 
 *:focus-visible {
   outline: 2px solid var(--color-teal);
