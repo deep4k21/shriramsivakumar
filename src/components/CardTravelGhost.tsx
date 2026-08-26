@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useScroll, useTransform, useMotionValueEvent } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { GhostSkin, readSkin, type Skin } from './GhostSkin';
 
 /** Set false to remove the travelling outline entirely. */
 export const CARD_TRAVEL_ENABLED = true;
@@ -12,8 +13,30 @@ interface Rect {
   radius: number;
 }
 
-const HERO_CARD = '#home [aria-label="Flip between design and travel side"]';
+// The card *body*, not the flip wrapper. The wrapper spans the full 768.5×700
+// composition — badges and portrait overhang the panel on both sides — so
+// measuring it made the ghost start out roughly 1.7× the card's own width.
+const HERO_CARD = '#home [data-hero-card-body]';
+/**
+ * The accent glow — orange on the design side, green on travel.
+ *
+ * Both faces are mounted at once, so this cannot simply take the first match:
+ * that is always the design face, whichever side is actually turned toward the
+ * viewer. The visible one is found by its rotation instead.
+ */
+const HERO_CARD_GLOW = '#home [data-hero-card-glow]';
+const HERO_FLIP = '#home [aria-label="Flip between design and travel side"]';
 const INTRO_PANEL = '[data-card-travel-target]';
+
+/** The accent glow on whichever card face is currently turned toward the viewer. */
+function visibleGlow(): Element | null {
+  const glows = [...document.querySelectorAll(HERO_CARD_GLOW)];
+  if (glows.length < 2) return glows[0] ?? null;
+  const rotating = document.querySelector(`${HERO_FLIP} > div > div > div`);
+  if (!rotating) return glows[0];
+  const showingBack = new DOMMatrixReadOnly(getComputedStyle(rotating).transform).m11 < 0;
+  return glows[showingBack ? 1 : 0];
+}
 
 /** How strongly the flight path bends back toward the viewport centre (0–1). */
 const ARC_STRENGTH = 0.85;
@@ -152,13 +175,50 @@ export function CardTravelGhost() {
   // Fade in as it leaves the hero, out as it lands on the panel.
   const opacity = useTransform(progress, [0, 0.12, 0.88, 1], [0, 1, 1, 0]);
 
+  // The ghost wears the hero card's glass on the way out and the intro panel's
+  // surface on the way in, read from the elements themselves so the two stay in
+  // step with whatever those are styled as.
+  const [skins, setSkins] = useState<{ from: Skin | null; to: Skin | null }>({ from: null, to: null });
+  const readSkins = useCallback(() => {
+    setSkins({
+      from: readSkin(document.querySelector(HERO_CARD), visibleGlow()),
+      to: readSkin(document.querySelector(INTRO_PANEL)),
+    });
+  }, []);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(readSkins);
+    const timers = [200, 700].map((ms) => setTimeout(readSkins, ms));
+    return () => {
+      cancelAnimationFrame(raf);
+      timers.forEach(clearTimeout);
+    };
+  }, [readSkins]);
+
+  // Re-read as the flight begins, so the ghost departs in whichever accent is
+  // facing the viewer at that moment. Reading only once at mount would freeze
+  // the colour that happened to be up on load, and the card can be flipped any
+  // number of times before the reader ever scrolls away from the hero.
+  const departed = useRef(false);
+  useMotionValueEvent(scrollY, 'change', () => {
+    const flying = progress.get() > 0 && progress.get() < 0.5;
+    if (flying && !departed.current) {
+      departed.current = true;
+      readSkins();
+    } else if (!flying && progress.get() === 0) {
+      departed.current = false;
+    }
+  });
+
   if (!ends) return null;
 
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed z-20 border border-teal/60 max-[900px]:hidden"
+      className="pointer-events-none fixed z-20 max-[900px]:hidden"
       style={{ top, left, width, height, borderRadius, opacity }}
-    />
+    >
+      <GhostSkin t={progress} from={skins.from} to={skins.to} borderRadius={borderRadius} />
+    </motion.div>
   );
 }

@@ -7,6 +7,7 @@ import {
   type MotionValue,
 } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
+import { GhostSkin, readSkin, type Skin } from './GhostSkin';
 
 interface Rect {
   top: number;
@@ -150,12 +151,39 @@ export function HandoffGhost({
     { clamp: true },
   );
 
+  // The ghost wears its origin's look on the way out and its destination's on
+  // the way in, so it reads as that panel travelling rather than a bare
+  // rectangle. Both are read once, after the endpoints exist and their styles
+  // have settled.
+  const [skins, setSkins] = useState<{ from: Skin | null; to: Skin | null }>({ from: null, to: null });
+  useEffect(() => {
+    const read = () =>
+      setSkins({
+        from: readSkin(document.querySelectorAll(fromSelector)[fromIndex]),
+        to: readSkin(document.querySelectorAll(toSelector)[toIndex]),
+      });
+    const raf = requestAnimationFrame(read);
+    const timers = [200, 700].map((ms) => setTimeout(read, ms));
+    return () => {
+      cancelAnimationFrame(raf);
+      timers.forEach(clearTimeout);
+    };
+  }, [fromSelector, fromIndex, toSelector, toIndex]);
+
+  /** The flight's own 0–1 progress, which is what drives the skin crossfade. */
+  const flight = useTransform(
+    progress,
+    (p) => Math.min(1, Math.max(0, (p - range.start) / (range.end - range.start))),
+  );
+
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed z-20 border border-teal/60 max-[900px]:hidden"
+      className="pointer-events-none fixed z-20 max-[900px]:hidden"
       style={{ top, left, width, height, borderRadius, opacity }}
-    />
+    >
+      <GhostSkin t={flight} from={skins.from} to={skins.to} borderRadius={borderRadius} />
+    </motion.div>
   );
 }
 
@@ -190,12 +218,32 @@ function Ghost({
     return linear + lift;
   });
 
+  // Both ends of a stage-two flight are about tiles, so there is one look to
+  // wear for the whole trip rather than a crossfade between two.
+  const [skin, setSkin] = useState<Skin | null>(null);
+  useEffect(() => {
+    const read = () => setSkin(readSkin(document.querySelector('[data-about-tile]')));
+    const raf = requestAnimationFrame(read);
+    const timers = [200, 700].map((ms) => setTimeout(read, ms));
+    return () => {
+      cancelAnimationFrame(raf);
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+
+  const flight = useTransform(
+    progress,
+    (p) => Math.min(1, Math.max(0, (p - range.start) / (range.end - range.start))),
+  );
+
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed z-20 border border-teal/60 max-[900px]:hidden"
+      className="pointer-events-none fixed z-20 max-[900px]:hidden"
       style={{ top, left, width, height, borderRadius, opacity }}
-    />
+    >
+      <GhostSkin t={flight} from={skin} to={skin} borderRadius={borderRadius} />
+    </motion.div>
   );
 }
 
