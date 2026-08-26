@@ -23,8 +23,22 @@ export interface ColorChip {
  * have every project share the same values, matching how the site looked
  * before this existed.
  */
+export interface ProjectMetric {
+  /** e.g. "47+", "2" — a leading number is counted up on scroll-in; any trailing suffix is preserved. */
+  value: string;
+  label: string;
+}
+
 export interface Project {
+  /** Shown on the category tile and the tab strip — kept short/generic ("A podcast identity"). */
   name: string;
+  /**
+   * The project's actual title, shown in the overlay's sticky header and hero
+   * banner. Falls back to `name` for every project that hasn't been given a
+   * distinct one — only projects with a proper-noun title (like "Orbitshift
+   * Podcast") need to set this.
+   */
+  title?: string;
   software: string[];
   problem: string;
   solution: string;
@@ -32,6 +46,12 @@ export interface Project {
   typeface: string;
   processRows: ProcessRow[];
   endNote: string;
+  /**
+   * The optional outcome-metrics row, sitting between the process rows and the
+   * end note. Omitted entirely for a project without metrics — the section
+   * renders nothing and reserves no space.
+   */
+  metrics?: { label: string; stats: ProjectMetric[] };
 }
 
 export interface Category {
@@ -131,7 +151,7 @@ export const CATEGORIES: Category[] = [
       // 2nd project: previously "Sub-brand architecture" — swapped with it so
       // this sits 2nd and that sits 4th, per instruction.
       {
-        name: 'A sub logo system',
+        name: 'Freshstart',
         software: ['Illustrator', 'Figma'],
         problem:
           'A startup partnership programme lived inside a larger SaaS brand with no mark of its own — nothing signalled that it belonged to the family, or that it stood for something distinct within it.',
@@ -163,39 +183,117 @@ export const CATEGORIES: Category[] = [
         endNote:
           'The rocket wasn’t the plan. It appeared once the colour inverted — and two ideas resolved into one shape.',
       },
+      // 3rd project — previously "Identity guidelines", replaced with the
+      // podcast identity per instruction (2026-08-25).
       {
-        name: 'Identity guidelines',
-        software: ['Illustrator', 'Figma', 'InDesign'],
-        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
-        solution:
-          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
-        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
-        typeface: 'Sora',
-        processRows: DEFAULT_PROCESS_ROWS,
-        endNote: 'Guidelines written for the people applying them, not for the deck.',
+        name: 'A podcast identity',
+        title: 'Orbitshift Podcast',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          'A startup programme wanted to reach founders beyond its own product ecosystem. That meant a podcast that could stand as its own media property while still reading as part of the family.',
+        solution: "A rocket leaving its orbit. The name's meaning, drawn as one line.",
+        chips: [
+          { color: '#00B9FF', border: 'rgba(255,255,255,0.15)' },
+          { color: '#A33CFF', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Rubik',
+        processRows: [
+          {
+            label: 'TRAJECTORY',
+            text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up — and the same thing an hour with someone further along is meant to trigger.",
+            slot: 'CONCEPT',
+          },
+          {
+            label: 'ESCAPE',
+            text: 'The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably; breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.',
+            slot: 'MARK CONSTRUCTION',
+          },
+          {
+            label: 'SURFACE',
+            // A full tall screenshot of the site alongside the social work: the
+            // dark-to-light scroll transition is the point and is lost if only
+            // the hero is shown.
+            text: 'The system extended into a site that opens in deep space and resolves into daylight as you scroll, with guest portraits duotoned into the palette, then out again across episode artwork, launch banners and social posts.',
+            slot: 'WEBSITE + APPLICATION',
+          },
+        ],
+        metrics: {
+          label: 'OUTCOME',
+          stats: [
+            { value: '2', label: 'SEASONS PRODUCED' },
+            { value: '47+', label: 'EPISODES PUBLISHED' },
+            { value: '4', label: 'PLATFORMS DISTRIBUTED' },
+          ],
+        },
+        endNote:
+          'The rocket sits outside the ring, not inside it. That was the whole argument — the point was never to orbit well.',
       },
-      // 4th project — previously 2nd, swapped with "A sub logo system" above.
+      // 4th project — previously "Sub-brand architecture" (itself previously
+      // 2nd, swapped with "A sub logo system" above).
       {
-        name: 'Sub-brand architecture',
-        software: ['Illustrator', 'Figma', 'InDesign'],
-        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        name: 'Uplift',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          "A global marketing technology brand needed an identity for its New York chapter — something with its own energy that still read as family, not a separate company.",
         solution:
-          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
-        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
-        typeface: 'Sora',
-        processRows: DEFAULT_PROCESS_ROWS,
-        endNote: 'Guidelines written for the people applying them, not for the deck.',
+          "A wordmark engineered from the parent brand's own arrow, so the event, the city and the company all live inside the same letterforms.",
+        chips: [
+          { color: '#2146EC', border: 'rgba(255,255,255,0.15)' },
+          { color: '#0A1533', border: 'rgba(255,255,255,0.15)' },
+          { color: '#4FDCCE', border: 'rgba(255,255,255,0.15)' },
+          { color: '#FFFAEF', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Roboto',
+        processRows: [
+          {
+            label: 'REFERENCES',
+            text: "Four starting points, all pointing the same way: the parent brand's arrow, the physical act of being lifted, a torch held above a city, and the rising axis of a growth chart.",
+            slot: 'MOODBOARD',
+          },
+          {
+            label: 'CONSTRUCTION',
+            text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
+            slot: 'LETTERFORM STUDIES',
+          },
+          {
+            label: 'EXTENSION',
+            text: "The arrow scales out of the logo and into the environment — repeated as a backdrop pattern over a mapped world, so the mark's single gesture becomes the brand's ambient texture.",
+            slot: 'BACKDROP + APPLICATION',
+          },
+        ],
+        endNote:
+          'Four ideas share one wordmark — an arrow, a lift, a torch, an axis. None of them announce themselves. You find them one at a time.',
       },
       {
-        name: 'Event identity',
-        software: ['Illustrator', 'Figma', 'InDesign'],
-        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
-        solution:
-          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
-        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
-        typeface: 'Sora',
-        processRows: DEFAULT_PROCESS_ROWS,
-        endNote: 'Guidelines written for the people applying them, not for the deck.',
+        name: 'Forge',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          'An accelerator programme for early-stage founders needed a mark of its own — one that described what the programme does to a company, not just who runs it.',
+        solution: 'An anvil and the letter F share a silhouette. Overlaid, they make one mark: the surface things get made on.',
+        chips: [
+          { color: '#FF9900', border: 'rgba(255,255,255,0.15)' },
+          { color: '#434343', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Roboto',
+        processRows: [
+          {
+            label: 'PREMISE',
+            text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge — a fair description of what an accelerator does to an early company.",
+            slot: 'NAME + CONCEPT',
+          },
+          {
+            label: 'FUSION',
+            text: 'An anvil profile and a capital F share the same structure: flat top, stepped shoulder, vertical base. Overlaying them produced a single mark that holds both readings.',
+            slot: 'ANVIL / F STUDIES',
+          },
+          {
+            label: 'HEAT',
+            text: 'The wordmark stays graphite; only the leading edge of the F ignites. Orange reads as the moment of striking rather than as decoration.',
+            slot: 'FINAL MARK + APPLICATION',
+          },
+        ],
+        endNote:
+          "An anvil doesn't make anything by itself. It's the surface something else gets made on — which is the more honest description of what a programme like this actually does.",
       },
     ],
   },

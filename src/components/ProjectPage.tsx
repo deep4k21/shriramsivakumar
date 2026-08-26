@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { Category } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
+import { ProjectMetricsRow } from './ProjectMetricsRow';
 
 interface ProjectPageProps {
   category: Category;
@@ -16,6 +17,9 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   const [projectIdx, setProjectIdx] = useState(initialProjectIdx);
   const pIdx = projectIdx % category.projects.length;
   const project = category.projects[pIdx];
+  // The header and hero banner show the project's actual title where it
+  // differs from its (shorter, tab-strip) name; otherwise the name doubles as both.
+  const displayTitle = project.title ?? project.name;
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
 
@@ -35,13 +39,13 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
               <motion.div
-                key={project.name}
+                key={displayTitle}
                 className="font-heading text-[26px] font-semibold tracking-[-0.02em] text-white"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, ease: [0.2, 0.7, 0.2, 1] }}
               >
-                {project.name}
+                {displayTitle}
               </motion.div>
             </div>
             <div className="flex items-center gap-3.5">
@@ -90,7 +94,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
 
         <div className="flex flex-col gap-6.5 p-8">
           <div className="grid h-[340px] w-full place-items-center rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
-            <span className="font-body text-[11px] tracking-[0.14em] text-grey">HERO BANNER — {project.name}</span>
+            <span className="font-body text-[11px] tracking-[0.14em] text-grey">HERO BANNER — {displayTitle}</span>
           </div>
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
@@ -142,6 +146,9 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               </div>
             </div>
           ))}
+
+          {/* Optional — omitted entirely (no row, no reserved spacing) for projects without metrics. */}
+          {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}
 
           <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">
             <div className="mb-2 font-body text-[11px] tracking-[0.16em] text-teal">END NOTE</div>
