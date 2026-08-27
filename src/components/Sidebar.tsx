@@ -146,15 +146,47 @@ export function Sidebar({
                             backgroundColor: open ? 'rgba(255,154,92,.1)' : 'rgba(255,255,255,0)',
                             color: open ? '#FF9A5C' : '#808080',
                           }}
-                          whileHover={{ backgroundColor: 'rgba(255,255,255,.06)', color: '#ffffff' }}
+                          // Orange on hover as well as when open, so the whole
+                          // category list stays in the accent rather than
+                          // flicking to white under the pointer.
+                          whileHover={{ backgroundColor: 'rgba(255,154,92,.08)', color: '#FF9A5C' }}
                           transition={{ duration: 0.18 }}
                         >
                           <span className="grid w-7 flex-none place-items-center">
-                            <motion.span
-                              className="size-1.75 rounded-full"
-                              animate={{ backgroundColor: open ? '#FF9A5C' : '#4a4a4a' }}
-                              transition={{ duration: 0.18 }}
-                            />
+                            {cat.icon ? (
+                              /*
+                                Drawn as a mask rather than an `<img>`, so the
+                                icon takes the button's own colour — orange when
+                                the category is open, grey otherwise. The SVGs
+                                have white baked in, which an `<img>` cannot be
+                                recoloured out of.
+
+                                Slightly smaller than the nav items' 4.5, so the
+                                nested list still reads as subordinate to them.
+                              */
+                              <motion.span
+                                aria-hidden="true"
+                                className="size-4 bg-current"
+                                style={{
+                                  maskImage: `url(${cat.icon})`,
+                                  WebkitMaskImage: `url(${cat.icon})`,
+                                  maskRepeat: 'no-repeat',
+                                  WebkitMaskRepeat: 'no-repeat',
+                                  maskPosition: 'center',
+                                  WebkitMaskPosition: 'center',
+                                  maskSize: 'contain',
+                                  WebkitMaskSize: 'contain',
+                                }}
+                                animate={{ opacity: open ? 1 : 0.55 }}
+                                transition={{ duration: 0.18 }}
+                              />
+                            ) : (
+                              <motion.span
+                                className="size-1.75 rounded-full"
+                                animate={{ backgroundColor: open ? '#FF9A5C' : '#4a4a4a' }}
+                                transition={{ duration: 0.18 }}
+                              />
+                            )}
                           </span>
                           <RailLabel show={hover} className="font-body text-[11.5px]">
                             {cat.short}

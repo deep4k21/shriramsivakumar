@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'motion/react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackgroundGrid } from './components/BackgroundGrid';
 import { AboutTravelGhosts } from './components/AboutTravelGhosts';
 import { PortfolioTravelGhosts } from './components/PortfolioTravelGhosts';
@@ -18,6 +18,7 @@ import { usePointerGlow } from './hooks/usePointerGlow';
 import { releaseBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useEscapeKey } from './hooks/useEscapeKey';
 import { useSmoothScrollTo } from './hooks/useSmoothScrollTo';
+import { useScrollSnap, type SnapPoint } from './hooks/useScrollSnap';
 import { CATEGORIES } from './data/content';
 import './styles/global.css';
 
@@ -26,11 +27,21 @@ interface View {
   projectIdx: number;
 }
 
+/** The static backdrop behind the whole site. */
+export const BACKDROPS = {
+  one: '/images/Bg 1.svg',
+  two: '/images/bg 2.svg',
+} as const;
+
+export type BackdropName = keyof typeof BACKDROPS;
+
 export interface SiteConfig {
   showGrid: boolean;
   gridRadius: number;
   flipOnHover: boolean;
   availableForWork: boolean;
+  /** Which backdrop image to use — see `BACKDROPS`. */
+  backdrop: BackdropName;
 }
 
 const DEFAULT_CONFIG: SiteConfig = {
@@ -38,6 +49,7 @@ const DEFAULT_CONFIG: SiteConfig = {
   gridRadius: 210,
   flipOnHover: false,
   availableForWork: true,
+  backdrop: 'one',
 };
 
 /**
@@ -81,6 +93,15 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const navOn = useNavVisible();
   usePointerGlow(config.gridRadius);
 
+  // The backdrop is painted by a fixed `body::before` in global.css, which
+  // reads this property — set here so the choice lives with the other options.
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--site-backdrop',
+      `url('${BACKDROPS[config.backdrop]}')`,
+    );
+  }, [config.backdrop]);
+
   const [view, setView] = useState<View | null>(null);
   const [connectOpen, setConnectOpen] = useState(false);
   // The expanded portfolio category. Owned here rather than inside Portfolio so
@@ -113,6 +134,28 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
     },
     [smoothScrollTo],
   );
+
+  /**
+   * The settled position of every section, in document coordinates.
+   *
+   * Measured on demand rather than cached: the pinned sections are sized in
+   * viewport units, so every one of these moves when the window is resized.
+   */
+  const snapPoints = useCallback(
+    (): SnapPoint[] =>
+      Object.entries(SECTION_SETTLED).flatMap(([id, fraction]) => {
+        const el = document.getElementById(id);
+        if (!el) return [];
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        const span = Math.max(0, el.offsetHeight - window.innerHeight);
+        return [{ id, y: top + span * fraction }];
+      }),
+    [],
+  );
+
+  // Suspended while an overlay owns the screen: the body is scroll-locked then,
+  // and a snap firing behind a modal would move the page out from under it.
+  useScrollSnap(snapPoints, smoothScrollTo, view === null && !connectOpen && portfolioCategory === null);
 
   /**
    * Opens a category from the sidebar.

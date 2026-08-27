@@ -81,6 +81,8 @@ export interface Category {
   body: string;
   lead: string;
   leadBold: string;
+  /** The category's icon in the sidebar's nested list. */
+  icon?: string;
   /** Artwork shown inside the portfolio tile, between the copy and the link. */
   art?: string;
   /** The same artwork with its accent darkened, shown on the tile's filled side. */
@@ -116,6 +118,7 @@ function chipsFrom(colors: string[]): ColorChip[] {
 export const CATEGORIES: Category[] = [
   {
     id: 'ui-ux',
+    icon: '/images/menuicons/uiux.svg',
     title: 'UI/UX Design',
     short: 'UI/UX',
     tags: 'Enterprise · SaaS · Product',
@@ -185,6 +188,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'brand-identity',
+    icon: '/images/menuicons/brandidentity.svg',
     title: 'Brand Identity',
     short: 'Brand Identity',
     tags: 'Identity · Strategy · Guidelines',
@@ -359,6 +363,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'marketing-campaigns',
+    icon: '/images/menuicons/campaigns.svg',
     title: 'Marketing Campaigns',
     short: 'Campaigns',
     tags: 'Creative · Growth · Performance',
@@ -389,6 +394,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'what-if',
+    icon: '/images/menuicons/whatif.svg',
     title: 'What If — Brand Reimagined',
     short: 'What If',
     tags: 'Conceptual · Explorations',

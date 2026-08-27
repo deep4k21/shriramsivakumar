@@ -30,6 +30,30 @@ html {
   background: var(--color-bg);
 }
 
+/*
+ * The static backdrop.
+ *
+ * A fixed pseudo-element rather than `background-attachment: fixed` on the
+ * body: that is a known jank source on long pages, since the browser
+ * re-composites the whole background on every scroll frame. A fixed layer is
+ * painted once and simply stays put.
+ *
+ * `-z-10` puts it behind everything including `BackgroundGrid`, which sits at
+ * `z-0` so the glass panels' `backdrop-filter` can sample it.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  /* Set from `SiteConfig.backdrop`; the fallback keeps a backdrop if unset. */
+  background-image: var(--site-backdrop, url('/images/Bg 1.svg'));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   background: transparent;
