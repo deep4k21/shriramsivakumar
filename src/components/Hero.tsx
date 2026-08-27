@@ -312,7 +312,19 @@ function HeroStatCycle({ stats, accent }: { stats: HeroStat[]; accent: string })
  * Both sides of the flip render this, so the two faces cannot drift out of
  * sync as the layout changes — only `content` differs.
  */
-function HeroCardFace({ content, back = false }: { content: HeroCardContent; back?: boolean }) {
+/** How much the four badges grow on hover. */
+const BADGE_HOVER_SCALE = 1.12;
+
+function HeroCardFace({
+  content,
+  back = false,
+  hovered = false,
+}: {
+  content: HeroCardContent;
+  back?: boolean;
+  /** Only the four badges respond to hover; the card itself stays put. */
+  hovered?: boolean;
+}) {
   const { accent } = content;
   return (
     <div
@@ -376,7 +388,14 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
         Placed absolutely they were a third of a percent high, which read as a
         slight lift off the centreline.
       */}
-      <div className="absolute top-[11.52%] left-0 flex h-[14.80%] w-[50.45%] items-center gap-[1.32cqw] rounded-[2.60cqw] bg-[#15161A] pl-[3.10cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]">
+      <motion.div
+        className="absolute top-[11.52%] left-0 flex h-[14.80%] w-[50.45%] items-center gap-[1.32cqw] rounded-[2.60cqw] bg-[#15161A] pl-[3.10cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        // Above the portrait's `z-10` while hovered, so a growing badge lifts
+        // over its neighbours rather than sliding under them.
+        style={{ zIndex: hovered ? 20 : undefined }}
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
+      >
         {/*
           Inlined rather than loaded as an `<img>`, for the same reason as the
           status tick: the ring is the accent colour, and an external SVG cannot
@@ -410,7 +429,7 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
           <span style={{ color: accent }}>{content.quote[0]}</span>
           {content.quote[1]}
         </span>
-      </div>
+      </motion.div>
 
       {/*
         The status pill — 307.9 × 60.1.
@@ -422,7 +441,12 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
         ("Available for work" against "Currently abroad") the text and tick
         drifted independently of the pill and of each other.
       */}
-      <div className="absolute top-[23.35%] left-[59.93%] flex h-[8.58%] w-[40.07%] items-center justify-center gap-[1.6cqw] rounded-full bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]">
+      <motion.div
+        className="absolute top-[23.35%] left-[59.93%] flex h-[8.58%] w-[40.07%] items-center justify-center gap-[1.6cqw] rounded-full bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        style={{ zIndex: hovered ? 20 : undefined }}
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
+      >
         <span className="font-body text-[2.86cqw]/[1] font-semibold whitespace-nowrap text-[#d9effc]">
           <span style={{ color: accent }}>{content.status[0]}</span>
           {content.status[1]}
@@ -445,11 +469,26 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
             strokeLinejoin="round"
           />
         </svg>
-      </div>
+      </motion.div>
 
-      {/* The stat block — 185.7 × 217.4 */}
-      <div className="absolute top-[36.78%] left-[15.43%] h-[31.05%] w-[24.16%] rounded-[2.60cqw] bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]" />
-      <HeroStatCycle stats={content.stats} accent={accent} />
+      {/*
+        The stat block — 185.7 × 217.4.
+
+        Panel and text scale together: the figure and label are positioned
+        against the face rather than inside the panel, so scaling the panel
+        alone would leave its text behind at the original size. The origin is
+        the block's own centre within the face — 15.43% + 24.16%/2 across,
+        36.78% + 31.05%/2 down — since this wrapper spans the whole face.
+      */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ transformOrigin: '27.51% 52.31%', zIndex: hovered ? 20 : undefined }}
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
+      >
+        <div className="absolute top-[36.78%] left-[15.43%] h-[31.05%] w-[24.16%] rounded-[2.60cqw] bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]" />
+        <HeroStatCycle stats={content.stats} accent={accent} />
+      </motion.div>
 
       {/*
         The trait pill — 218.6 × 104.3.
@@ -463,9 +502,14 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
         the badges and its shoulder reached 72.12%, covering the first 27px of
         this pill's text. This clears it while still ending inside the face.
       */}
-      <div className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[28.45%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]">
+      <motion.div
+        className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[28.45%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        style={{ zIndex: hovered ? 20 : undefined }}
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
+      >
         <HeroTraitCycle traits={content.traits} accent={accent} />
-      </div>
+      </motion.div>
 
       {/*
         Name — 345.7 wide, and the role pill — 282.2 × 53.4.
@@ -620,11 +664,11 @@ export function Hero({ flipOnHover }: HeroProps) {
           page. The translate re-centres on the card instead.
         */}
         <div
-          className="relative box-content w-[clamp(288px,41.6vw,608px)] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
+          className="relative box-content w-[clamp(232.9px,33.65vw,491.9px)] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
           // Expressed against the face's own width rather than as a percentage
           // of this wrapper, which also carries horizontal padding and would
           // shift by the wrong amount.
-          style={{ transform: 'translateX(calc(clamp(288px, 41.6vw, 608px) * -0.0398))' }}
+          style={{ transform: 'translateX(calc(clamp(232.9px, 33.65vw, 491.9px) * -0.0398))' }}
         >
           <div
             // No `perspective` here: it would only reach direct 3D children,
@@ -657,22 +701,6 @@ export function Hero({ flipOnHover }: HeroProps) {
               Keeping the two on separate elements leaves the 3D context intact.
             */}
             <motion.div className="relative size-full" style={{ opacity: exit.opacity }}>
-            {/*
-              The hover lift. It gets its own layer between the exit fade and
-              the rotating face: putting the lift on the rotating element would
-              compose with its `rotateY` and fight the flip, and a transform
-              here is safe where `opacity` and `backdrop-filter` were not — it
-              does not create a stacking context, so the 3D context survives.
-            */}
-            <motion.div
-              className="relative size-full"
-              // Scale alone, with no `y` shift: a vertical translate reads as
-              // the card sliding up rather than growing, and at this size it
-              // swamped the scale entirely. Growing from the centre pushes every
-              // edge out evenly instead.
-              animate={{ scale: hovered ? 1.045 : 1 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
-            >
             <motion.div
               className="relative size-full"
               style={{ transformStyle: 'preserve-3d' }}
@@ -693,14 +721,13 @@ export function Hero({ flipOnHover }: HeroProps) {
               transition={{ duration: FLIP_MS / 1000, ease: FLIP_EASE }}
             >
               {/* Front — design side. */}
-              <HeroCardFace content={HERO_DESIGN} />
+              <HeroCardFace content={HERO_DESIGN} hovered={hovered} />
 
               {/*
                 Back — travel side. The same card, so the two faces cannot
                 drift apart as the layout changes; only the copy and accent do.
               */}
-              <HeroCardFace content={HERO_TRAVEL} back />
-            </motion.div>
+              <HeroCardFace content={HERO_TRAVEL} back hovered={hovered} />
             </motion.div>
             </motion.div>
           </div>
