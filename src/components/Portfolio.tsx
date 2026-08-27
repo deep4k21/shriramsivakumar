@@ -203,9 +203,8 @@ function useIconHome() {
  * `origin` is where each tile flies in from, as a multiple of the stage, chosen
  * to match the edge it sits against so the movement converges inward.
  *
- * `wide` marks the short, wide tiles. Their copy leaves a lot of empty space to
- * the right, so the "Open" link moves to the bottom-right corner to sit in it
- * rather than leaving the tile visually lopsided.
+ * `wide` marks the short, wide tiles. It no longer changes their layout — all
+ * four stack the same way — but it still records which blocks are which.
  */
 const MOSAIC = [
   { area: '1 / 1 / 2 / 3', origin: { x: -1.15, y: -0.7 }, wide: true },
@@ -262,7 +261,7 @@ function CategoryCard({
   const span = CARDS.end - CARDS.start;
   const range: [number, number] = [start, start + span];
 
-  const { origin, wide } = MOSAIC[index];
+  const { origin } = MOSAIC[index];
   const opacity = useTransform(progress, [start, start + span * 0.3], [0, 1], { clamp: true });
   const x = useTransform(progress, range, [`${origin.x * 100}%`, '0%'], { clamp: true, ease: EASE });
   const y = useTransform(progress, range, [`${origin.y * 100}%`, '0%'], { clamp: true, ease: EASE });
@@ -344,20 +343,12 @@ function CategoryCard({
       </motion.div>
 
       {/*
-        On the wide tiles the copy and the link share a row pinned to the bottom
-        of the card, so the link sits on the same baseline as the tall tiles'
-        rather than floating mid-card above a band of empty space.
-
-        The tall tiles keep the stacked layout, where a spacer pins the link to
-        the bottom of the column.
+        Every tile stacks the same way: copy directly under the title, a spacer
+        taking up the slack, and the link pinned to the bottom of the column.
+        The wide tiles used to lay copy and link out in a row along the bottom
+        instead, which read as a different card from the tall ones beside them.
       */}
-      <div
-        className={
-          wide
-            ? 'relative flex min-h-0 flex-1 items-end justify-between gap-6'
-            : 'relative flex min-h-0 flex-1 flex-col'
-        }
-      >
+      <div className="relative flex min-h-0 flex-1 flex-col">
         <motion.p
           className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
           animate={{ color: filled ? accent.ink : '#808080' }}
@@ -372,7 +363,64 @@ function CategoryCard({
             {cat.leadBold}
           </motion.span>
         </motion.p>
-        {!wide && <div className="flex-1" />}
+        <div className="flex-1" />
+
+        {/*
+          The category's artwork, pinned to the tile's right edge as a square.
+
+          Absolute rather than in the column, so it does not push the copy or
+          the link around: the text keeps its own width on the left and the art
+          occupies the empty band beside it. `aspect-square` with the height
+          driving keeps it square at any tile size.
+        */}
+        {cat.art && (
+          /*
+            Turns over as the card fills, the way the hero card flips.
+
+            The perspective rides in the transform itself rather than on an
+            ancestor, which would only reach its direct 3D children — without it
+            the turn is orthographic and reads as the art squashing flat rather
+            than rotating.
+
+            The image is mirrored back with `scaleX` at the halfway point, where
+            the wrapper is edge-on and the swap cannot be seen. A 180° turn
+            leaves whatever is on the face reversed, so the artwork would
+            otherwise settle with its phone and tablet on the wrong sides — and
+            counter-rotating the image would cancel the visible turn along with
+            the mirroring.
+          */
+          <motion.div
+            className="pointer-events-none absolute top-0 bottom-0 right-0 my-auto aspect-square h-full select-none"
+            animate={{ rotateY: filled ? 180 : 0, transformPerspective: 900 }}
+            transition={{ duration: 0.85, ease: [0.7, 0, 0.2, 1] }}
+          >
+            <motion.div
+              className="relative size-full"
+              animate={{ scaleX: filled ? -1 : 1 }}
+              transition={{ duration: 0, delay: 0.425 }}
+            >
+              <img src={cat.art} alt="" aria-hidden="true" className="size-full object-contain" />
+              {/*
+                The same artwork with its orange swapped for the card's own
+                dark ink, swapped in at the halfway point while the wrapper is
+                edge-on. A CSS filter cannot do this: every candidate that
+                darkened the orange darkened the white linework with it, since
+                the two differ in hue rather than in a channel a filter can
+                isolate.
+              */}
+              {cat.artDark && (
+                <motion.img
+                  src={cat.artDark}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 size-full object-contain"
+                  animate={{ opacity: filled ? 1 : 0 }}
+                  transition={{ duration: 0, delay: 0.425 }}
+                />
+              )}
+            </motion.div>
+          </motion.div>
+        )}
           <motion.div
             className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)]"
             animate={{ color: filled ? accent.ink : '#00B8C9' }}

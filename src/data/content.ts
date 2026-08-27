@@ -81,6 +81,10 @@ export interface Category {
   body: string;
   lead: string;
   leadBold: string;
+  /** Artwork shown inside the portfolio tile, between the copy and the link. */
+  art?: string;
+  /** The same artwork with its accent darkened, shown on the tile's filled side. */
+  artDark?: string;
   stats: CategoryStat[];
   projects: Project[];
 }
@@ -118,6 +122,8 @@ export const CATEGORIES: Category[] = [
     body: 'Designing intuitive digital experiences that transform complex workflows into scalable products and seamless user journeys.',
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
+    art: '/images/portfolio/UIUX.svg',
+    artDark: '/images/portfolio/UIUX-dark.svg',
     stats: [
       { value: '20+', label: 'PRODUCTS' },
       { value: '6', label: 'YEARS' },
