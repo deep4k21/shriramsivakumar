@@ -27,12 +27,21 @@ export function CategoryExpanded({
   onOpenProject,
   accent,
 }: CategoryExpandedProps) {
-  // The panel inherits the tile's hover colour, so opening one reads as that
-  // card blowing up to fill the stage rather than turning into a dark sheet.
-  // Inner boxes sit on a translucent wash of the accent's own ink instead of a
-  // fixed dark fill, which would read as holes punched in the colour.
-  const inset = `${accent.ink}26`;
-  const insetBorder = `${accent.ink}1f`;
+  /*
+    The accent is the *transition*, not the destination.
+
+    The panel starts in the tile's hover colour so opening one reads as that
+    card blowing up — then settles onto the site's own dark surface, with the
+    section's usual palette. Staying orange turned the whole page into a single
+    flat block and forced every piece of text to dark ink to stay legible.
+  */
+  const inset = 'rgba(255,255,255,.04)';
+  const insetBorder = 'rgba(255,255,255,.08)';
+  /** The tile's resting colours, which the panel returns to once it has grown. */
+  const TITLE = '#FF9A5C';
+  const BODY = '#808080';
+  const MUTED = '#5a5a5a';
+  const LINK = '#00B8C9';
 
   return (
     <motion.div
@@ -41,13 +50,12 @@ export function CategoryExpanded({
       // right and bottom edges of the viewport. The left inset is kept — that
       // is the sidebar's clearance — and the corners on that side stay rounded
       // while the three that now meet an edge are squared off.
-      className="absolute inset-y-[calc(var(--stage-inset-y)*-1)] right-[calc(var(--spacing-gutter)*-1)] left-0 z-30 flex flex-col overflow-hidden rounded-l-[10px]"
-      style={
-        {
-          backgroundColor: accent.fill,
-          '--stage-inset-y': 'clamp(16px, 2.2vh, 32px)',
-        } as React.CSSProperties
-      }
+      className="absolute inset-y-[calc(var(--stage-inset-y)*-1)] right-[calc(var(--spacing-gutter)*-1)] left-0 z-30 flex flex-col overflow-hidden rounded-l-[10px] border border-white/8"
+      style={{ '--stage-inset-y': 'clamp(16px, 2.2vh, 32px)' } as React.CSSProperties}
+      // Blows out in the tile's colour, then settles to the page's own surface.
+      initial={{ backgroundColor: accent.fill }}
+      animate={{ backgroundColor: '#0a0a0a' }}
+      transition={{ backgroundColor: { duration: 0.42, ease: 'easeOut', delay: 0.1 } }}
     >
       {/*
         A fully opaque backing layer. This panel shares a `layoutId` with the
@@ -57,7 +65,12 @@ export function CategoryExpanded({
         visible again underneath. An opaque layer means that can never bleed
         through, regardless of what the tile underneath is doing.
       */}
-      <div className="absolute inset-0 -z-10" style={{ backgroundColor: accent.fill }} />
+      <motion.div
+        className="absolute inset-0 -z-10"
+        initial={{ backgroundColor: accent.fill }}
+        animate={{ backgroundColor: '#0a0a0a' }}
+        transition={{ duration: 0.42, ease: 'easeOut', delay: 0.1 }}
+      />
 
       {/*
         The stage is a fixed height, so the content is sized to fit inside the
@@ -83,19 +96,19 @@ export function CategoryExpanded({
           >
             <div
               className="font-body text-[11px] tracking-[0.16em] opacity-70"
-              style={{ color: accent.ink }}
+              style={{ color: MUTED }}
             >
               {String(categoryIndex + 1).padStart(2, '0')} / 04 · CATEGORY
             </div>
             <div
               className="font-heading text-[clamp(22px,2.2vw,32px)] font-semibold tracking-[-0.02em]"
-              style={{ color: accent.ink }}
+              style={{ color: TITLE }}
             >
               {category.title}
             </div>
             <p
               className="m-0 max-w-[62ch] font-body text-[clamp(13px,0.95vw,15px)]/[1.65] opacity-80"
-              style={{ color: accent.ink }}
+              style={{ color: BODY }}
             >
               {category.body}
             </p>
@@ -111,11 +124,11 @@ export function CategoryExpanded({
             onClick={onClose}
             aria-label="Close category"
             className="absolute top-[clamp(20px,3vh,36px)] right-[clamp(24px,2.6vw,40px)] z-10 size-9 flex-none cursor-pointer rounded-[9px] border-0 font-body text-base"
-            style={{ backgroundColor: inset, color: accent.ink }}
+            style={{ backgroundColor: inset, color: '#ffffff' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: CONTENT_DELAY, duration: 0.28 }}
-            whileHover={{ backgroundColor: `${accent.ink}3d` }}
+            whileHover={{ backgroundColor: 'rgba(255,255,255,.1)' }}
           >
             ✕
           </motion.button>
@@ -139,13 +152,13 @@ export function CategoryExpanded({
               >
                 <div
                   className="font-heading text-[clamp(26px,2.6vw,40px)] leading-none font-bold tracking-[-0.03em]"
-                  style={{ color: accent.ink }}
+                  style={{ color: TITLE }}
                 >
                   {s.value}
                 </div>
                 <div
                   className="font-body text-[10.5px] tracking-[0.14em] opacity-70"
-                  style={{ color: accent.ink }}
+                  style={{ color: MUTED }}
                 >
                   {s.label}
                 </div>
@@ -156,7 +169,7 @@ export function CategoryExpanded({
           <div className="flex flex-col gap-[clamp(10px,1.4vh,18px)]">
             <div
               className="font-body text-[11px] tracking-[0.16em] opacity-70"
-              style={{ color: accent.ink }}
+              style={{ color: MUTED }}
             >
               {category.projects.length} PROJECTS
             </div>
@@ -177,16 +190,16 @@ export function CategoryExpanded({
                   onClick={() => onOpenProject(pi)}
                   className="flex cursor-pointer flex-col overflow-hidden rounded-[10px] border p-0 text-left"
                   style={{ backgroundColor: inset, borderColor: insetBorder }}
-                  whileHover={{ y: -4, borderColor: `${accent.ink}66` }}
+                  whileHover={{ y: -4, borderColor: 'rgba(255,154,92,.45)' }}
                   transition={{ duration: 0.2 }}
                 >
                   <div
                     className="grid h-[clamp(80px,10vh,120px)] place-items-center"
-                    style={{ backgroundColor: `${accent.ink}1a` }}
+                    style={{ backgroundColor: 'rgba(255,255,255,.03)' }}
                   >
                     <span
                       className="font-body text-[10px] tracking-[0.14em] opacity-55"
-                      style={{ color: accent.ink }}
+                      style={{ color: MUTED }}
                     >
                       PROJECT SHOT
                     </span>
@@ -194,11 +207,11 @@ export function CategoryExpanded({
                   <div className="flex flex-col gap-1.5 px-[clamp(12px,1.1vw,18px)] py-[clamp(12px,1.6vh,20px)]">
                     <div
                       className="font-heading text-[clamp(13px,1vw,15.5px)]/[1.35] font-semibold tracking-[-0.01em] text-balance"
-                      style={{ color: accent.ink }}
+                      style={{ color: '#ffffff' }}
                     >
                       {p.name}
                     </div>
-                    <div className="font-body text-[12px] opacity-75" style={{ color: accent.ink }}>
+                    <div className="font-body text-[12px] opacity-75" style={{ color: LINK }}>
                       Open case study →
                     </div>
                   </div>
