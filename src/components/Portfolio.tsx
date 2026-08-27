@@ -221,11 +221,17 @@ const MOSAIC = [
  * accent rather than assumed, since the light fills need dark type to stay
  * legible and the darker one needs the opposite.
  */
+/**
+ * One accent for every card, rather than a colour per section.
+ *
+ * Kept as a four-entry list so the per-index lookup elsewhere still works and
+ * a distinct colour can be given back to any card by editing its row.
+ */
 export const CARD_ACCENT = [
-  { fill: '#00B8C9', ink: '#08191C' },
   { fill: '#FF9A5C', ink: '#241004' },
-  { fill: '#47C89A', ink: '#062016' },
-  { fill: '#A374FF', ink: '#150A2B' },
+  { fill: '#FF9A5C', ink: '#241004' },
+  { fill: '#FF9A5C', ink: '#241004' },
+  { fill: '#FF9A5C', ink: '#241004' },
 ] as const;
 
 function CategoryCard({
