@@ -314,6 +314,18 @@ function HeroStatCycle({ stats, accent }: { stats: HeroStat[]; accent: string })
  */
 /** How much the four badges grow on hover. */
 const BADGE_HOVER_SCALE = 1.12;
+/**
+ * How much the card panel itself grows on hover — a gentler lift than the
+ * badges', so it rises with them without swamping them.
+ *
+ * The panel's parts (body, disc, portrait, name, role pill) are separate
+ * absolutely-positioned siblings interleaved with the badges, so each scales
+ * about the card's own centre rather than being wrapped in one layer. The card
+ * body spans 24.70%–83.26% of the face, putting that centre at 53.98%.
+ */
+const CARD_HOVER_SCALE = 1.05;
+const CARD_ORIGIN = '53.98% 50%';
+const HOVER_SPRING = { type: 'spring', stiffness: 320, damping: 26, mass: 0.7 } as const;
 
 function HeroCardFace({
   content,
@@ -346,14 +358,28 @@ function HeroCardFace({
         3D context — so it lives here on the body rather than on the rotating
         face, whose `preserve-3d` keeps the flip's backface culling working.
       */}
-      <div
+      <motion.div
         // The travelling ghost measures this, not the face — the face spans the
         // whole composition including the badges and portrait that overhang the
         // card, so an outline drawn around it enclosed far more than the panel.
         // Only the front face is tagged: the back is rotated 180°, so its rect
         // would hand the ghost a mirrored start.
         data-hero-card-body={back ? undefined : ''}
-        className="absolute top-0 left-[24.70%] h-full w-[58.56%] overflow-hidden rounded-[3.90cqw] bg-[linear-gradient(160deg,rgba(38,40,46,.62),rgba(19,19,21,.55)_45%,rgba(28,30,35,.60))] shadow-[0_28px_64px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.12),inset_0_0_0_1px_rgba(255,255,255,.055)] backdrop-blur-2xl backdrop-saturate-150"
+        className="absolute top-0 left-[24.70%] h-full w-[58.56%] overflow-hidden rounded-[3.90cqw] bg-[linear-gradient(160deg,rgba(38,40,46,.62),rgba(19,19,21,.55)_45%,rgba(28,30,35,.60))] backdrop-blur-2xl backdrop-saturate-150"
+        style={{
+          transformOrigin: CARD_ORIGIN,
+          // The drop shadow is tinted with the side's own accent — orange on
+          // the design face, green on travel — over the neutral black one that
+          // does the actual lifting. The inset highlights stay as they were.
+          boxShadow: [
+            '0 28px 64px rgba(0,0,0,.55)',
+            `0 24px 88px 8px ${accent}59`,
+            'inset 0 1px 0 rgba(255,255,255,.12)',
+            'inset 0 0 0 1px rgba(255,255,255,.055)',
+          ].join(', '),
+        }}
+        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
+        transition={HOVER_SPRING}
       >
         <div
           // Tagged so the travelling ghost can pick the accent glow up and
@@ -365,19 +391,27 @@ function HeroCardFace({
             background: `radial-gradient(120% 80% at 50% 100%, ${accent}30, ${accent}00 70%)`,
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Disc — 275 × 275. The portrait overlaps it top and bottom. */}
-      <div className="absolute top-[27.79%] left-[36.03%] h-[39.28%] w-[35.78%] rounded-full bg-[#171616]" />
+      <motion.div
+        className="absolute top-[27.79%] left-[36.03%] h-[39.28%] w-[35.78%] rounded-full bg-[#171616]"
+        style={{ transformOrigin: CARD_ORIGIN }}
+        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
+        transition={HOVER_SPRING}
+      />
       {/*
         Above the badges, so the shoulders overlap them rather than being cut
         off where a badge crosses the portrait.
       */}
-      <img
+      <motion.img
         src="/images/hero/hero-background.svg"
         alt=""
         aria-hidden="true"
         className="pointer-events-none absolute top-[14.86%] left-[35.84%] z-10 h-[52.14%] w-[36.28%] object-contain select-none"
+        style={{ transformOrigin: CARD_ORIGIN }}
+        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
+        transition={HOVER_SPRING}
       />
 
       {/*
@@ -503,7 +537,10 @@ function HeroCardFace({
         this pill's text. This clears it while still ending inside the face.
       */}
       <motion.div
-        className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[28.45%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        // Narrowed from 28.45% to sit closer to the copy. Kept fixed rather than
+        // sized to content: the text types in a character at a time, so a
+        // content-width pill grew and shrank on every keystroke.
+        className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[24%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         style={{ zIndex: hovered ? 20 : undefined }}
         animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
         transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
@@ -519,17 +556,27 @@ function HeroCardFace({
         than the Figma face did, so a fixed box wrapped it onto the pill.
         Centring keeps the intended position while letting the line stay whole.
       */}
-      <span className="absolute top-[75.35%] left-[24.70%] w-[58.56%] text-center font-heading text-[4.6cqw]/[1] font-bold whitespace-nowrap tracking-[-0.02em] text-[#d9effc]">
+      <motion.span
+        className="absolute top-[75.35%] left-[24.70%] w-[58.56%] text-center font-heading text-[4.6cqw]/[1] font-bold whitespace-nowrap tracking-[-0.02em] text-[#d9effc]"
+        style={{ transformOrigin: CARD_ORIGIN }}
+        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
+        transition={HOVER_SPRING}
+      >
         Shriram Sivakumar
-      </span>
+      </motion.span>
       {/*
         The role text sits inside the pill rather than in its own positioned
         span, so it centres for any string — "Avid Traveller" is much shorter
         than the design's role and sat off to one side otherwise.
       */}
-      <div className="absolute top-[83.74%] left-[35.62%] flex h-[7.63%] w-[36.72%] items-center justify-center rounded-[1.30cqw] bg-[#131218]">
+      <motion.div
+        className="absolute top-[83.74%] left-[35.62%] flex h-[7.63%] w-[36.72%] items-center justify-center rounded-[1.30cqw] bg-[#131218]"
+        style={{ transformOrigin: CARD_ORIGIN }}
+        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
+        transition={HOVER_SPRING}
+      >
         <span className="font-body text-[2.86cqw]/[1] font-semibold text-teal">{content.role}</span>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -664,11 +711,11 @@ export function Hero({ flipOnHover }: HeroProps) {
           page. The translate re-centres on the card instead.
         */}
         <div
-          className="relative box-content w-[clamp(232.9px,33.65vw,491.9px)] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
+          className="relative box-content w-[clamp(249.2px,36.01vw,526.3px)] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
           // Expressed against the face's own width rather than as a percentage
           // of this wrapper, which also carries horizontal padding and would
           // shift by the wrong amount.
-          style={{ transform: 'translateX(calc(clamp(232.9px, 33.65vw, 491.9px) * -0.0398))' }}
+          style={{ transform: 'translateX(calc(clamp(249.2px, 36.01vw, 526.3px) * -0.0398))' }}
         >
           <div
             // No `perspective` here: it would only reach direct 3D children,
