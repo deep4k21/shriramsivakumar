@@ -13,15 +13,44 @@ interface HeroProps {
  * the accent lands on the opening phrase and the remainder stays light, the
  * way the design has it.
  */
+/**
+ * One phrase in the trait pill, pre-split into the lines it occupies — for the
+ * same reason as the stat labels, see `HeroStat.label`.
+ *
+ * `accentChars` counts how many characters from the start take the card's
+ * accent colour; the remainder is the light ink. Counting rather than storing
+ * the two fragments separately keeps the colour split and the line breaks from
+ * drifting out of sync.
+ */
+interface HeroTrait {
+  lines: string[];
+  accentChars: number;
+}
+
+/** One figure in the stat block, with the icon that sits above it. */
+interface HeroStat {
+  icon: string;
+  value: string;
+  /**
+   * The label, pre-split into the lines it should occupy.
+   *
+   * Broken here rather than left to wrap: typing into a box that wraps on its
+   * own content reflows as it fills, so a word that fits on line one gets
+   * pushed down by the next character and the text visibly jumps. With the
+   * lines fixed, each one types within a box whose position never changes.
+   */
+  label: string[];
+}
+
 interface HeroCardContent {
   accent: string;
   /** Opening phrase (accented) and remainder, for each of the three quotes. */
   quote: [string, string];
   status: [string, string];
-  trait: [string, string];
-  /** The stat block: a figure and its label. */
-  statValue: string;
-  statLabel: string;
+  /** The trait pill cycles through these, one at a time. */
+  traits: HeroTrait[];
+  /** The stat block cycles through these, one at a time. */
+  stats: HeroStat[];
   /** The pill under the name. */
   role: string;
 }
@@ -34,9 +63,17 @@ const HERO_DESIGN: HeroCardContent = {
   accent: '#FF9A5C',
   quote: ['“Mid-iteration', ' on a new layout”'],
   status: ['"Available', ' for work"'],
-  trait: ['"Curious"', ' by default'],
-  statValue: '500+',
-  statLabel: 'Projects delivered',
+  traits: [
+    { lines: ['"Curious"', 'by default'], accentChars: 9 },
+    { lines: ['"Wireframe"', 'to workflow'], accentChars: 11 },
+    { lines: ['"figma-native"', 'obviously'], accentChars: 14 },
+  ],
+  stats: [
+    { icon: '/images/hero/projects-delivered.svg', value: '500+', label: ['Projects', 'delivered'] },
+    { icon: '/images/hero/globe.svg', value: '9', label: ['Years', 'experience'] },
+    // Placeholder figure — no count was given for this one.
+    { icon: '/images/hero/briefcase.svg', value: '20+', label: ['Global client', 'base'] },
+  ],
   role: 'Visual & UI/UX Designer',
 };
 
@@ -44,11 +81,223 @@ const HERO_TRAVEL: HeroCardContent = {
   accent: '#47C89A',
   quote: ['“Mid-flight,', ' mid-thought”'],
   status: ['"Currently', ' abroad"'],
-  trait: ['"Window seat', ' to worldview"'],
-  statValue: '14',
-  statLabel: 'Countries visited',
+  // Companions to the given "Window seat" line are placeholders.
+  traits: [
+    { lines: ['"Window seat"', 'to worldview'], accentChars: 13 },
+    { lines: ['"Passport"', 'always packed'], accentChars: 10 },
+    { lines: ['"One-way"', 'by instinct'], accentChars: 9 },
+  ],
+  // The travel side cycles too, so the block behaves the same on both faces.
+  // These two companions are placeholders — only the countries figure was given.
+  stats: [
+    { icon: '/images/hero/projects-delivered.svg', value: '14', label: ['Countries', 'visited'] },
+    { icon: '/images/hero/globe.svg', value: '30+', label: ['Cities', 'explored'] },
+    { icon: '/images/hero/briefcase.svg', value: '6', label: ['Continents', 'covered'] },
+  ],
   role: 'Avid Traveller',
 };
+
+/**
+ * Typewriter pacing for the stat block, in milliseconds per character.
+ *
+ * The figure gets a slower beat than its label. It is only two to four
+ * characters long, so at the label's rate the whole number appeared in about a
+ * tenth of a second — it read as popping in rather than being typed, while the
+ * label that followed took the best part of a second.
+ */
+const STAT_VALUE_TYPE_MS = 130;
+const STAT_VALUE_DELETE_MS = 80;
+const STAT_TYPE_MS = 45;
+const STAT_DELETE_MS = 22;
+/** How long a fully typed stat holds before it starts deleting. */
+const STAT_HOLD_MS = 2600;
+
+/**
+ * Types a string out, holds it, deletes it, then moves to the next entry.
+ *
+ * Returns the index of the current entry and how many characters of it are
+ * showing (`null` under reduced motion, meaning show everything).
+ *
+ * `slowUntil` marks a leading stretch that types at the slower beat — the stat
+ * block's figure uses it, since a two-character number at the label's rate
+ * reads as popping in rather than being typed.
+ */
+function useTypewriterCycle(lengths: number[], slowUntil = 0) {
+  const [i, setI] = useState(0);
+  const [typed, setTyped] = useState<number | null>(null);
+
+  const count = lengths.length;
+  const length = lengths[i] ?? 0;
+
+  useEffect(() => {
+    if (length <= 0) return;
+    // Reduced motion gets the finished text, with no typing and no cycling.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTyped(null);
+      return;
+    }
+
+    let n = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    setTyped(0);
+
+    const slow = (at: number) => at <= slowUntil;
+    const next = () => setI((v) => (v + 1) % count);
+    const erase = () => {
+      n -= 1;
+      setTyped(n);
+      timer = setTimeout(n <= 0 ? next : erase, slow(n) ? STAT_VALUE_DELETE_MS : STAT_DELETE_MS);
+    };
+    const hold = () => {
+      timer = setTimeout(erase, STAT_HOLD_MS);
+    };
+    const type = () => {
+      n += 1;
+      setTyped(n);
+      timer = setTimeout(n >= length ? hold : type, slow(n) ? STAT_VALUE_TYPE_MS : STAT_TYPE_MS);
+    };
+
+    timer = setTimeout(type, slowUntil > 0 ? STAT_VALUE_TYPE_MS : STAT_TYPE_MS);
+    return () => clearTimeout(timer);
+  }, [i, length, slowUntil, count]);
+
+  return { i, typed };
+}
+
+/**
+ * Deals a character budget out across pre-split lines, so each line fills in
+ * turn. The join between lines costs a character, matching the single string
+ * the timer counts against.
+ */
+function fillLines(lines: string[], budget: number): string[] {
+  let remaining = budget;
+  return lines.map((line, idx) => {
+    if (idx > 0 && remaining > 0) remaining -= 1;
+    const take = Math.min(remaining, line.length);
+    remaining -= take;
+    return line.slice(0, take);
+  });
+}
+
+/**
+ * The trait pill, typing each phrase out and deleting it again.
+ *
+ * Its lines are fixed rows for the same reason as the stat labels: a wrapping
+ * box reflows as it fills, so the second line would type on line one until a
+ * character pushed it down.
+ *
+ * The accent covers a leading run of characters that can span a line break, so
+ * each line is split at whatever part of that run falls inside it rather than
+ * colouring whole lines.
+ */
+function HeroTraitCycle({ traits, accent }: { traits: HeroTrait[]; accent: string }) {
+  const lengths = traits.map((t) => t.lines.join(' ').length);
+  const { i, typed } = useTypewriterCycle(lengths);
+
+  const trait = traits[i] ?? traits[0];
+  if (!trait) return null;
+
+  const lines = fillLines(trait.lines, typed ?? lengths[i] ?? 0);
+
+  // Where each line starts within the whole phrase, so the accent run can be
+  // located inside it. The +1 accounts for the space the join adds.
+  let cursor = 0;
+  const offsets = trait.lines.map((line) => {
+    const at = cursor;
+    cursor += line.length + 1;
+    return at;
+  });
+
+  return (
+    <span className="flex flex-col font-body text-[2.86cqw]/[1.3] font-semibold text-[#d9effc]">
+      {lines.map((line, idx) => {
+        const start = offsets[idx];
+        // How much of this line falls inside the accented run.
+        const accentLen = Math.max(0, Math.min(line.length, trait.accentChars - start));
+        return (
+          <span key={trait.lines[idx]} className="block h-[3.72cqw] whitespace-nowrap">
+            <span style={{ color: accent }}>{line.slice(0, accentLen)}</span>
+            {line.slice(accentLen)}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+/**
+ * The figure inside the stat block, typing each stat out and deleting it again.
+ *
+ * The value and label are paced as one string, so they type in sequence — the
+ * figure first, then its label — and delete in reverse, the way a single line
+ * of text would.
+ *
+ * Both card faces render this, so each runs its own timer. The hidden face
+ * types too, which costs nothing and means a flip never lands on a half-typed
+ * stat that then jumps.
+ */
+function HeroStatCycle({ stats, accent }: { stats: HeroStat[]; accent: string }) {
+  const lengths = stats.map((s) => s.value.length + s.label.join(' ').length);
+  // The figure types at the slower beat; its length sets where that ends.
+  const { i, typed } = useTypewriterCycle(lengths, stats[0]?.value.length ?? 0);
+
+  const stat = stats[i] ?? stats[0];
+  const full = lengths[i] ?? 0;
+
+  if (!stat) return null;
+
+  // The value fills up first; the label takes whatever characters are left.
+  const shown = typed ?? full;
+  const value = stat.value.slice(0, Math.min(shown, stat.value.length));
+  const lines = fillLines(stat.label, Math.max(0, shown - stat.value.length));
+
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      {/*
+        The icon fades rather than types — there is no character-by-character
+        equivalent for an image, and snapping it in on the first keystroke read
+        as a glitch beside the steady typing.
+      */}
+      <motion.img
+        key={stat.icon}
+        src={stat.icon}
+        alt=""
+        aria-hidden="true"
+        className="absolute top-[40.72%] left-[18.95%] h-[5.02%] w-[4.06%] object-contain"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: shown > 0 ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
+      />
+      <span
+        className="absolute top-[48.58%] left-[18.95%] font-body text-[4.16cqw]/[1] font-semibold whitespace-nowrap"
+        style={{ color: accent }}
+      >
+        {value}
+      </span>
+      {/*
+        Widened from Figma's 13% to 17.5%. The block is 24.16% wide starting at
+        15.43%, so its inner edge is at 39.59% — a 13% label left 45px of the
+        panel unused on the right and forced "Global client base" onto a third
+        line, which ran past the block's bottom edge. At 17.5% every label fits
+        in two lines with the panel's right padding intact.
+
+        Each line is its own row rather than one wrapping paragraph: a wrapping
+        box reflows as it fills, so "Projects delive" sat on line one until the
+        next character bumped "delivered" down — the text jumped as it typed.
+        Fixed rows put every line at a position that does not depend on how much
+        of it has been typed yet. Each row keeps its height while empty, so the
+        block does not grow line by line either.
+      */}
+      <span className="absolute top-[56.83%] left-[19.05%] flex w-[17.5%] flex-col font-body text-[2.86cqw]/[1.3] font-semibold text-[#d9effc]">
+        {lines.map((line, idx) => (
+          <span key={stat.label[idx]} className="block h-[3.72cqw] whitespace-nowrap">
+            {line}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
 
 /**
  * The hero card, laid out to Figma node 2372:985.
@@ -200,21 +449,7 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
 
       {/* The stat block — 185.7 × 217.4 */}
       <div className="absolute top-[36.78%] left-[15.43%] h-[31.05%] w-[24.16%] rounded-[2.60cqw] bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]" />
-      <img
-        src="/images/hero/projects-delivered.svg"
-        alt=""
-        aria-hidden="true"
-        className="absolute top-[40.72%] left-[18.95%] h-[5.02%] w-[4.06%]"
-      />
-      <span
-        className="absolute top-[48.58%] left-[18.95%] font-body text-[4.16cqw]/[1] font-semibold whitespace-nowrap"
-        style={{ color: accent }}
-      >
-        {content.statValue}
-      </span>
-      <span className="absolute top-[56.83%] left-[19.05%] w-[13%] font-body text-[2.86cqw]/[1.3] font-semibold text-[#d9effc]">
-        {content.statLabel}
-      </span>
+      <HeroStatCycle stats={content.stats} accent={accent} />
 
       {/*
         The trait pill — 218.6 × 104.3.
@@ -229,10 +464,7 @@ function HeroCardFace({ content, back = false }: { content: HeroCardContent; bac
         this pill's text. This clears it while still ending inside the face.
       */}
       <div className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[28.45%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]">
-        <span className="font-body text-[2.86cqw]/[1.3] font-semibold text-[#d9effc]">
-          <span style={{ color: accent }}>{content.trait[0]}</span>
-          {content.trait[1]}
-        </span>
+        <HeroTraitCycle traits={content.traits} accent={accent} />
       </div>
 
       {/*
