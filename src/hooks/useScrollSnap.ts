@@ -10,8 +10,13 @@ const IDLE_MS = 140;
  * Wide enough to catch someone who has stopped just short of a section's
  * settled state, narrow enough that deliberately parking mid-window — to watch
  * a reveal partway through, say — is left alone.
+ *
+ * 0.52 rather than 0.45 because the portfolio now rests twice, about a viewport
+ * apart: at 0.45 a band midway between the two settled points fell outside both
+ * and snapped to neither, which is the one place a reader is most likely to
+ * stop. Half the gap is what it takes for the two to meet.
  */
-const REACH = 0.45;
+const REACH = 0.52;
 
 /** Below this the reader is treated as still scrolling, not stopped. */
 const SETTLED_VELOCITY = 0.08;

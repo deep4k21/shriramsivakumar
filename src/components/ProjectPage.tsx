@@ -5,6 +5,9 @@ import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 import { ProjectMetricsRow } from './ProjectMetricsRow';
 import { PrototypePiP } from './PrototypePiP';
+import { AssetSet } from './AssetSet';
+import { DocumentViewer } from './DocumentViewer';
+import { MotionClip } from './MotionClip';
 
 interface ProjectPageProps {
   category: Category;
@@ -108,15 +111,17 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
             <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
-              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">PROBLEM</div>
+              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{project.problemLabel ?? 'PROBLEM'}</div>
               <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.problem}</p>
             </div>
             <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
-              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">SOLUTION</div>
+              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">{project.solutionLabel ?? 'SOLUTION'}</div>
               <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.solution}</p>
             </div>
           </div>
 
+          {/* Omitted entirely for a project with no single palette — see Project.chips. */}
+          {project.chips && project.typeface && (
           <div className="flex flex-wrap items-center gap-6">
             <span className="font-heading text-[15.5px] font-semibold tracking-[-0.01em] text-teal">Brand system</span>
             <div
@@ -139,6 +144,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               </div>
             </div>
           </div>
+          )}
 
           {/*
             Both columns top-align and the row's height follows its own
@@ -150,7 +156,33 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             to match the image's height.
           */}
           {project.processRows.map((row) => {
-            const slot = row.prototype ? (
+            /*
+              A text-only row has no slot at all — not an empty one. It keeps
+              the two-column shape so the labels stay aligned with every other
+              row, and the text simply takes the width the image would have had.
+            */
+            if (row.textOnly) {
+              return (
+                <div
+                  key={row.label}
+                  className="grid items-start gap-6 border-t border-white/7 py-5"
+                  style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
+                >
+                  <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">
+                    {row.label}
+                  </div>
+                  <p className="m-0 font-body text-[15px]/[1.7] text-grey">{row.text}</p>
+                </div>
+              );
+            }
+
+            const slot = row.document ? (
+              <DocumentViewer doc={row.document} height={row.slotHeight} />
+            ) : row.motion ? (
+              <MotionClip clip={row.motion} height={row.slotHeight} />
+            ) : row.assetSet ? (
+              <AssetSet assets={row.assetSet} height={row.slotHeight} />
+            ) : row.prototype ? (
               <div
                 className="w-full"
                 style={
@@ -169,7 +201,15 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             ) : (
               <div
                 className="grid min-h-[160px] place-items-center rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
-                style={row.slotAspectVideo ? { aspectRatio: '16 / 9', minHeight: 0 } : row.slotMaxHeight ? { maxHeight: row.slotMaxHeight } : undefined}
+                style={
+                  row.slotAspectVideo
+                    ? { aspectRatio: '16 / 9', minHeight: 0 }
+                    : row.slotHeight
+                      ? { height: row.slotHeight, minHeight: row.slotHeight }
+                      : row.slotMaxHeight
+                        ? { maxHeight: row.slotMaxHeight }
+                        : undefined
+                }
               >
                 <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
               </div>
@@ -202,13 +242,34 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             );
           })}
 
+          {/*
+            The whole deck as one viewer, below the rows that argue for it.
+            Locked to 16:9 because that is the shape the slides were made in —
+            a taller frame would letterbox every page.
+          */}
+          {project.deck && (
+            /*
+              `min-h-0` is what actually holds the ratio. As a flex item this
+              box defaults to `min-height: auto`, which floors it at its
+              content's height — the viewer's own controls and padding come to
+              more than 16:9 allows, so without this the frame sits taller than
+              the ratio it declares.
+            */
+            <div className="w-full min-h-0 flex-none" style={{ aspectRatio: '16 / 9' }}>
+              <DocumentViewer doc={project.deck} height="100%" />
+            </div>
+          )}
+
           {/* Optional — omitted entirely (no row, no reserved spacing) for projects without metrics. */}
           {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}
 
-          <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">
-            <div className="mb-2 font-body text-[11px] tracking-[0.16em] text-teal">END NOTE</div>
-            <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{project.endNote}</p>
-          </div>
+          {/* Optional on the same terms as the metrics row above. */}
+          {project.endNote && (
+            <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">
+              <div className="mb-2 font-body text-[11px] tracking-[0.16em] text-teal">END NOTE</div>
+              <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{project.endNote}</p>
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <motion.button

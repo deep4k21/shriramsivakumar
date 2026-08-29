@@ -88,6 +88,28 @@ const SECTION_SETTLED: Record<string, number> = {
   career: 0.35,
 };
 
+/**
+ * The intro card's settled position inside the portfolio's window.
+ *
+ * Portfolio reveals two things in sequence — the "Every Project" card, then the
+ * category mosaic — and each has its own resting point. Measured: the card
+ * finishes moving at 0.54 and holds, while the mosaic is still arriving. A
+ * single snap at the mosaic meant the card had no stopping point of its own, so
+ * the reader scrolled straight past the state it settles into.
+ */
+const PORTFOLIO_CARD_SETTLED = 0.54;
+
+/**
+ * Extra settled points beyond each section's primary one, for sections that
+ * reveal more than one thing.
+ *
+ * These are snap targets only — sidebar navigation still goes to the section's
+ * main position in `SECTION_SETTLED`.
+ */
+const EXTRA_SETTLED: Record<string, number[]> = {
+  portfolio: [PORTFOLIO_CARD_SETTLED],
+};
+
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const { active } = useActiveSection();
   const navOn = useNavVisible();
@@ -148,7 +170,9 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         if (!el) return [];
         const top = el.getBoundingClientRect().top + window.scrollY;
         const span = Math.max(0, el.offsetHeight - window.innerHeight);
-        return [{ id, y: top + span * fraction }];
+        // A section can rest at more than one place on the way through.
+        const fractions = [fraction, ...(EXTRA_SETTLED[id] ?? [])];
+        return fractions.map((f) => ({ id, y: top + span * f }));
       }),
     [],
   );
