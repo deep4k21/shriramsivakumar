@@ -240,15 +240,15 @@ const COLLECTION_LABEL = '#47C89A';
  * pool in the corner instead of banding down the whole right edge.
  */
 const CARD_GRADIENT =
-  'radial-gradient(120% 145% at 100% 100%, #C46A26 0%, #7A431A 22%, #33210F 44%, #191512 64%, #131417 82%)';
+  'radial-gradient(95% 115% at 100% 100%, #6E3D18 0%, #3D2712 20%, #22190F 40%, #171514 62%, #131417 80%)';
 
 /** The same gradient at full strength, faded over the resting one on hover. */
 const CARD_GRADIENT_LIT =
-  'radial-gradient(120% 145% at 100% 100%, #FF9A5C 0%, #C4661F 24%, #6B3B14 46%, #241A11 66%, #16171B 84%)';
+  'radial-gradient(95% 115% at 100% 100%, #B85F22 0%, #6B3B14 22%, #33210F 44%, #1D1813 66%, #16171B 84%)';
 
 /** The bloom around a hovered card, in the gradient's own warm light. */
 const CARD_BLOOM =
-  '0 0 0 1px rgba(255,154,92,.22), 0 10px 40px -6px rgba(255,154,92,.38), 0 0 70px -10px rgba(255,154,92,.30)';
+  '0 0 0 1px rgba(255,154,92,.16), 0 8px 30px -8px rgba(255,154,92,.26), 0 0 52px -14px rgba(255,154,92,.20)';
 
 export const CARD_ACCENT = [
   { fill: '#FF9A5C', ink: '#241004' },
