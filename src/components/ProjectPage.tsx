@@ -39,14 +39,37 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
     <Overlay
       z="z-60"
       onClose={onClose}
+      /*
+        A lighter scrim than the shared default, so the page actually shows
+        through the glass rather than the panel floating on a near-black field.
+        Passed here rather than changed in `Overlay`, which every other modal
+        and lightbox on the site also uses.
+      */
+      scrimClassName="bg-black/10 p-[clamp(24px,5vh,64px)]"
       // Capped to well inside the viewport, so the dimmed page frames it the way a
       // dialog should. Content scrolls within the panel rather than growing it
       // past the screen and scrolling the scrim instead.
-      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/9 bg-black shadow-[0_40px_120px_rgba(0,0,0,.7)]"
+      /*
+        The body is glass: barely any fill of its own, so whatever the modal
+        happens to be sitting over reads through it. The header opts out below
+        and paints an opaque surface, because type that scrolls underneath it
+        has to be hidden rather than merely dimmed.
+
+        A trace of gradient remains rather than nothing at all — it is what
+        gives the sheet an edge and a direction, where pure transparency would
+        read as a missing background.
+      */
+      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.07),rgba(16,17,21,.04)_42%,rgba(28,30,36,.06))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
     >
       {/* The scroll container, so the sticky header stays put while the body moves. */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-20 flex flex-col gap-4.5 border-b border-white/8 bg-black/92 px-8 py-5.5 backdrop-blur-xl">
+        {/*
+          Solid, not glass: the body scrolls underneath this, and anything less
+          than opaque leaves the copy ghosting through the title and tab strip
+          as it passes. The glass belongs to the body, where there is something
+          behind the modal worth seeing.
+        */}
+        <div className="sticky top-0 z-20 flex flex-col gap-4.5 border-b border-white/10 bg-[#111216] px-8 py-5.5">
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
@@ -110,11 +133,16 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           </div>
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
-            <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
+            {/*
+              Lifted off the panel with a translucent wash rather than
+              `bg-surface`, which is pure black — a solid block would sit on the
+              glass as a hole rather than as a panel resting on it.
+            */}
+            <div className="flex flex-col gap-2.5 rounded-[14px] border border-white/10 bg-white/7 px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{project.problemLabel ?? 'PROBLEM'}</div>
               <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.problem}</p>
             </div>
-            <div className="flex flex-col gap-2.5 rounded-[14px] bg-surface px-7 py-6.5">
+            <div className="flex flex-col gap-2.5 rounded-[14px] border border-white/10 bg-white/7 px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">{project.solutionLabel ?? 'SOLUTION'}</div>
               <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.solution}</p>
             </div>

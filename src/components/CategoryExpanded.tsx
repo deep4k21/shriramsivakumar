@@ -6,8 +6,6 @@ interface CategoryExpandedProps {
   categoryIndex: number;
   onClose: () => void;
   onOpenProject: (projectIndex: number) => void;
-  /** The tile's hover colour, carried through so the panel it grew from keeps it. */
-  accent: { fill: string; ink: string };
 }
 
 /** Content fades in slightly after the box has started growing. */
@@ -25,19 +23,10 @@ export function CategoryExpanded({
   categoryIndex,
   onClose,
   onOpenProject,
-  accent,
 }: CategoryExpandedProps) {
-  /*
-    The accent is the *transition*, not the destination.
-
-    The panel starts in the tile's hover colour so opening one reads as that
-    card blowing up — then settles onto the site's own dark surface, with the
-    section's usual palette. Staying orange turned the whole page into a single
-    flat block and forced every piece of text to dark ink to stay legible.
-  */
   const inset = 'rgba(255,255,255,.04)';
   const insetBorder = 'rgba(255,255,255,.08)';
-  /** The tile's resting colours, which the panel returns to once it has grown. */
+  /** The section's own palette, which the panel uses throughout. */
   const TITLE = '#FF9A5C';
   const BODY = '#808080';
   const MUTED = '#5a5a5a';
@@ -52,10 +41,10 @@ export function CategoryExpanded({
       // while the three that now meet an edge are squared off.
       className="absolute inset-y-[calc(var(--stage-inset-y)*-1)] right-[calc(var(--spacing-gutter)*-1)] left-0 z-30 flex flex-col overflow-hidden rounded-l-[10px] border border-white/8"
       style={{ '--stage-inset-y': 'clamp(16px, 2.2vh, 32px)' } as React.CSSProperties}
-      // Blows out in the tile's colour, then settles to the page's own surface.
-      initial={{ backgroundColor: accent.fill }}
+      // Opens straight onto the page's own surface: the tile's colour flooding
+      // the screen first read as a flash rather than as the panel growing.
+      initial={{ backgroundColor: '#0a0a0a' }}
       animate={{ backgroundColor: '#0a0a0a' }}
-      transition={{ backgroundColor: { duration: 0.42, ease: 'easeOut', delay: 0.1 } }}
     >
       {/*
         A fully opaque backing layer. This panel shares a `layoutId` with the
@@ -65,12 +54,7 @@ export function CategoryExpanded({
         visible again underneath. An opaque layer means that can never bleed
         through, regardless of what the tile underneath is doing.
       */}
-      <motion.div
-        className="absolute inset-0 -z-10"
-        initial={{ backgroundColor: accent.fill }}
-        animate={{ backgroundColor: '#0a0a0a' }}
-        transition={{ duration: 0.42, ease: 'easeOut', delay: 0.1 }}
-      />
+      <motion.div className="absolute inset-0 -z-10" style={{ backgroundColor: '#0a0a0a' }} />
 
       {/*
         The stage is a fixed height, so the content is sized to fit inside the

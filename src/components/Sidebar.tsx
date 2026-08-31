@@ -81,7 +81,7 @@ export function Sidebar({
               // this group's icons off-centre against every other rail item.
               className={
                 isPortfolio && on
-                  ? '-mx-[5px] flex flex-col gap-1 rounded-[13px] border border-white/10 p-1'
+                  ? '-mx-[5px] flex flex-col rounded-[13px] border border-white/10 p-1'
                   : 'contents'
               }
             >
@@ -127,10 +127,29 @@ export function Sidebar({
               <AnimatePresence initial={false}>
                 {isPortfolio && on && (
                   <motion.div
+                    /*
+                      Indented so the nested list reads as belonging to
+                      Portfolio rather than as four more top-level items. The
+                      inset is on this wrapper rather than each button, so the
+                      hover and open highlights indent with the row instead of
+                      starting flush with the rail's edge.
+
+                      34px puts the nested icons' left edge exactly on the
+                      "Portfolio" label above them, so the sub-items start where
+                      their parent's text does rather than somewhere between its
+                      icon and its label.
+
+                      Animated rather than a fixed class: the list stays mounted
+                      when the rail collapses to 62px, and a standing indent
+                      there pushed the icons off the rail's centre line — out of
+                      the rail entirely at its right edge. It goes flush again
+                      as the rail shrinks, so the icons re-centre with the ones
+                      above them.
+                    */
                     className="flex flex-col gap-1 overflow-hidden"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
+                    initial={{ height: 0, opacity: 0, marginLeft: 0 }}
+                    animate={{ height: 'auto', opacity: 1, marginLeft: hover ? 34 : 0 }}
+                    exit={{ height: 0, opacity: 0, marginLeft: 0 }}
                     transition={{ duration: 0.28, ease: EASE_OUT }}
                   >
                     {CATEGORIES.map((cat, i) => {
@@ -157,16 +176,20 @@ export function Sidebar({
                               /*
                                 Drawn as a mask rather than an `<img>`, so the
                                 icon takes the button's own colour — orange when
-                                the category is open, grey otherwise. The SVGs
-                                have white baked in, which an `<img>` cannot be
-                                recoloured out of.
+                                the category is open, white otherwise.
+
+                                White rather than the button's own grey: the
+                                nav items above are white SVGs at the same 0.55
+                                opacity, so inheriting the label's grey left
+                                these visibly dimmer than the icons they sit
+                                under. Only the label stays grey.
 
                                 Slightly smaller than the nav items' 4.5, so the
                                 nested list still reads as subordinate to them.
                               */
                               <motion.span
                                 aria-hidden="true"
-                                className="size-4 bg-current"
+                                className="size-4"
                                 style={{
                                   maskImage: `url(${cat.icon})`,
                                   WebkitMaskImage: `url(${cat.icon})`,
@@ -177,7 +200,10 @@ export function Sidebar({
                                   maskSize: 'contain',
                                   WebkitMaskSize: 'contain',
                                 }}
-                                animate={{ opacity: open ? 1 : 0.55 }}
+                                animate={{
+                                  backgroundColor: open ? '#FF9A5C' : '#ffffff',
+                                  opacity: open ? 1 : 0.55,
+                                }}
                                 transition={{ duration: 0.18 }}
                               />
                             ) : (

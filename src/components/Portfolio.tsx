@@ -221,41 +221,23 @@ const MOSAIC = [
  * accent rather than assumed, since the light fills need dark type to stay
  * legible and the darker one needs the opposite.
  */
-/**
- * One accent for every card, rather than a colour per section.
- *
- * Kept as a four-entry list so the per-index lookup elsewhere still works and
- * a distinct colour can be given back to any card by editing its row.
- */
 /** The "Curated Collection" label on a hovered tile. */
 const COLLECTION_LABEL = '#47C89A';
 
 /**
- * The card's own surface: warm light pooling in the bottom-right corner and
- * falling away toward the top-left, present at rest rather than arriving on
- * hover. Hovering brightens this same gradient and blooms a glow around the
- * card — the light comes up, it does not sweep in.
+ * The hover gradient: warm light pooling in the bottom-right corner and
+ * falling away toward the top-left. The card is plain at rest — this arrives
+ * with the pointer and leaves with it.
  *
  * Radial from that corner rather than a linear sweep, so the warmth stays a
  * pool in the corner instead of banding down the whole right edge.
  */
-const CARD_GRADIENT =
-  'radial-gradient(95% 115% at 100% 100%, #6E3D18 0%, #3D2712 20%, #22190F 40%, #171514 62%, #131417 80%)';
-
-/** The same gradient at full strength, faded over the resting one on hover. */
 const CARD_GRADIENT_LIT =
   'radial-gradient(95% 115% at 100% 100%, #B85F22 0%, #6B3B14 22%, #33210F 44%, #1D1813 66%, #16171B 84%)';
 
 /** The bloom around a hovered card, in the gradient's own warm light. */
 const CARD_BLOOM =
   '0 0 0 1px rgba(255,154,92,.16), 0 8px 30px -8px rgba(255,154,92,.26), 0 0 52px -14px rgba(255,154,92,.20)';
-
-export const CARD_ACCENT = [
-  { fill: '#FF9A5C', ink: '#241004' },
-  { fill: '#FF9A5C', ink: '#241004' },
-  { fill: '#FF9A5C', ink: '#241004' },
-  { fill: '#FF9A5C', ink: '#241004' },
-] as const;
 
 function CategoryCard({
   progress,
@@ -324,15 +306,12 @@ function CategoryCard({
           boxShadow: filled ? CARD_BLOOM : '0 0 0 0 rgba(255,154,92,0)',
         }}
         transition={{ duration: 0.25 }}
-        style={{ background: CARD_GRADIENT, pointerEvents: hidden ? 'none' : 'auto' }}
+        style={{ pointerEvents: hidden ? 'none' : 'auto' }}
       >
       {/*
-        The lit gradient, cross-faded over the resting one.
-
-        The card already carries its gradient — hovering raises the same light
-        rather than wiping a colour in, which is what the reference does. Two
-        stacked layers because a gradient cannot be interpolated between two
-        values; only opacity can carry the change.
+        The gradient, faded in on hover and gone at rest — its own layer rather
+        than a background on the card, because opacity is the only way to
+        animate a gradient in and out.
       */}
       <motion.span
         aria-hidden="true"
@@ -857,7 +836,6 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
                 categoryIndex={openIdx}
                 onClose={closeCategory}
                 onOpenProject={(projectIdx) => onOpenProject(openIdx, projectIdx)}
-                accent={CARD_ACCENT[openIdx % CARD_ACCENT.length]}
               />
             )}
           </AnimatePresence>
