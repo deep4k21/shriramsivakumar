@@ -193,9 +193,16 @@ export function CategoryExpanded({
                   whileHover={{ y: -4, borderColor: 'rgba(255,154,92,.45)' }}
                   transition={{ duration: 0.2 }}
                 >
+                  {/*
+                    Matched to the project page's hero banner (934 × 340), so a
+                    thumbnail here is a scaled version of the image it opens
+                    rather than a differently-cropped one. A fixed height made
+                    the ratio drift with the column's width; the aspect ratio
+                    holds it at every viewport.
+                  */}
                   <div
-                    className="grid h-[clamp(80px,10vh,120px)] place-items-center"
-                    style={{ backgroundColor: 'rgba(255,255,255,.03)' }}
+                    className="grid w-full place-items-center"
+                    style={{ backgroundColor: 'rgba(255,255,255,.03)', aspectRatio: '934 / 340' }}
                   >
                     <span
                       className="font-body text-[10px] tracking-[0.14em] opacity-55"

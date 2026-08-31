@@ -227,6 +227,29 @@ const MOSAIC = [
  * Kept as a four-entry list so the per-index lookup elsewhere still works and
  * a distinct colour can be given back to any card by editing its row.
  */
+/** The "Curated Collection" label on a hovered tile. */
+const COLLECTION_LABEL = '#47C89A';
+
+/**
+ * The card's own surface: warm light pooling in the bottom-right corner and
+ * falling away toward the top-left, present at rest rather than arriving on
+ * hover. Hovering brightens this same gradient and blooms a glow around the
+ * card — the light comes up, it does not sweep in.
+ *
+ * Radial from that corner rather than a linear sweep, so the warmth stays a
+ * pool in the corner instead of banding down the whole right edge.
+ */
+const CARD_GRADIENT =
+  'radial-gradient(120% 145% at 100% 100%, #C46A26 0%, #7A431A 22%, #33210F 44%, #191512 64%, #131417 82%)';
+
+/** The same gradient at full strength, faded over the resting one on hover. */
+const CARD_GRADIENT_LIT =
+  'radial-gradient(120% 145% at 100% 100%, #FF9A5C 0%, #C4661F 24%, #6B3B14 46%, #241A11 66%, #16171B 84%)';
+
+/** The bloom around a hovered card, in the gradient's own warm light. */
+const CARD_BLOOM =
+  '0 0 0 1px rgba(255,154,92,.22), 0 10px 40px -6px rgba(255,154,92,.38), 0 0 70px -10px rgba(255,154,92,.30)';
+
 export const CARD_ACCENT = [
   { fill: '#FF9A5C', ink: '#241004' },
   { fill: '#FF9A5C', ink: '#241004' },
@@ -247,7 +270,6 @@ function CategoryCard({
   hidden: boolean;
 }) {
   const cat = CATEGORIES[index];
-  const accent = CARD_ACCENT[index % CARD_ACCENT.length];
 
   /*
    * The fill grows from wherever the pointer entered, so the colour reads as
@@ -296,36 +318,29 @@ function CategoryCard({
         }}
         onPointerLeave={() => setFill(null)}
         className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden ${CARD} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
-        animate={{ opacity: hidden ? 0 : 1 }}
+        animate={{
+          opacity: hidden ? 0 : 1,
+          // The bloom is the hover cue, alongside the gradient coming up.
+          boxShadow: filled ? CARD_BLOOM : '0 0 0 0 rgba(255,154,92,0)',
+        }}
         transition={{ duration: 0.25 }}
-        style={{ pointerEvents: hidden ? 'none' : 'auto' }}
+        style={{ background: CARD_GRADIENT, pointerEvents: hidden ? 'none' : 'auto' }}
       >
       {/*
-        The colour itself: a circle centred on the pointer's entry point,
-        scaling up to cover the card. It sits behind the copy (`-z-10` against
-        the content's own stacking) and is `pointer-events-none` so it never
-        interrupts the click that opens the category.
+        The lit gradient, cross-faded over the resting one.
+
+        The card already carries its gradient — hovering raises the same light
+        rather than wiping a colour in, which is what the reference does. Two
+        stacked layers because a gradient cannot be interpolated between two
+        values; only opacity can carry the change.
       */}
       <motion.span
         aria-hidden="true"
-        className="pointer-events-none absolute rounded-full"
-        style={{
-          backgroundColor: accent.fill,
-          // Sized to the card's diagonal so the far corner is reached from any
-          // origin; positioned so the circle's own centre sits on the pointer.
-          width: '250%',
-          aspectRatio: '1',
-          left: fill ? fill.x : '50%',
-          top: fill ? fill.y : '50%',
-          x: '-50%',
-          y: '-50%',
-        }}
+        className="pointer-events-none absolute inset-0"
+        style={{ background: CARD_GRADIENT_LIT }}
         initial={false}
-        animate={{ scale: filled ? 1 : 0, opacity: filled ? 1 : 0 }}
-        transition={{
-          scale: { duration: 0.52, ease: [0.22, 0.61, 0.24, 1] },
-          opacity: { duration: filled ? 0.12 : 0.3 },
-        }}
+        animate={{ opacity: filled ? 1 : 0 }}
+        transition={{ duration: 0.42, ease: [0.22, 0.61, 0.24, 1] }}
       />
 
       {/*
@@ -334,15 +349,8 @@ function CategoryCard({
         rather than the old grey type over a new background.
       */}
       <motion.div
-        className="relative font-heading text-[10.5px] font-medium tracking-[0.14em]"
-        animate={{ color: filled ? accent.ink : '#5a5a5a' }}
-        transition={{ duration: 0.18 }}
-      >
-        {String(index + 1).padStart(2, '0')} / {String(CATEGORIES.length).padStart(2, '0')}
-      </motion.div>
-      <motion.div
         className="relative font-heading text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em]"
-        animate={{ color: filled ? accent.ink : '#FF9A5C' }}
+        animate={{ color: '#FF9A5C' }}
         transition={{ duration: 0.18 }}
       >
         {cat.title}
@@ -355,20 +363,70 @@ function CategoryCard({
         instead, which read as a different card from the tall ones beside them.
       */}
       <div className="relative flex min-h-0 flex-1 flex-col">
-        <motion.p
-          className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
-          animate={{ color: filled ? accent.ink : '#808080' }}
+        {/*
+          The category line — "Enterprise · SaaS · Product". Set in the body
+          face at the tile's own size, above the description rather than beside
+          it, so the two read as one block of copy.
+        */}
+        <motion.div
+          className="font-body text-[clamp(13px,1vw,16px)]/[1.65] font-medium"
+          animate={{ color: '#ffffff' }}
           transition={{ duration: 0.18 }}
         >
-          {cat.lead}{' '}
-          <motion.span
-            className="font-bold"
-            animate={{ color: filled ? accent.ink : '#ffffff' }}
-            transition={{ duration: 0.18 }}
-          >
-            {cat.leadBold}
-          </motion.span>
-        </motion.p>
+          {cat.tags}
+        </motion.div>
+        {/*
+          Hovering swaps the sentence describing the category for the work it
+          actually holds, under a "Curated Collection" label. Both states are
+          the same two-line block in the same place, so the tile does not
+          resize as the pointer moves across it — only the words change.
+        */}
+        <div className="relative mt-[clamp(8px,0.9vw,14px)]">
+          <AnimatePresence mode="wait" initial={false}>
+            {filled ? (
+              <motion.div
+                key="collection"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                {/*
+                  The label's own green, as in the mock.
+
+                  Not the site's `--color-green` (#47c89a): that is almost
+                  exactly as light as the orange fill it sits on — 1.00:1, so
+                  it would vanish. This deeper green is the one the mock uses
+                  and the only one of the two that stays visible here.
+                */}
+                <div
+                  className="font-body text-[clamp(13px,1vw,16px)]/[1.65] font-semibold"
+                  style={{ color: COLLECTION_LABEL }}
+                >
+                  Curated Collection
+                </div>
+                <p
+                  className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
+                  style={{ color: '#808080' }}
+                >
+                  {cat.collection}
+                </p>
+              </motion.div>
+            ) : (
+              <motion.p
+                key="body"
+                className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
+                style={{ color: '#808080' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                {cat.body}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
         <div className="flex-1" />
 
         {/*
@@ -429,10 +487,17 @@ function CategoryCard({
         )}
           <motion.div
             className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)]"
-            animate={{ color: filled ? accent.ink : '#00B8C9' }}
+            animate={{ color: '#00B8C9' }}
             transition={{ duration: 0.18 }}
           >
-            Open <span className="font-bold">{cat.short}</span> <span className="text-[15px]">→</span>
+            Continue to <span className="font-bold">{cat.linkLabel ?? cat.short}</span>{' '}
+            <motion.span
+              className="text-[15px]"
+              animate={{ x: filled ? 3 : 0 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              →
+            </motion.span>
           </motion.div>
         </div>
       </motion.div>

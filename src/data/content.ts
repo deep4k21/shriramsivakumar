@@ -168,6 +168,17 @@ export interface Category {
   id: string;
   title: string;
   short: string;
+  /**
+   * The name in the tile's "Continue to …" link, where it differs from
+   * `short`. UI/UX's link spells the category out in full while its tab strip
+   * stays abbreviated.
+   */
+  linkLabel?: string;
+  /**
+   * What the tile shows in place of `body` while it is hovered — the work the
+   * category actually contains, rather than the sentence describing it.
+   */
+  collection: string;
   tags: string;
   body: string;
   lead: string;
@@ -299,7 +310,9 @@ export const CATEGORIES: Category[] = [
     icon: '/images/menuicons/uiux.svg',
     title: 'UI/UX Design',
     short: 'UI/UX',
+    linkLabel: 'UI/UX Design',
     tags: 'Enterprise · SaaS · Product',
+    collection: 'Enterprise Dashboards · Websites · Design Systems · Product Experiences',
     body: 'Designing intuitive digital experiences that transform complex workflows into scalable products and seamless user journeys.',
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
@@ -309,6 +322,7 @@ export const CATEGORIES: Category[] = [
       { value: '20+', label: 'PRODUCTS' },
       { value: '6', label: 'YEARS' },
       { value: '5', label: 'INDUSTRIES' },
+      { value: '10+', label: 'GLOBAL MARKETS' },
     ],
     projects: [
       {
@@ -497,6 +511,7 @@ export const CATEGORIES: Category[] = [
     title: 'Brand Identity',
     short: 'Brand Identity',
     tags: 'Identity · Strategy · Guidelines',
+    collection: 'Brand exploration on · Freshstart · Forge · HealthDesk · Project Agresor',
     body: 'Building memorable brands through thoughtful identities and scalable visual systems.',
     lead: 'Identities and visual systems built to',
     leadBold: 'hold together at scale.',
@@ -504,6 +519,7 @@ export const CATEGORIES: Category[] = [
       { value: '10+', label: 'IDENTITIES' },
       { value: '4', label: 'REBRANDS' },
       { value: '10+', label: 'MARKETS' },
+      { value: '100+', label: 'GLOBAL COLLABORATIONS' },
     ],
     projects: [
       {
@@ -672,6 +688,7 @@ export const CATEGORIES: Category[] = [
     title: 'Marketing Campaigns',
     short: 'Campaigns',
     tags: 'Creative · Growth · Performance',
+    collection: 'Product Launches · Event Branding · Social Campaigns · Landing Pages',
     body: 'Campaigns that combine storytelling, strategy, events, illustrations and measurable business impact.',
     lead: 'Storytelling and strategy measured on',
     leadBold: 'business impact.',
@@ -679,6 +696,7 @@ export const CATEGORIES: Category[] = [
       { value: '50+', label: 'CAMPAIGNS' },
       { value: '12', label: 'EVENTS' },
       { value: '10+', label: 'MARKETS' },
+      { value: '50+', label: 'MARKETING ASSETS' },
     ],
     projects: [
       /*
@@ -929,6 +947,7 @@ export const CATEGORIES: Category[] = [
     title: 'Presentations',
     short: 'Presentations',
     tags: 'Pitch · Product · Strategy',
+    collection: 'Pitch Decks · Product Launches · Sales Enablement · Corporate Profiles',
     body: 'Decks built to be presented, not read — where the argument is the design.',
     lead: 'Decks built to be presented, not read —',
     leadBold: 'the argument is the design.',
@@ -936,6 +955,7 @@ export const CATEGORIES: Category[] = [
       { value: '30+', label: 'DECKS' },
       { value: '5', label: 'FORMATS' },
       { value: '68', label: 'LONGEST DECK' },
+      { value: '500+', label: 'SLIDES DESIGNED' },
     ],
     /*
       A reduced variant of the project template, configured per project rather
