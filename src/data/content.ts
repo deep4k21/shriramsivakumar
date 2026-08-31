@@ -1311,7 +1311,6 @@ export const TOOLKIT: ToolIcon[] = [
   { name: 'Framer', icon: '/images/mytoolkit/image 17.png' },
   { name: 'InDesign', icon: '/images/mytoolkit/Group 367.png' },
   { name: 'After Effects', icon: '/images/mytoolkit/Clip path frame.png' },
-  { name: 'XD', icon: '/images/mytoolkit/Rectangle.png' },
   { name: 'Premiere Pro', icon: '/images/mytoolkit/Rectangle (1).png' },
   { name: 'Rive', icon: '/images/mytoolkit/image 27.png' },
   { name: 'PowerPoint', icon: '/images/mytoolkit/image 19.png' },

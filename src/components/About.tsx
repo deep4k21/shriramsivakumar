@@ -11,13 +11,13 @@ import { BriefcaseIcon, ChipIcon, CompassIcon, SparkleIcon, WrenchIcon } from '.
 
 const QUOTE_END = 0.3;
 /**
- * The tiles reveal in step with the travelling ghosts rather than as one block.
+ * The tiles reveal in sequence rather than as one block.
  *
- * The middle tile ("After Hours") is where stage one of the ghost lands, so it
- * arrives early — stage one finishes at intro progress 1.6, which is this
- * section's 0.1. The two flanking tiles are stage two's destinations and match
- * its window (STAGE_TWO in AboutTravelGhosts), so each outline arrives just as
- * its tile does.
+ * The middle tile ("After Hours") is where the travelling ghost lands, so it
+ * arrives early — the flight finishes at intro progress 1.6, which is this
+ * section's 0.1. The two flanking tiles follow on their own, no longer trailing
+ * a ghost of their own; their timing is kept as the beat that reads well after
+ * the middle one has settled.
  */
 const TILE_MID_START = 0.02;
 const TILE_MID_END = 0.14;
@@ -152,7 +152,7 @@ function IntroTile({
   return (
     <motion.div
       data-about-tile
-      className={`group relative flex flex-col gap-2 overflow-hidden ${CARD} px-6.5 py-6`}
+      className={`group relative flex flex-col gap-2 overflow-hidden ${CARD} px-6.5 pt-6 pb-11`}
       style={{ ...reveal, opacity }}
     >
       <CardGlow />
@@ -192,7 +192,7 @@ function ToolIcon({ name, icon }: { name: string; icon: string }) {
         alt={name}
         // No pointer cursor: hovering only reveals the name tooltip, there is
         // nothing here to click.
-        className="size-10 rounded-lg object-contain"
+        className="size-13 rounded-lg object-contain"
         whileHover={{ y: -3, scale: 1.06 }}
         transition={{ duration: 0.18 }}
       />
@@ -256,8 +256,14 @@ export function About() {
             &ldquo;The more I <SplitFlapWord word={quoteWord} trailing="&rdquo;" />
           </motion.h2>
 
+          {/*
+            The extra margin sits on this row rather than widening the column's
+            shared gap, which also spaces the heading — the break wanted is
+            between the tiles and the toolkit cards specifically, now that the
+            cards no longer carry a tall min-height of their own.
+          */}
           <div
-            className="grid gap-[clamp(14px,1.6vw,22px)]"
+            className="mb-[clamp(10px,2vh,26px)] grid gap-[clamp(14px,1.6vw,22px)]"
             style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
           >
             {INTRO_TILES.map((tile, i) => {
@@ -283,13 +289,13 @@ export function About() {
             }}
           >
             {/*
-              A min-height rather than a fixed one: the content keeps its own
-              size and sits at the top, with the extra space falling below it —
-              and a card whose icons ever wrap to another row can still grow
-              past it instead of clipping.
+              Sized to its content rather than to a min-height: the icons take
+              two rows at most, so a 300–420px floor left the bottom half of
+              both cards empty. Without it each card ends just below its last
+              row of icons, and a card whose icons wrap further simply grows.
             */}
             <div
-              className={`group relative flex min-h-[clamp(300px,36vh,420px)] flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 py-6.5`}
+              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
@@ -301,14 +307,14 @@ export function About() {
                   {TOOLKIT.length} TOOLS
                 </span>
               </div>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3.5">
                 {TOOLKIT.map((tool) => (
                   <ToolIcon key={tool.name} name={tool.name} icon={tool.icon} />
                 ))}
               </div>
             </div>
             <div
-              className={`group relative flex min-h-[clamp(300px,36vh,420px)] flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 py-6.5`}
+              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
@@ -320,7 +326,7 @@ export function About() {
                   {AI_TOOLS.length} TOOLS
                 </span>
               </div>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3.5">
                 {AI_TOOLS.map((tool) => (
                   <ToolIcon key={tool.name} name={tool.name} icon={tool.icon} />
                 ))}
