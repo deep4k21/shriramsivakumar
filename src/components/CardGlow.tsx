@@ -34,12 +34,20 @@ export function CardGlow({
   /** Seconds for the single lap, held constant whatever the card's size. */
   duration = 2.2,
   color = '#00B8C9',
+  active,
 }: {
   radius?: number;
   width?: number;
   segmentRatio?: number;
   duration?: number;
   color?: string;
+  /**
+   * Drives the run from outside instead of from this element's own pointer
+   * events. For a card whose hover is already tracked elsewhere — or one with a
+   * layer painted over the top, which would swallow `pointerenter` before it
+   * reached the host. Left undefined, the component listens for itself.
+   */
+  active?: boolean;
 }) {
   const ref = useRef<SVGRectElement>(null);
   const [length, setLength] = useState(0);
@@ -67,6 +75,8 @@ export function CardGlow({
   // Hover is read from the card itself so the light still responds to the whole
   // card, the way `group-hover` did — the SVG is `pointer-events-none`.
   useEffect(() => {
+    // The caller is driving it; its own pointer events would only fight that.
+    if (active !== undefined) return;
     const card = ref.current?.ownerSVGElement?.parentElement;
     if (!card) return;
 
@@ -78,7 +88,10 @@ export function CardGlow({
       card.removeEventListener('pointerenter', enter);
       card.removeEventListener('pointerleave', leave);
     };
-  }, []);
+  }, [active]);
+
+  /** The caller's state when it is driving, this element's own otherwise. */
+  const running = active ?? hovered;
 
   const half = width / 2;
   // The segment is a share of the perimeter rather than a fixed pixel length,
@@ -142,29 +155,29 @@ export function CardGlow({
         a second hover replays the run rather than resuming where it stopped.
       */}
       <motion.rect
-        key={hovered ? 'from-tl' : 'from-tl-idle'}
+        key={running ? 'from-tl' : 'from-tl-idle'}
         ref={ref}
         {...shared}
         initial={{ strokeDashoffset: cornerArc, opacity: 0 }}
         animate={
-          hovered && length
+          running && length
             ? { strokeDashoffset: cornerArc - halfPerimeter, opacity: [0, 1, 1, 0] }
             : { strokeDashoffset: cornerArc, opacity: 0 }
         }
-        transition={hovered && length ? timing : { duration: 0.2 }}
+        transition={running && length ? timing : { duration: 0.2 }}
       />
       <motion.rect
-        key={hovered ? 'from-br' : 'from-br-idle'}
+        key={running ? 'from-br' : 'from-br-idle'}
         {...shared}
         // Half a perimeter behind the first, which puts it on the opposite
         // corner; it ends where the first one started.
         initial={{ strokeDashoffset: cornerArc + halfPerimeter, opacity: 0 }}
         animate={
-          hovered && length
+          running && length
             ? { strokeDashoffset: cornerArc, opacity: [0, 1, 1, 0] }
             : { strokeDashoffset: cornerArc + halfPerimeter, opacity: 0 }
         }
-        transition={hovered && length ? timing : { duration: 0.2 }}
+        transition={running && length ? timing : { duration: 0.2 }}
       />
     </svg>
   );

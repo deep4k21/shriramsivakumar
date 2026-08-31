@@ -68,7 +68,18 @@ export function readSkin(
   const hasGradient = c.backgroundImage && c.backgroundImage !== 'none';
   const own = hasGradient ? c.backgroundImage : soften(c.backgroundColor);
 
-  const overlayFill = overlay ? getComputedStyle(overlay).backgroundImage : 'none';
+  /*
+    An overlay may publish the accent it is built from. That is preferred over
+    its live gradient, which can be mid-fade or fully transparent — a glow that
+    only paints on hover would otherwise hand the ghost plain glass every time
+    it departs a card sitting at rest.
+  */
+  const accent = overlay?.getAttribute('data-ghost-accent');
+  const overlayFill = accent
+    ? `radial-gradient(120% 80% at 50% 100%, ${accent}30, ${accent}00 70%)`
+    : overlay
+      ? getComputedStyle(overlay).backgroundImage
+      : 'none';
   // CSS paints the first layer on top, so the overlay leads.
   const background =
     overlayFill && overlayFill !== 'none' && hasGradient ? `${overlayFill}, ${own}` : own;

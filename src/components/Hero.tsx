@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
 import { CELL_H, flipDelayFor, useHomeGrid } from '../hooks/useHomeGrid';
+import { CardGlow } from './CardGlow';
 
 interface HeroProps {
   flipOnHover: boolean;
@@ -338,8 +339,30 @@ function HeroCardFace({
   hovered?: boolean;
 }) {
   const { accent } = content;
+  /*
+    The body's corner is set in container units (`3.90cqw`), so it changes with
+    the viewport while `CardGlow` needs a number. Measured from the rendered
+    element and kept in sync on resize.
+  */
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [glowRadius, setGlowRadius] = useState(10);
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const measure = () =>
+      setGlowRadius(Number.parseFloat(getComputedStyle(el).borderTopLeftRadius) || 10);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
+      // Tagged so the travelling ghost can walk up from the glow to the element
+      // that actually rotates, rather than counting wrappers down from the
+      // button — a count that breaks silently whenever the markup changes.
+      data-hero-face={back ? 'back' : 'front'}
       className="absolute inset-0 isolate [container-type:size] [backface-visibility:hidden]"
       style={{
         zIndex: back ? 1 : 2,
@@ -364,21 +387,32 @@ function HeroCardFace({
         // card, so an outline drawn around it enclosed far more than the panel.
         // Only the front face is tagged: the back is rotated 180°, so its rect
         // would hand the ghost a mirrored start.
+        ref={bodyRef}
         data-hero-card-body={back ? undefined : ''}
         className="absolute top-0 left-[24.70%] h-full w-[58.56%] overflow-hidden rounded-[3.90cqw] bg-[linear-gradient(160deg,rgba(38,40,46,.62),rgba(19,19,21,.55)_45%,rgba(28,30,35,.60))] backdrop-blur-2xl backdrop-saturate-150"
-        style={{
-          transformOrigin: CARD_ORIGIN,
-          // The drop shadow is tinted with the side's own accent — orange on
-          // the design face, green on travel — over the neutral black one that
-          // does the actual lifting. The inset highlights stay as they were.
+        style={{ transformOrigin: CARD_ORIGIN }}
+        /*
+          The drop shadows belong to the hover state, so the card sits flat in
+          the checkerboard until it is pointed at and then lifts off it. The two
+          inset lines are not part of that — they are the glass rim itself, and
+          dropping them would change what the panel is made of rather than how
+          high it sits, so they stay on at both ends.
+
+          The lifted shadow is tinted with the side's own accent — orange on the
+          design face, green on travel — over the neutral black one doing the
+          actual lifting. At rest both collapse to fully transparent versions of
+          themselves rather than being removed: keeping the same layer count and
+          order is what lets the shadow animate instead of snapping.
+        */
+        animate={{
+          scale: hovered ? CARD_HOVER_SCALE : 1,
           boxShadow: [
-            '0 28px 64px rgba(0,0,0,.55)',
-            `0 24px 88px 8px ${accent}59`,
+            hovered ? '0 28px 64px rgba(0,0,0,.55)' : '0 0 0 0 rgba(0,0,0,0)',
+            hovered ? `0 24px 88px 8px ${accent}59` : `0 0 0 0 ${accent}00`,
             'inset 0 1px 0 rgba(255,255,255,.12)',
             'inset 0 0 0 1px rgba(255,255,255,.055)',
           ].join(', '),
         }}
-        animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
         transition={HOVER_SPRING}
       >
         <div
@@ -386,11 +420,29 @@ function HeroCardFace({
           // carry it: the ghost reads the card body, and this sits on a child
           // layer, so without it the ghost departs in the neutral glass only.
           data-hero-card-glow=""
+          // The accent the ghost should leave in, published so it does not
+          // depend on reading this layer's live paint.
+          data-ghost-accent={accent}
+          // Part of the card's own surface, not a hover cue: the gradient is
+          // always lit. Only the drop shadows below answer the pointer.
           className="absolute inset-0"
           style={{
             background: `radial-gradient(120% 80% at 50% 100%, ${accent}30, ${accent}00 70%)`,
           }}
         />
+        {/*
+          The same two lights that trace the other cards on hover, so the hero
+          card answers the pointer the way the rest of the site does.
+
+          The radius is measured rather than passed as a constant: the body's
+          corner is `3.90cqw`, which grows with the viewport, and a fixed number
+          would leave the light cutting across the corners on a large screen.
+        */}
+        {/*
+          Driven by the card's own hover state: a full-face layer is painted
+          over the body, so the component's own `pointerenter` never reaches it.
+        */}
+        <CardGlow radius={glowRadius} color={accent} active={hovered} />
       </motion.div>
 
       {/* Disc — 275 × 275. The portrait overlaps it top and bottom. */}
@@ -597,7 +649,7 @@ export function Hero({ flipOnHover }: HeroProps) {
   // geometrically. Swapping `src` on a timer instead would need every column to
   // change at its own midpoint: the columns turn at staggered times, so any
   // single moment catches some of them face-on, picture visibly changing.
-  const gridSlots = useHomeGrid(8, 2600);
+  const gridSlots = useHomeGrid(2600);
 
   // The hero → intro ghost leaves the flip card as the hero scrolls away, so
   // the hero's own content clears behind it. The card's outer box keeps its
@@ -711,20 +763,44 @@ export function Hero({ flipOnHover }: HeroProps) {
           page. The translate re-centres on the card instead.
         */}
         <div
-          className="relative box-content w-[clamp(249.2px,36.01vw,526.3px)] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
+          /*
+            Sized so the card body fills the grid's empty centre gap exactly —
+            one cell wide, three rows tall.
+
+            The body is 58.56% of this composition's width (24.70%–83.26%) and
+            its full height. The grid is an even 5×5 across the hero, so a cell
+            is 20vw × 20vh: the body wants 20vw × 60vh, which puts this
+            composition at 20vw / 0.5856 = 34.153vw wide and 60vh tall.
+
+            No width clamp any more. The card is now measured against the grid
+            rather than sized for its own sake, and a clamp would hold it still
+            while the cells kept growing — which is exactly the drift that left
+            it smaller than its own cell on wide screens.
+          */
+          className="relative box-content w-[34.153vw] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
           // Expressed against the face's own width rather than as a percentage
           // of this wrapper, which also carries horizontal padding and would
           // shift by the wrong amount.
-          style={{ transform: 'translateX(calc(clamp(249.2px, 36.01vw, 526.3px) * -0.0398))' }}
+          style={{ transform: 'translateX(calc(34.153vw * -0.0398))' }}
         >
           <div
             // No `perspective` here: it would only reach direct 3D children,
             // and the wrappers below are flat. The rotating element carries its
             // own via `transformPerspective` instead.
             className="cursor-pointer"
-            // 768.5 × 700 — the full extent of the composition in Figma,
-            // including the badges that overhang the 450px card.
-            style={{ width: '100%', aspectRatio: '768.5 / 700', maxHeight: '80vh' }}
+            /*
+              Height is driven by the grid, not by the artwork's own
+              proportions: three rows is 60vh, and the body spans this box's
+              full height.
+
+              The Figma composition is 768.5 × 700, which is a shorter box than
+              a 1×3 gap — so holding that aspect would leave the card short of
+              the gap it is meant to fill. Taking the height from the grid
+              instead stretches the artwork vertically by about 1.2×, which is
+              the deliberate trade for an even checkerboard and a card that
+              lands on it exactly.
+            */
+            style={{ width: '100%', height: '60vh' }}
             role="button"
             tabIndex={0}
             aria-pressed={flipped}

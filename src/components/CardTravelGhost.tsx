@@ -25,14 +25,21 @@ const HERO_CARD = '#home [data-hero-card-body]';
  * viewer. The visible one is found by its rotation instead.
  */
 const HERO_CARD_GLOW = '#home [data-hero-card-glow]';
-const HERO_FLIP = '#home [aria-label="Flip between design and travel side"]';
 const INTRO_PANEL = '[data-card-travel-target]';
 
 /** The accent glow on whichever card face is currently turned toward the viewer. */
 function visibleGlow(): Element | null {
   const glows = [...document.querySelectorAll(HERO_CARD_GLOW)];
   if (glows.length < 2) return glows[0] ?? null;
-  const rotating = document.querySelector(`${HERO_FLIP} > div > div > div`);
+  /*
+    Which face is turned toward the viewer, read from the glow's own ancestry
+    rather than a fixed path down from the button. A hard-coded depth silently
+    picks the wrong face the moment a wrapper is added or removed between the
+    two — it keeps matching some element, just not the rotating one — and the
+    ghost then departs in the colour of the hidden side.
+  */
+  const face = glows[0].closest('[data-hero-face]');
+  const rotating = face?.parentElement ?? null;
   if (!rotating) return glows[0];
   const showingBack = new DOMMatrixReadOnly(getComputedStyle(rotating).transform).m11 < 0;
   return glows[showingBack ? 1 : 0];

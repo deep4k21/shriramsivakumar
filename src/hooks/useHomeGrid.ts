@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-const DESIGN_FILENAMES = [
+/**
+ * Every image in the grid pool — one per filled cell, so the whole set is on
+ * screen at once rather than a subset cycling through a larger library.
+ */
+const FILENAMES = [
   'card01_portrait_man.png',
   'card02_experience_nxt.png',
   'card03_forge_logo.png',
@@ -11,9 +15,6 @@ const DESIGN_FILENAMES = [
   'card08_ufo_desert.png',
   'card09_recognizing_needs.png',
   'card10_freshsprint_hackathon.png',
-];
-
-const TRAVEL_FILENAMES = [
   'card11_food_illustration.png',
   'card12_phones_travel.png',
   'card13_six_reasons_freshworks.png',
@@ -24,16 +25,19 @@ const TRAVEL_FILENAMES = [
   'card18_icons_grid.png',
   'card19_mobily_dashboard.png',
   'card20_man_thinking.png',
+  'card21_icons_grid.png',
+  'card22_freshstart_logo.png',
 ];
 
-const IMAGE_SETS: Record<HomeGridMode, string[]> = {
-  design: DESIGN_FILENAMES.map((name) => `/images/homegrid/${name}`),
-  travel: TRAVEL_FILENAMES.map((name) => `/images/homegrid/${name}`),
-};
+const IMAGES = FILENAMES.map((name) => `/images/homegrid/${name}`);
 
-export type HomeGridMode = 'design' | 'travel';
-
-type Side = 'left' | 'right';
+/**
+ * The card's two faces still show different pictures, so the flip reveals a
+ * changed scene rather than the same one twice. Both faces draw from the same
+ * pool; the back is offset by half the pool so a tile never shows the same
+ * image on both sides.
+ */
+const BACK_OFFSET = Math.floor(IMAGES.length / 2);
 
 interface SlotAnchor {
   top: string;
@@ -41,7 +45,6 @@ interface SlotAnchor {
   right?: string;
   /** Width as a share of the hero, so the pattern holds at any viewport. */
   width: string;
-  side: Side;
   /** Grid column, which sets when this cell joins a sweeping flip. */
   col: number;
 }
@@ -70,21 +73,26 @@ const CELL_W = '20%';
 /** Cell height as a share of the hero — a full fifth, so rows meet exactly. */
 export const CELL_H = '20%';
 
-/** [col, row] of every filled cell, read off the reference checkerboard. */
+/**
+ * [col, row] of every filled cell.
+ *
+ * The full 5×5 grid, less the three cells the hero card covers — column 2,
+ * rows 1 through 3. That leaves 22 cells, one for each image in the pool, so
+ * the whole set is visible at once with no cell left empty.
+ */
 const FILLED_CELLS: Array<[number, number]> = [
-  [0, 0], [2, 0], [4, 0],
-  [1, 1], [3, 1],
-  [0, 2], [4, 2],
-  [1, 3], [3, 3],
-  [0, 4], [2, 4], [4, 4],
+  [0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
+  [0, 1], [1, 1],         [3, 1], [4, 1],
+  [0, 2], [1, 2],         [3, 2], [4, 2],
+  [0, 3], [1, 3],         [3, 3], [4, 3],
+  [0, 4], [1, 4], [2, 4], [3, 4], [4, 4],
 ];
 
 /** Wait between one column starting its flip and the next, in seconds. */
 const FLIP_STAGGER = 0.11;
 
 function cellAnchor([col, row]: [number, number]): SlotAnchor {
-  const side: Side = col < 2 ? 'left' : col > 2 ? 'right' : row < 2 ? 'left' : 'right';
-  return { top: ROW[row], left: COL[col], width: CELL_W, side, col };
+  return { top: ROW[row], left: COL[col], width: CELL_W, col };
 }
 
 /**
@@ -101,11 +109,6 @@ export function flipDelayFor(col: number, reverse: boolean): number {
 
 const CELL_ANCHORS = FILLED_CELLS.map(cellAnchor);
 
-const LEFT_ANCHORS: SlotAnchor[] = CELL_ANCHORS.filter((a) => a.side === 'left');
-const RIGHT_ANCHORS: SlotAnchor[] = CELL_ANCHORS.filter((a) => a.side === 'right');
-
-const ANCHORS_BY_SIDE: Record<Side, SlotAnchor[]> = { left: LEFT_ANCHORS, right: RIGHT_ANCHORS };
-
 export interface HomeGridSlot {
   /** Stable identity for AnimatePresence — changes whenever the tile's content does. */
   key: string;
@@ -116,96 +119,90 @@ export interface HomeGridSlot {
   anchor: SlotAnchor;
 }
 
-function pickIndices(count: number, exclude: Set<number>, total: number): number[] {
-  const pool = Array.from({ length: total }, (_, i) => i).filter((i) => !exclude.has(i));
-  const picked: number[] = [];
-  while (picked.length < count && pool.length > 0) {
-    const idx = Math.floor(Math.random() * pool.length);
-    picked.push(pool.splice(idx, 1)[0]);
+/** A shuffled copy, so the pool lands in a different order on each visit. */
+function shuffled<T>(items: T[]): T[] {
+  const out = items.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
   }
-  return picked;
-}
-
-function pickAnchors(side: Side, count: number, exclude: Set<SlotAnchor> = new Set()): SlotAnchor[] {
-  const pool = ANCHORS_BY_SIDE[side].filter((a) => !exclude.has(a));
-  const picked: SlotAnchor[] = [];
-  while (picked.length < count && pool.length > 0) {
-    const idx = Math.floor(Math.random() * pool.length);
-    picked.push(pool.splice(idx, 1)[0]);
-  }
-  return picked;
+  return out;
 }
 
 let keySeq = 0;
 const nextKey = () => `tile-${++keySeq}`;
 
-/** Builds slots split evenly across both sides (slotCount must be even). */
-function buildSlots(slotCount: number): HomeGridSlot[] {
-  const perSide = slotCount / 2;
-  const design = pickIndices(slotCount, new Set(), IMAGE_SETS.design.length);
-  const travel = pickIndices(slotCount, new Set(), IMAGE_SETS.travel.length);
-  const leftAnchors = pickAnchors('left', perSide);
-  const rightAnchors = pickAnchors('right', perSide);
-  const anchors = [...leftAnchors, ...rightAnchors];
-  return anchors.map((anchor, i) => ({
-    key: nextKey(),
-    src: IMAGE_SETS.design[design[i]],
-    backSrc: IMAGE_SETS.travel[travel[i]],
-    anchor,
-  }));
+/**
+ * One slot per filled cell, holding the whole image pool at once.
+ *
+ * Cells are not chosen — every one is filled, which is what makes the grid
+ * read as a complete checkerboard rather than a scattering of tiles. Only the
+ * assignment of images to cells is random.
+ */
+function buildSlots(): HomeGridSlot[] {
+  const order = shuffled(IMAGES.map((_, i) => i));
+  return CELL_ANCHORS.map((anchor, i) => {
+    const front = order[i % order.length];
+    return {
+      key: nextKey(),
+      src: IMAGES[front],
+      backSrc: IMAGES[(front + BACK_OFFSET) % IMAGES.length],
+      anchor,
+    };
+  });
 }
 
 /**
- * The floating tiles behind the hero card.
+ * The tiles behind the hero card.
  *
- * Each slot carries a fresh `key` whenever its content changes, so
- * `AnimatePresence` in the view animates the old tile out and the new one in —
- * no visibility flags or hand-rolled timing here.
+ * Every cell of the checkerboard is filled from the start, so the whole image
+ * pool is on screen at once. The cycle then swaps one tile at a time: a tile
+ * keeps its cell and takes a new image, which the view cross-fades because the
+ * slot's `key` changes.
+ *
+ * The tile is picked at random rather than in sequence, so the changes read as
+ * scattered across the grid instead of marching through it in order. The one
+ * rule is that it never picks the tile it just changed — back-to-back swaps in
+ * the same cell look like a glitch rather than a rotation.
+ *
+ * Images cycle among the tiles rather than being drawn from a larger library:
+ * with the pool exactly filling the grid there is no unseen image to bring in,
+ * so a swap trades pictures with another cell.
  */
-export function useHomeGrid(slotCount = 6, swapIntervalMs = 1500) {
-  const [slots, setSlots] = useState<HomeGridSlot[]>(() => buildSlots(slotCount));
-  const nextSlotRef = useRef(0);
+export function useHomeGrid(swapIntervalMs = 2600) {
+  const [slots, setSlots] = useState<HomeGridSlot[]>(() => buildSlots());
+  /** The cell changed last, so the next pick can avoid repeating it. */
+  const lastSwapped = useRef(-1);
 
-  // Steady-state: rotate one slot at a time to fresh images + position.
-  // Only meaningful when a set has more images than visible slots — with
-  // slotCount >= pool size every image is already on screen, so there's nothing
-  // left to rotate in and this stays idle.
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-    if (slotCount >= IMAGE_SETS.design.length) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const id = setInterval(() => {
-      const swapSlot = nextSlotRef.current % slotCount;
-      nextSlotRef.current += 1;
-
       setSlots((prev) => {
-        // Both faces are replaced together, so a tile never keeps a stale
-        // picture on the side that happens to be hidden.
-        const pickFor = (set: HomeGridMode, current: (s: HomeGridSlot) => string) => {
-          const paths = IMAGE_SETS[set];
-          const used = new Set(prev.map((s) => paths.indexOf(current(s))).filter((i) => i !== -1));
-          const [idx] = pickIndices(1, used, paths.length);
-          return idx === undefined ? undefined : paths[idx];
-        };
-        const nextSrc = pickFor('design', (s) => s.src);
-        const nextBack = pickFor('travel', (s) => s.backSrc);
-        if (!nextSrc || !nextBack) return prev;
+        if (prev.length < 2) return prev;
 
-        const side = prev[swapSlot].anchor.side;
-        const usedAnchors = new Set(prev.filter((s) => s.anchor.side === side).map((s) => s.anchor));
-        const [nextAnchor] = pickAnchors(side, 1, usedAnchors);
-        if (nextAnchor === undefined) return prev;
-        return prev.map((s, i) =>
-          i === swapSlot
-            ? { key: nextKey(), src: nextSrc, backSrc: nextBack, anchor: nextAnchor }
-            : s,
-        );
+        // A random cell, never the one changed last.
+        let target = Math.floor(Math.random() * prev.length);
+        if (target === lastSwapped.current) target = (target + 1) % prev.length;
+        lastSwapped.current = target;
+
+        // Trade images with another cell: the pool exactly fills the grid, so
+        // a new picture for this tile has to come from somewhere on it.
+        let donor = Math.floor(Math.random() * prev.length);
+        if (donor === target) donor = (donor + 1) % prev.length;
+
+        return prev.map((s, i) => {
+          if (i === target)
+            return { ...s, key: nextKey(), src: prev[donor].src, backSrc: prev[donor].backSrc };
+          if (i === donor)
+            return { ...s, key: nextKey(), src: prev[target].src, backSrc: prev[target].backSrc };
+          return s;
+        });
       });
     }, swapIntervalMs);
 
     return () => clearInterval(id);
-  }, [slotCount, swapIntervalMs]);
+  }, [swapIntervalMs]);
 
   return slots;
 }
