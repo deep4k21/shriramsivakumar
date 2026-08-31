@@ -55,9 +55,22 @@ export function Career() {
         </motion.div>
       </motion.div>
 
-      <motion.div className={`group relative flex flex-col overflow-hidden ${CARD}`} style={exit}>
-        <CardGlow />
-        <div className="flex items-stretch gap-1.5 overflow-x-auto overflow-y-hidden px-1.5 pt-1.5">
+      {/*
+        A browser tab strip: the outline runs up and around the selected
+        company and back down into the panel, so the two read as one shape. The
+        other three sit outside it, unbordered, as tabs waiting behind.
+
+        The strip is not inside the bordered box — it sits above it, and the
+        active tab drops onto the panel's top edge to cover that segment of
+        border with its own fill. That break in the line is the whole effect.
+
+        Nothing on this path may clip its overflow, or the tab's overhang is
+        sliced off and the border reappears underneath it: not the panel
+        (`overflow-hidden` moved to the content below) and not the strip, which
+        is why it carries no `overflow-x-auto` despite being a row of tabs.
+      */}
+      <motion.div className="group relative flex flex-col" style={exit}>
+        <div className="relative z-1 flex items-stretch gap-1.5">
           {ROLES.map((r, i) => {
             const on = companyIdx === i;
             return (
@@ -68,10 +81,29 @@ export function Career() {
                 title={r.name}
                 aria-label={r.name}
                 aria-pressed={on}
-                className="flex h-11.5 flex-none cursor-pointer items-center justify-center rounded-t-lg px-6"
+                /*
+                  The tab is pulled down over the panel's top border so its own
+                  fill hides that segment, leaving the outline open between the
+                  tab's two sides — that break is the whole browser-tab effect.
+
+                  Two pixels rather than one: the tab and the panel do not land
+                  on the same device pixel at every zoom and viewport, so a 1px
+                  overlap against a 1px border let the line show through under
+                  the selected tab. The second pixel is covered by the panel's
+                  own fill below it, so it costs nothing visually.
+
+                  Inactive tabs keep a transparent border rather than none, so
+                  switching does not shift anything by a pixel.
+                */
+                className="relative -mb-0.5 flex h-11.5 flex-none cursor-pointer items-center justify-center rounded-t-[10px] border border-b-0 px-6"
+                /*
+                  Opaque, not the panel's 85% surface: this fill is what hides
+                  the panel's top border under the tab, and a translucent one
+                  would let the line show straight through.
+                */
                 animate={{
-                  backgroundColor: on ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,0)',
-                  boxShadow: on ? 'inset 0 -1px 0 0 rgba(137,145,159,0)' : 'inset 0 -1px 0 0 #89919F',
+                  backgroundColor: on ? 'rgb(24,25,29)' : 'rgba(255,255,255,0)',
+                  borderColor: on ? 'rgba(137,145,159,.7)' : 'rgba(137,145,159,0)',
                 }}
                 transition={{ duration: 0.18 }}
               >
@@ -79,13 +111,36 @@ export function Career() {
                   src={r.logo}
                   alt={r.name}
                   className="h-5.5 w-auto object-contain"
-                  animate={{ opacity: on ? 1 : 0.6 }}
+                  animate={{ opacity: on ? 1 : 0.55 }}
                   transition={{ duration: 0.18 }}
                 />
               </motion.button>
             );
           })}
         </div>
+
+        {/*
+          The panel proper. Its top-left corner is squared off only when the
+          first tab is selected — the tab is sitting on that corner then, and a
+          radius there would leave the outline visibly kinked.
+        */}
+        <div
+          /*
+            A min-height so switching companies does not resize the panel.
+            Freshworks is the only role with a progression row, which made it
+            40px taller than the other three and the whole card jumped when it
+            was selected — 393px is that tallest role, so the shorter ones now
+            pad out to it instead.
+
+            A floor rather than a fixed height: a role whose copy wraps to an
+            extra line on a narrow viewport can still grow past it, which is
+            the right failure — text stays readable rather than being clipped.
+          */
+          className={`relative flex min-h-[393px] flex-col overflow-hidden ${CARD} ${
+            companyIdx === 0 ? 'rounded-tl-none' : ''
+          }`}
+        >
+          <CardGlow />
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -133,6 +188,7 @@ export function Career() {
             </div>
           </motion.div>
         </AnimatePresence>
+        </div>
       </motion.div>
       </div>
     </section>
