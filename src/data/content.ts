@@ -169,6 +169,12 @@ export interface Project {
    */
   deck?: RowDocument;
   /**
+   * A live prototype shown below the process rows, in the same 16:9 frame the
+   * deck uses. The alternative to `deck` for a project whose artefact is
+   * interactive rather than a sequence of slides — set one or the other.
+   */
+  prototype?: ProjectPrototype;
+  /**
    * The optional outcome-metrics row, sitting between the process rows and the
    * end note. Omitted entirely for a project without metrics — the section
    * renders nothing and reserves no space.
@@ -1148,6 +1154,36 @@ export const CATEGORIES: Category[] = [
         // TODO: supply the real slides. Findings, ratings and client detail
         // shown are placeholder.
         deck: { title: 'A long-form report', pages: placeholderPages(68, 12) },
+      },
+      {
+        name: 'A proposal prototype',
+        software: ['Figma'],
+        thumbnail: '/images/Presentation/A proposal prototype/thumbnail.svg',
+        problem:
+          "A consulting proposal where the methodology is the sell — five phases across four delivery waves. As slides it's five pages of cards, and by page three the client has lost the shape of the whole thing.",
+        solution:
+          'Built in Figma as a clickable prototype instead of a deck: the approach becomes one horizontal track the client pans along, so the sequence stays visible while they move through it.',
+        processRows: [
+          {
+            label: 'TRACK',
+            text: 'The dotted line, the icon markers and the wave label continue across screens rather than resetting. Moving right feels like panning along a single timeline, not advancing to the next slide.',
+            textOnly: true,
+          },
+          {
+            label: 'CONTROL',
+            text: 'One forward affordance at a time, sitting on the track itself where the eye already is. Back and home stay parked bottom-left throughout, so exploring never risks getting lost.',
+            textOnly: true,
+          },
+          {
+            label: 'RETURN',
+            text: 'Every path leads back to the opening requirements screen. A proposal gets revisited in a room full of people arguing — it needed a fixed point to return to, not a linear exit.',
+            textOnly: true,
+          },
+        ],
+        // The artefact is interactive, so this takes the prototype frame rather
+        // than the paginated deck viewer the other five use.
+        // TODO: supply the real Figma embed URL.
+        prototype: { embedUrl: 'about:blank' },
       },
     ],
   },

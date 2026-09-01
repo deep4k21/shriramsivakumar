@@ -336,6 +336,16 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             </div>
           )}
 
+          {/*
+            A live prototype in the same frame the deck uses, for a project
+            whose artefact is interactive rather than a run of slides.
+          */}
+          {project.prototype && (
+            <div className="w-full min-h-0 flex-none" style={{ aspectRatio: '16 / 9' }}>
+              <PrototypePiP prototype={project.prototype} />
+            </div>
+          )}
+
           {/* Optional — omitted entirely (no row, no reserved spacing) for projects without metrics. */}
           {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}
 
