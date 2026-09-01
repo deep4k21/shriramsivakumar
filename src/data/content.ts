@@ -1008,6 +1008,7 @@ export const CATEGORIES: Category[] = [
     projects: [
       {
         name: 'A self-presentation deck',
+        thumbnail: '/images/Presentation/A self-presentation deck/thumbnail.svg',
         software: ['Figma'],
         problem:
           'A deck about myself, built for a company I wanted to work at. The hardest brief there is — no client to hide behind, and the design gets judged as hard as anything I put inside it.',
@@ -1035,6 +1036,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'A product pitch deck',
+        thumbnail: '/images/Presentation/A product pitch deck/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
           'Six slides to sell an AI payroll and HR platform to enterprise buyers running payroll across multiple countries — people who sit through pitches for a living and have heard every version of “one platform” before.',
@@ -1062,6 +1064,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'A presentation system',
+        thumbnail: '/images/Presentation/A presentation system/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
           'A consulting team producing a constant stream of client decks — kickoffs, scoping documents, executive committee updates — built mostly by consultants, not designers. Without a system every deck restarts every decision, and none of them match.',
@@ -1090,6 +1093,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'An interactive deck',
+        thumbnail: '/images/Presentation/An interactive deck/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
           'A thirty-three slide people update spanning four HR functions — shared services, talent acquisition, talent management and organisational development — presented to leaders who each mainly care about one of them. Linear slide order serves nobody in that room.',
@@ -1118,6 +1122,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'A long-form report',
+        thumbnail: '/images/Presentation/A long-form report/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
           'A sixty-eight slide maturity assessment across eleven domains, each with its own findings, rating and recommendations — and roughly 230 scored questions underneath it. Past about slide forty a reader stops knowing where they are.',
