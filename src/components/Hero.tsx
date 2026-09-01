@@ -1,8 +1,15 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
-import { CELL_H, flipDelayFor, useHomeGrid } from '../hooks/useHomeGrid';
+import {
+  CELL_H,
+  FADE_FLOOR,
+  SHRINK_FLOOR,
+  SHRINK_S,
+  flipDelayFor,
+  useHomeGrid,
+} from '../hooks/useHomeGrid';
 import { CardGlow } from './CardGlow';
 
 interface HeroProps {
@@ -638,17 +645,17 @@ export function Hero({ flipOnHover }: HeroProps) {
   const [hovered, setHovered] = useState(false);
   /** Signed half-turn count: +1 to show travel, −1 back, so the two sweeps mirror. */
   const [turns, setTurns] = useState(0);
-  // Eight of the twelve checkerboard cells are filled at a time. The spare
-  // cells are what make the rotation visible: each swap can move an image to a
-  // position that was empty, so tiles appear and disappear around the grid
-  // rather than only changing picture in place.
+  // Every checkerboard cell is filled, and each image keeps the cell it was
+  // assigned — the layout is fixed. What moves is scale: tiles shrink toward
+  // their own centres and grow back on slow, independent clocks, so the field
+  // keeps breathing without the composition ever changing.
   //
   // Each tile carries both pictures at once — its design image on the front
   // face and its travel image on the back — so the flip reveals the other one
   // geometrically. Swapping `src` on a timer instead would need every column to
   // change at its own midpoint: the columns turn at staggered times, so any
   // single moment catches some of them face-on, picture visibly changing.
-  const gridSlots = useHomeGrid(2600);
+  const gridSlots = useHomeGrid();
 
   // The hero → intro ghost leaves the flip card as the hero scrolls away, so
   // the hero's own content clears behind it. The card's outer box keeps its
@@ -690,8 +697,7 @@ export function Hero({ flipOnHover }: HeroProps) {
         aria-hidden="true"
         style={exit}
       >
-        <AnimatePresence>
-          {gridSlots.map((slot) => {
+        {gridSlots.map((slot) => {
             return (
               <motion.div
                 key={slot.key}
@@ -706,13 +712,24 @@ export function Hero({ flipOnHover }: HeroProps) {
                   width: slot.anchor.width,
                   height: CELL_H,
                 }}
-                // The cells hold their place in the pattern, so swapping is a
-                // slow cross-fade in place rather than a scatter — movement
-                // would break the grid the images are meant to form.
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.6, ease: 'easeInOut' }}
+                // Each tile shrinks toward its own centre and grows back, on
+                // its own clock. The cell's box is fixed, so `scale` contracts
+                // about the middle of the tile — the picture never changes and
+                // nothing moves out of place.
+                //
+                // Opacity rides along with the scale rather than replacing it:
+                // a tile that only shrank would leave a visible gap in the
+                // checkerboard, and one that only faded is the flicker this
+                // replaced. Both stop short of nothing, so the tile recedes.
+                //
+                // Slow and shallow by intent — a long ease with a small range
+                // reads as the field breathing rather than as tiles animating.
+                initial={{ scale: 1, opacity: 1 }}
+                animate={{
+                  scale: slot.visible ? 1 : SHRINK_FLOOR,
+                  opacity: slot.visible ? 1 : FADE_FLOOR,
+                }}
+                transition={{ duration: SHRINK_S, ease: 'easeInOut' }}
               >
                 {/*
                   The tile turns with the card, so the whole scene flips to the
@@ -753,7 +770,6 @@ export function Hero({ flipOnHover }: HeroProps) {
               </motion.div>
             );
           })}
-        </AnimatePresence>
       </motion.div>
 
       {/*

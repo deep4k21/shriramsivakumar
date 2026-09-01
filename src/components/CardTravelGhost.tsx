@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useScroll, useTransform, useMotionValueEvent } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GhostSkin, readSkin, type Skin } from './GhostSkin';
+import { FRAME_TILT_DEG } from './PhotoFrame';
 
 /** Set false to remove the travelling outline entirely. */
 export const CARD_TRAVEL_ENABLED = true;
@@ -179,6 +180,19 @@ export function CardTravelGhost() {
   const width = useTransform(progress, [0, 1], [ends?.from.width ?? 0, ends?.to.width ?? 0]);
   const height = useTransform(progress, [0, 1], [ends?.from.height ?? 0, ends?.to.height ?? 0]);
   const borderRadius = useTransform(progress, [0, 1], [ends?.from.radius ?? 0, ends?.to.radius ?? 0]);
+  /*
+    The hero card hangs square and the photo frame it becomes hangs tilted, so
+    the ghost turns as it flies rather than arriving flat and snapping.
+
+    It overshoots slightly past the middle — a card being set down swings a
+    little further than its resting angle and settles back — which reads as
+    weight rather than as a linear tween between two numbers.
+  */
+  const rotate = useTransform(
+    progress,
+    [0, 0.55, 1],
+    [0, FRAME_TILT_DEG * 1.35, FRAME_TILT_DEG],
+  );
   // Fade in as it leaves the hero, out as it lands on the panel.
   const opacity = useTransform(progress, [0, 0.12, 0.88, 1], [0, 1, 1, 0]);
 
@@ -223,7 +237,10 @@ export function CardTravelGhost() {
     <motion.div
       aria-hidden="true"
       className="pointer-events-none fixed z-20 max-[900px]:hidden"
-      style={{ top, left, width, height, borderRadius, opacity }}
+      // `transformOrigin` matches the frame's own: both turn about the taped
+      // top edge, so the ghost's rotation tracks the frame's rather than
+      // pivoting about a different point and drifting off it at the handoff.
+      style={{ top, left, width, height, borderRadius, opacity, rotate, transformOrigin: 'top center' }}
     >
       <GhostSkin t={progress} from={skins.from} to={skins.to} borderRadius={borderRadius} />
     </motion.div>

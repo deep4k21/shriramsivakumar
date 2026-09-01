@@ -6,6 +6,7 @@ import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { DownloadCircleIcon } from './Icons';
+import { PhotoFrame } from './PhotoFrame';
 import { ResumeFlight } from './ResumeFlight';
 
 /*
@@ -95,7 +96,11 @@ export function Intro() {
         <div
           className="grid w-full items-center gap-[clamp(36px,4.5vw,76px)]"
           style={{
-            gridTemplateColumns: 'minmax(320px, 1fr) minmax(280px, 408px)',
+            // The right column caps the photo frame's size — the frame fills
+            // the square panel, so this number is its width. Held in `vh` as
+            // well as px so a short viewport shrinks it rather than pushing the
+            // frame past the fold; 730 is the ceiling on a tall screen.
+            gridTemplateColumns: 'minmax(320px, 1fr) minmax(280px, min(730px, 72vh))',
             transform: `scale(${fit.toFixed(3)})`,
             transformOrigin: 'center left',
           }}
@@ -110,13 +115,13 @@ export function Intro() {
               <RevealWord
                 progress={progress}
                 slot={0}
-                className="font-heading text-[clamp(20px,2vw,30px)] font-bold text-grey"
+                className="font-heading text-[clamp(20px,2.2vw,36px)] font-bold text-grey"
               >
                 From
               </RevealWord>
 
               <h1
-                className="relative m-0 flex max-w-[17ch] flex-wrap text-[clamp(32px,3.9vw,58px)] leading-[1.14] tracking-[-0.03em]"
+                className="relative m-0 flex max-w-[17ch] flex-wrap text-[clamp(32px,4.4vw,70px)] leading-[1.14] tracking-[-0.03em]"
                 style={{ columnGap: '0.26em', rowGap: '0.02em' }}
               >
                 {/*
@@ -151,12 +156,17 @@ export function Intro() {
               </h1>
             </div>
 
-            <motion.div className="flex max-w-[46ch] flex-col gap-2" style={bodyReveal}>
-              <p className="m-0 font-body text-[clamp(13.5px,1.05vw,15.5px)]/[1.7] font-bold">
+            {/*
+              Measured in `ch`, so the line length holds as the type scales —
+              the paragraph keeps a readable measure rather than stretching to
+              the column's full 1120px.
+            */}
+            <motion.div className="flex max-w-[52ch] flex-col gap-2.5" style={bodyReveal}>
+              <p className="m-0 font-body text-[clamp(13.5px,1.2vw,18.5px)]/[1.7] font-bold">
                 <span className="text-orange">Designer by profession,</span>{' '}
                 <span className="text-green">traveler by instinct.</span>
               </p>
-              <p className="m-0 font-body text-[clamp(13.5px,1.05vw,15.5px)]/[1.7] text-grey text-pretty">
+              <p className="m-0 font-body text-[clamp(13.5px,1.2vw,18.5px)]/[1.7] text-grey text-pretty">
                 Over <span className="font-bold text-white">9 years</span> designing SaaS products, UI/UX
                 experiences, and scalable visual systems shaped by{' '}
                 <span className="font-bold text-white">global perspective, curiosity,</span> and{' '}
@@ -187,7 +197,7 @@ export function Intro() {
                   // click can trigger it again rather than leaving it "used up".
                   window.setTimeout(() => setFlightPath(null), 1000);
                 }}
-                className="inline-flex items-center gap-3.5 rounded-xl border border-teal bg-[#005961]/10 py-3 pr-4 pl-5 font-heading text-[clamp(14px,1.05vw,16px)] font-bold text-teal"
+                className="inline-flex items-center gap-3.5 rounded-xl border border-teal bg-[#005961]/10 py-3 pr-4 pl-5 font-heading text-[clamp(14px,1.15vw,19px)] font-bold text-teal"
                 whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}
                 transition={{ duration: 0.2 }}
               >
@@ -197,86 +207,52 @@ export function Intro() {
             </motion.div>
           </motion.div>
 
+          {/*
+            The photo frame itself, not a browser window holding one: the
+            drawing carries its own border and tape, so the panel chrome that
+            used to sit around it — the bar of dots, the bordered box, the
+            footer rule — was a second frame around a frame.
+
+            `data-card-travel-target` stays on the outer box. The hero's ghost
+            flies into this element and the about ghost departs from it, both
+            measuring it live, so the attribute has to ride whatever the panel
+            becomes.
+          */}
           <motion.div
             data-card-travel-target
-            // Square, matching the Figma: the panel's overall footprint tracks
-            // the left column rather than the image area dictating a wider,
-            // shorter box. The image region flexes into whatever the chrome
-            // leaves, so the outer box stays 1:1 at any width.
-            className="relative flex aspect-square flex-col overflow-hidden rounded-[18px] border border-white/9 bg-surface"
+            // Square, matching the Figma: the footprint tracks the left column
+            // rather than the artwork dictating a wider, shorter box.
+            className="relative flex aspect-square flex-col items-center justify-center gap-[clamp(10px,1.6vh,18px)]"
             style={{ ...panelReveal, opacity: panelOpacity }}
           >
-            <motion.div
-              className="flex flex-none items-center gap-1.75 border-b border-white/7 px-4 py-3.25"
-              style={exit}
-            >
-              <span className="size-2.25 rounded-full bg-orange" />
-              <span className="size-2.25 rounded-full bg-green" />
-              <span className="size-2.25 rounded-full bg-teal" />
-              <span className="ml-2.5 font-heading text-[10.5px] font-medium tracking-[0.14em] text-teal">
-                {INTRO_SLIDES[slideIdx].toUpperCase()}
-              </span>
-              <div className="flex-1" />
-              <span className="font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
-                {slideIdx + 1} / {INTRO_SLIDES.length}
-              </span>
-            </motion.div>
-            <motion.div className="relative min-h-0 w-full flex-1 bg-[#0d0f12]" style={exit}>
+            {/*
+              One frame per slide, cross-fading. The drawing carries all of the
+              furniture itself — label and counter on its top bar, arrows in its
+              lower margin — so there is no separate row under the frame.
+
+              Only the slide on screen gets the handlers: the others are still
+              mounted for the cross-fade, and arrows on a hidden frame would sit
+              under the cursor as dead targets.
+            */}
+            <motion.div className="relative min-h-0 w-full flex-1" style={exit}>
               {INTRO_SLIDES.map((slide, i) => (
                 <motion.div
-                  key={slide}
-                  className="absolute inset-0 grid place-items-center"
+                  key={slide.caption}
+                  className="absolute inset-0 flex min-h-0 items-center justify-center"
                   animate={{ opacity: i === slideIdx ? 1 : 0 }}
                   transition={{ duration: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
                   style={{ pointerEvents: i === slideIdx ? 'auto' : 'none' }}
                 >
-                  <span className="font-body text-[11px] tracking-[0.1em] text-[#5a5a5a]">{slide}</span>
+                  <PhotoFrame
+                    caption={slide.caption}
+                    image={slide.image}
+                    index={i + 1}
+                    total={INTRO_SLIDES.length}
+                    onPrev={i === slideIdx ? prevSlide : undefined}
+                    onNext={i === slideIdx ? nextSlide : undefined}
+                  />
                 </motion.div>
               ))}
-            </motion.div>
-            <motion.div
-              className="flex flex-none flex-wrap items-center gap-1.75 border-t border-white/7 px-4 py-3.5"
-              style={exit}
-            >
-              {INTRO_SLIDES.map((slide, i) => {
-                const on = i === slideIdx;
-                return (
-                  <motion.button
-                    key={slide}
-                    type="button"
-                    title={slide}
-                    onClick={() => setSlideIdx(i)}
-                    className="h-7 w-8.5 flex-none cursor-pointer rounded-md font-body text-[10.5px] font-medium"
-                    whileHover={{ y: -2 }}
-                    transition={{ duration: 0.18 }}
-                    animate={{
-                      backgroundColor: on ? 'rgba(0,184,201,.12)' : 'rgba(0,0,0,0)',
-                      borderColor: on ? '#00B8C9' : 'rgba(255,255,255,.1)',
-                      color: on ? '#00B8C9' : '#5a5a5a',
-                    }}
-                    style={{ borderWidth: 1.5, borderStyle: 'solid' }}
-                  >
-                    {i + 1}
-                  </motion.button>
-                );
-              })}
-              <div className="flex-1" />
-              <button
-                type="button"
-                onClick={prevSlide}
-                aria-label="Previous slide"
-                className="grid size-7.5 flex-none cursor-pointer place-items-center rounded-md border border-white/12 bg-transparent font-body text-[13px] text-grey hover:text-white"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={nextSlide}
-                aria-label="Next slide"
-                className="grid size-7.5 flex-none cursor-pointer place-items-center rounded-md border border-white/12 bg-transparent font-body text-[13px] text-grey hover:text-white"
-              >
-                ›
-              </button>
             </motion.div>
           </motion.div>
         </div>

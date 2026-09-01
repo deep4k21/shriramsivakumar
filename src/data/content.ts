@@ -1518,4 +1518,23 @@ export const INTRO_TILES: IntroTile[] = [
   },
 ];
 
-export const INTRO_SLIDES = ['At the desk', 'On the road', 'Studio setup', 'Speaking', 'Sketchbook', 'Window seat'];
+/** A slide in the intro's photo frame: its caption and the picture behind it. */
+export interface IntroSlide {
+  caption: string;
+  image: string;
+}
+
+/*
+  Placeholders, borrowed from the home grid until the real photographs exist.
+  Matched to their captions where the artwork allows — the travel illustration
+  for "On the road", the desert scene for "Window seat" — so the sequence reads
+  deliberately rather than as six unrelated pictures.
+*/
+export const INTRO_SLIDES: IntroSlide[] = [
+  { caption: 'At the desk', image: '/images/homegrid/card01_portrait_man.png' },
+  { caption: 'On the road', image: '/images/homegrid/card12_phones_travel.png' },
+  { caption: 'Studio setup', image: '/images/homegrid/card19_mobily_dashboard.png' },
+  { caption: 'Speaking', image: '/images/homegrid/card20_man_thinking.png' },
+  { caption: 'Sketchbook', image: '/images/homegrid/card14_city_illustration.png' },
+  { caption: 'Window seat', image: '/images/homegrid/card08_ufo_desert.png' },
+];

@@ -450,11 +450,22 @@ function CategoryCard({
           />
         )}
           <motion.div
-            className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)]"
+            className="flex flex-none items-center gap-[0.26em] font-body text-[clamp(12.5px,0.95vw,15px)]"
             animate={{ color: '#00B8C9' }}
             transition={{ duration: 0.18 }}
           >
-            Continue to <span className="font-bold">{cat.linkLabel ?? cat.short}</span>{' '}
+            {/*
+              No literal spaces between these: the row is a flex container with
+              its own `gap`, so a trailing space in the text node and a `{' '}`
+              before the arrow were each adding a second space on top of it.
+
+              The gap is in `em` so it tracks the clamped font size, and sized
+              to one word space rather than the 9px left over from when literal
+              spaces were still here — at 15px that was 2.2x a real space, which
+              still read as the double space it was meant to fix.
+            */}
+            <span>Continue to</span>
+            <span className="font-bold">{cat.linkLabel ?? cat.short}</span>
             <motion.span
               className="text-[15px]"
               animate={{ x: filled ? 3 : 0 }}

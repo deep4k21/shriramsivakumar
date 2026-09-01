@@ -1,44 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Every image in the grid pool — one per filled cell, so the whole set is on
- * screen at once rather than a subset cycling through a larger library.
- */
-const FILENAMES = [
-  'card01_portrait_man.png',
-  'card02_experience_nxt.png',
-  'card03_forge_logo.png',
-  'card04_pale_blue.png',
-  'card05_orbit_shift_podcast.png',
-  'card06_phone_screens.png',
-  'card07_iprovision.png',
-  'card08_ufo_desert.png',
-  'card09_recognizing_needs.png',
-  'card10_freshsprint_hackathon.png',
-  'card11_food_illustration.png',
-  'card12_phones_travel.png',
-  'card13_six_reasons_freshworks.png',
-  'card14_city_illustration.png',
-  'card15_project_agresar.png',
-  'card16_freshstart_logo.png',
-  'card17_lavender_blank.png',
-  'card18_icons_grid.png',
-  'card19_mobily_dashboard.png',
-  'card20_man_thinking.png',
-  'card21_icons_grid.png',
-  'card22_freshstart_logo.png',
-];
-
-const IMAGES = FILENAMES.map((name) => `/images/homegrid/${name}`);
-
-/**
- * The card's two faces still show different pictures, so the flip reveals a
- * changed scene rather than the same one twice. Both faces draw from the same
- * pool; the back is offset by half the pool so a tile never shows the same
- * image on both sides.
- */
-const BACK_OFFSET = Math.floor(IMAGES.length / 2);
-
 interface SlotAnchor {
   top: string;
   left?: string;
@@ -50,18 +11,9 @@ interface SlotAnchor {
 }
 
 /**
- * The tiles sit on a checkerboard: a 5×5 grid where alternating cells are
- * filled, leaving the centre 3×3 clear for the hero card.
- *
- * Columns 0–1 land left of the card, 3–4 right; the middle column only carries
- * tiles in the top and bottom rows, where the card is not in the way. Rows and
- * columns are expressed in percentages so the pattern scales with the hero.
- */
-/**
  * An exact 5×5: each cell is a fifth of the hero and starts where the last one
  * ended, so the checkerboard tiles edge to edge with no seams between filled
- * neighbours. The previous values were hand-tuned per column and left gaps of
- * up to 11% horizontally and 6% vertically.
+ * neighbours.
  *
  * The centre cell [2,2] is deliberately unfilled — it sits at 40–60% on both
  * axes, and the hero card covers 36–64% × 21–79% at the narrowest viewport, so
@@ -74,26 +26,66 @@ const CELL_W = '20%';
 export const CELL_H = '20%';
 
 /**
- * [col, row] of every filled cell.
+ * Every filled cell, in reading order, paired with the image that lives there.
  *
- * The full 5×5 grid, less the three cells the hero card covers — column 2,
- * rows 1 through 3. That leaves 22 cells, one for each image in the pool, so
- * the whole set is visible at once with no cell left empty.
+ * The layout is fixed rather than shuffled: each picture has a chosen home and
+ * keeps it for the life of the page, so the composition is designed rather than
+ * whatever a shuffle happened to produce. `card10_freshsprint_hackathon` is
+ * pinned to bottom-centre, [2,4], the one cell the brief names.
+ *
+ * The rest are placed for balance across the field:
+ *   - the two portraits, 01 and 20, sit on opposite sides and opposite rows
+ *   - the near-blank plates, 04 and 17, are split to either side of the card so
+ *     the quiet cells do not pool in one corner
+ *   - the two logo marks (03, 16/22) and the two icon grids (18, 21) are each
+ *     separated, since a repeated look side by side reads as a mistake
+ *
+ * The full 5×5 less the three cells the card covers — column 2, rows 1–3 —
+ * leaves exactly 22, one per image in the set.
  */
-const FILLED_CELLS: Array<[number, number]> = [
-  [0, 0], [1, 0], [2, 0], [3, 0], [4, 0],
-  [0, 1], [1, 1],         [3, 1], [4, 1],
-  [0, 2], [1, 2],         [3, 2], [4, 2],
-  [0, 3], [1, 3],         [3, 3], [4, 3],
-  [0, 4], [1, 4], [2, 4], [3, 4], [4, 4],
+const CELLS: Array<{ cell: [number, number]; file: string }> = [
+  // Top row, left to right.
+  { cell: [0, 0], file: 'card01_portrait_man.png' },
+  { cell: [1, 0], file: 'card06_phone_screens.png' },
+  { cell: [2, 0], file: 'card13_six_reasons_freshworks.png' },
+  { cell: [3, 0], file: 'card18_icons_grid.png' },
+  { cell: [4, 0], file: 'card08_ufo_desert.png' },
+
+  // Second row — the card blocks the middle from here down.
+  { cell: [0, 1], file: 'card04_pale_blue.png' },
+  { cell: [1, 1], file: 'card15_project_agresar.png' },
+  { cell: [3, 1], file: 'card02_experience_nxt.png' },
+  { cell: [4, 1], file: 'card11_food_illustration.png' },
+
+  // Third row, flanking the card.
+  { cell: [0, 2], file: 'card19_mobily_dashboard.png' },
+  { cell: [1, 2], file: 'card03_forge_logo.png' },
+  { cell: [3, 2], file: 'card16_freshstart_logo.png' },
+  { cell: [4, 2], file: 'card09_recognizing_needs.png' },
+
+  // Fourth row.
+  { cell: [0, 3], file: 'card14_city_illustration.png' },
+  { cell: [1, 3], file: 'card21_icons_grid.png' },
+  { cell: [3, 3], file: 'card07_iprovision.png' },
+  { cell: [4, 3], file: 'card17_lavender_blank.png' },
+
+  // Bottom row — card10 sits dead centre, as specified.
+  { cell: [0, 4], file: 'card12_phones_travel.png' },
+  { cell: [1, 4], file: 'card05_orbit_shift_podcast.png' },
+  { cell: [2, 4], file: 'card10_freshsprint_hackathon.png' },
+  { cell: [3, 4], file: 'card20_man_thinking.png' },
+  { cell: [4, 4], file: 'card22_freshstart_logo.png' },
 ];
+
+/**
+ * The back face's image for a given cell, offset through the list so a tile
+ * never shows the same picture on both sides. Fixed like the front: the same
+ * cell reveals the same second picture every time it turns.
+ */
+const BACK_OFFSET = Math.floor(CELLS.length / 2);
 
 /** Wait between one column starting its flip and the next, in seconds. */
 const FLIP_STAGGER = 0.11;
-
-function cellAnchor([col, row]: [number, number]): SlotAnchor {
-  return { top: ROW[row], left: COL[col], width: CELL_W, col };
-}
 
 /**
  * How long a cell waits before flipping, so the turn sweeps across the grid
@@ -107,102 +99,143 @@ export function flipDelayFor(col: number, reverse: boolean): number {
   return order * FLIP_STAGGER;
 }
 
-const CELL_ANCHORS = FILLED_CELLS.map(cellAnchor);
-
 export interface HomeGridSlot {
-  /** Stable identity for AnimatePresence — changes whenever the tile's content does. */
+  /** Stable identity — the tile keeps its cell and image for the page's life. */
   key: string;
   /** Shown on the tile's front face, while the card shows its design side. */
   src: string;
   /** Shown on the back face, revealed when the tile turns over. */
   backSrc: string;
   anchor: SlotAnchor;
+  /** False while this tile is contracted. Drives both faces at once. */
+  visible: boolean;
 }
-
-/** A shuffled copy, so the pool lands in a different order on each visit. */
-function shuffled<T>(items: T[]): T[] {
-  const out = items.slice();
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-let keySeq = 0;
-const nextKey = () => `tile-${++keySeq}`;
 
 /**
- * One slot per filled cell, holding the whole image pool at once.
- *
- * Cells are not chosen — every one is filled, which is what makes the grid
- * read as a complete checkerboard rather than a scattering of tiles. Only the
- * assignment of images to cells is random.
+ * How far a tile shrinks toward its own centre — all the way to nothing, so it
+ * collapses into the middle of its cell and grows back out of it.
  */
-function buildSlots(): HomeGridSlot[] {
-  const order = shuffled(IMAGES.map((_, i) => i));
-  return CELL_ANCHORS.map((anchor, i) => {
-    const front = order[i % order.length];
-    return {
-      key: nextKey(),
-      src: IMAGES[front],
-      backSrc: IMAGES[(front + BACK_OFFSET) % IMAGES.length],
-      anchor,
-    };
-  });
-}
+export const SHRINK_FLOOR = 0;
+/**
+ * Opacity at full contraction. Redundant against a scale of zero, but it keeps
+ * the tile from reading as a hard-edged shape shrinking to a point.
+ */
+export const FADE_FLOOR = 0;
+/** One leg of the shrink-and-grow, in seconds. Slow enough not to catch the eye. */
+export const SHRINK_S = 3.4;
+/**
+ * How long the collapsed tile stays gone before growing back, in ms.
+ *
+ * This has to outlast one leg of the animation (`SHRINK_S`) or the tile turns
+ * around before it ever reaches the centre — which is what made an earlier,
+ * faster version bottom out halfway and read as a flicker.
+ */
+const HIDDEN_MS: [number, number] = [3600, 5200];
+/** The pause after a tile has returned before that lane picks another, in ms. */
+const BETWEEN_MS: [number, number] = [1200, 3200];
+/**
+ * How many tiles are animating at once.
+ *
+ * Five of twenty-two: enough that the grid always has something moving in it,
+ * while leaving seventeen steady so the checkerboard still reads as a complete
+ * field rather than a dissolving one. Each runs in its own lane — an
+ * independent shrink-pause-grow loop — and the lanes never collide on the same
+ * cell.
+ */
+const CONCURRENT = 5;
+
+const randBetween = ([lo, hi]: [number, number]) => lo + Math.random() * (hi - lo);
+
+const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file }, i) => ({
+  key: `cell-${cell[0]}-${cell[1]}`,
+  src: `/images/homegrid/${file}`,
+  backSrc: `/images/homegrid/${CELLS[(i + BACK_OFFSET) % CELLS.length].file}`,
+  anchor: { top: ROW[cell[1]], left: COL[cell[0]], width: CELL_W, col: cell[0] },
+  visible: true,
+}));
 
 /**
  * The tiles behind the hero card.
  *
- * Every cell of the checkerboard is filled from the start, so the whole image
- * pool is on screen at once. The cycle then swaps one tile at a time: a tile
- * keeps its cell and takes a new image, which the view cross-fades because the
- * slot's `key` changes.
+ * Every cell is filled from the start and every image keeps its cell — the
+ * layout above is the composition, not a starting point it drifts away from.
+ * All 22 pictures are on screen throughout.
  *
- * The tile is picked at random rather than in sequence, so the changes read as
- * scattered across the grid instead of marching through it in order. The one
- * rule is that it never picks the tile it just changed — back-to-back swaps in
- * the same cell look like a glitch rather than a rotation.
- *
- * Images cycle among the tiles rather than being drawn from a larger library:
- * with the pool exactly filling the grid there is no unseen image to bring in,
- * so a swap trades pictures with another cell.
+ * The life in the grid comes from five tiles at a time, each in its own lane:
+ * a tile shrinks into its own centre, pauses, and grows back, and only once it
+ * has returned does that lane choose another. No lane repeats its own last
+ * cell, and no two lanes hold the same one. Seventeen of the twenty-two are
+ * therefore steady at any moment, so the checkerboard still reads as a complete
+ * field. That is also why the flip needs no special handling: a contracting
+ * tile takes both its faces with it.
  */
-export function useHomeGrid(swapIntervalMs = 2600) {
-  const [slots, setSlots] = useState<HomeGridSlot[]>(() => buildSlots());
-  /** The cell changed last, so the next pick can avoid repeating it. */
-  const lastSwapped = useRef(-1);
+export function useHomeGrid() {
+  const [slots, setSlots] = useState<HomeGridSlot[]>(SLOTS);
+  /** Live timers, one per lane, so unmount cannot leave any running. */
+  const timers = useRef<number[]>([]);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const id = setInterval(() => {
-      setSlots((prev) => {
-        if (prev.length < 2) return prev;
+    const setVisible = (index: number, visible: boolean) =>
+      setSlots((prev) => prev.map((s, i) => (i === index ? { ...s, visible } : s)));
 
-        // A random cell, never the one changed last.
-        let target = Math.floor(Math.random() * prev.length);
-        if (target === lastSwapped.current) target = (target + 1) % prev.length;
-        lastSwapped.current = target;
+    /** Cells currently spoken for, so two lanes never animate the same tile. */
+    const busy = new Set<number>();
+    /** The last cell each lane ran, so a lane does not repeat itself. */
+    const lastOfLane = new Array<number>(CONCURRENT).fill(-1);
+    let stopped = false;
 
-        // Trade images with another cell: the pool exactly fills the grid, so
-        // a new picture for this tile has to come from somewhere on it.
-        let donor = Math.floor(Math.random() * prev.length);
-        if (donor === target) donor = (donor + 1) % prev.length;
+    const after = (lane: number, ms: number, fn: () => void) => {
+      timers.current[lane] = window.setTimeout(() => {
+        if (!stopped) fn();
+      }, ms);
+    };
 
-        return prev.map((s, i) => {
-          if (i === target)
-            return { ...s, key: nextKey(), src: prev[donor].src, backSrc: prev[donor].backSrc };
-          if (i === donor)
-            return { ...s, key: nextKey(), src: prev[target].src, backSrc: prev[target].backSrc };
-          return s;
+    /**
+     * Pick a cell for this lane: never one another lane is already animating,
+     * and never the one this lane just ran. Choosing at random without those
+     * guards lets a cell come up twice running, which reads as a glitch in one
+     * place rather than as movement across the grid.
+     */
+    const pick = (lane: number): number => {
+      const free = SLOTS.map((_, i) => i).filter(
+        (i) => !busy.has(i) && i !== lastOfLane[lane],
+      );
+      // `free` cannot be empty: 22 cells against 5 lanes plus one excluded.
+      return free[Math.floor(Math.random() * free.length)];
+    };
+
+    /** One lane's endless cycle: choose, collapse, pause, grow back, repeat. */
+    const step = (lane: number) => {
+      const index = pick(lane);
+      busy.add(index);
+      lastOfLane[lane] = index;
+
+      setVisible(index, false);
+      after(lane, randBetween(HIDDEN_MS), () => {
+        setVisible(index, true);
+        // Hold the cell until it has finished growing, so the lane cannot
+        // reclaim it — or hand it to another lane — mid-return.
+        after(lane, SHRINK_S * 1000 + randBetween(BETWEEN_MS), () => {
+          busy.delete(index);
+          step(lane);
         });
       });
-    }, swapIntervalMs);
+    };
 
-    return () => clearInterval(id);
-  }, [swapIntervalMs]);
+    // Stagger the lanes' first picks so they do not all collapse together and
+    // leave the grid pulsing in unison rather than shifting continuously.
+    for (let lane = 0; lane < CONCURRENT; lane++) {
+      after(lane, randBetween(BETWEEN_MS) + lane * 900, () => step(lane));
+    }
+
+    const running = timers.current;
+    return () => {
+      stopped = true;
+      running.forEach(clearTimeout);
+    };
+  }, []);
 
   return slots;
 }
