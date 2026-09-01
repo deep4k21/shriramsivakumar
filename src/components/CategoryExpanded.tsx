@@ -1,11 +1,68 @@
-import { motion } from 'motion/react';
+import { animate, motion, useMotionValue, useTransform } from 'motion/react';
+import { useEffect } from 'react';
 import type { Category } from '../data/content';
+import { CARD_GLASS } from '../styles/card';
 
 interface CategoryExpandedProps {
   category: Category;
   categoryIndex: number;
   onClose: () => void;
   onOpenProject: (projectIndex: number) => void;
+}
+
+/**
+ * The panel's surface: the site's own backdrop, so the expanded category sits
+ * on the same ground as every other section rather than on a flat fill of its
+ * own. Painted here rather than left transparent because the panel has to be
+ * opaque — the mosaic it grew from is still behind it.
+ */
+const PANEL_BG = '#16181D';
+const PANEL_BACKDROP = "url('/images/bg 2.svg')";
+
+/**
+ * How long a stat takes to run up to its value.
+ *
+ * Slower than the project metrics row's 1.1s: these four sit together at the
+ * top of the panel and are the first thing that moves as it opens, so a quick
+ * count reads as a flicker rather than as numbers arriving.
+ */
+const COUNT_DURATION_S = 2.2;
+
+/**
+ * One stat, counting up to its value as the panel opens.
+ *
+ * The value is split into its numeric lead and any trailing suffix ("20" and
+ * "+"), so the number runs and the suffix arrives with it — matching how the
+ * project metrics row behaves. A value with no number at all ("∞") skips the
+ * count and simply appears.
+ */
+function StatValue({ value }: { value: string }) {
+  const match = value.match(/^(\d+(?:\.\d+)?)(.*)$/);
+  const numeric = match ? Number.parseFloat(match[1]) : null;
+  const suffix = match ? match[2] : '';
+
+  const count = useMotionValue(0);
+  const display = useTransform(count, (v) => `${Math.round(v)}${suffix}`);
+
+  useEffect(() => {
+    if (numeric === null) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      count.set(numeric);
+      return;
+    }
+    const controls = animate(count, numeric, {
+      duration: COUNT_DURATION_S,
+      // Starts quickly and eases into the final value, so the number settles
+      // rather than stopping dead on it.
+      ease: [0.2, 0.7, 0.2, 1],
+      delay: CONTENT_DELAY,
+    });
+    return () => controls.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numeric]);
+
+  if (numeric === null) return <>{value}</>;
+  return <motion.span>{display}</motion.span>;
 }
 
 /** Content fades in slightly after the box has started growing. */
@@ -24,10 +81,12 @@ export function CategoryExpanded({
   onClose,
   onOpenProject,
 }: CategoryExpandedProps) {
+  /** The close button's fill; the cards use the shared glass card instead. */
   const inset = 'rgba(255,255,255,.04)';
-  const insetBorder = 'rgba(255,255,255,.08)';
   /** The section's own palette, which the panel uses throughout. */
   const TITLE = '#FF9A5C';
+  /** The stat numbers, in the site's own teal rather than the title's orange. */
+  const STAT = '#00B8C9';
   const BODY = '#808080';
   const MUTED = '#5a5a5a';
   const LINK = '#00B8C9';
@@ -43,8 +102,8 @@ export function CategoryExpanded({
       style={{ '--stage-inset-y': 'clamp(16px, 2.2vh, 32px)' } as React.CSSProperties}
       // Opens straight onto the page's own surface: the tile's colour flooding
       // the screen first read as a flash rather than as the panel growing.
-      initial={{ backgroundColor: '#0a0a0a' }}
-      animate={{ backgroundColor: '#0a0a0a' }}
+      initial={{ backgroundColor: PANEL_BG }}
+      animate={{ backgroundColor: PANEL_BG }}
     >
       {/*
         A fully opaque backing layer. This panel shares a `layoutId` with the
@@ -54,7 +113,16 @@ export function CategoryExpanded({
         visible again underneath. An opaque layer means that can never bleed
         through, regardless of what the tile underneath is doing.
       */}
-      <motion.div className="absolute inset-0 -z-10" style={{ backgroundColor: '#0a0a0a' }} />
+      <motion.div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundColor: PANEL_BG,
+          backgroundImage: PANEL_BACKDROP,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
 
       {/*
         The stage is a fixed height, so the content is sized to fit inside the
@@ -131,18 +199,17 @@ export function CategoryExpanded({
             {category.stats.map((s) => (
               <div
                 key={s.label}
-                className="flex flex-col gap-1.5 rounded-[10px] border px-[clamp(18px,1.8vw,28px)] py-[clamp(14px,1.8vh,22px)]"
-                style={{ backgroundColor: inset, borderColor: insetBorder }}
+                className={`flex flex-col gap-1.5 px-[clamp(18px,1.8vw,28px)] py-[clamp(14px,1.8vh,22px)] ${CARD_GLASS}`}
               >
                 <div
                   className="font-heading text-[clamp(26px,2.6vw,40px)] leading-none font-bold tracking-[-0.03em]"
-                  style={{ color: TITLE }}
+                  style={{ color: STAT }}
                 >
-                  {s.value}
+                  <StatValue value={s.value} />
                 </div>
                 <div
-                  className="font-body text-[10.5px] tracking-[0.14em] opacity-70"
-                  style={{ color: MUTED }}
+                  className="font-body text-[10.5px] tracking-[0.14em]"
+                  style={{ color: '#ffffff' }}
                 >
                   {s.label}
                 </div>
@@ -172,9 +239,10 @@ export function CategoryExpanded({
                   key={p.name}
                   type="button"
                   onClick={() => onOpenProject(pi)}
-                  className="flex cursor-pointer flex-col overflow-hidden rounded-[10px] border p-0 text-left"
-                  style={{ backgroundColor: inset, borderColor: insetBorder }}
-                  whileHover={{ y: -4, borderColor: 'rgba(255,154,92,.45)' }}
+                  className={`flex cursor-pointer flex-col overflow-hidden p-0 text-left ${CARD_GLASS}`}
+                  // Only the lift on hover: the accent border it used to take
+                  // would override the glass card's own rim.
+                  whileHover={{ y: -4 }}
                   transition={{ duration: 0.2 }}
                 >
                   {/*

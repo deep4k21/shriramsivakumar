@@ -741,7 +741,7 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
                   the eyebrow line so the label doesn't shift when it leaves.
                 */}
                 <span data-icon-home className="inline-block size-[2.2cqw] flex-none" />
-                02 · PORTFOLIO
+                PORTFOLIO
               </div>
 
               <div className="absolute top-[17.5%] left-[6.6%] font-heading text-[6.4cqw]/[1.22] font-bold tracking-[-0.02em] text-white">

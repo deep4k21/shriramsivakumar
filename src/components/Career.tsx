@@ -31,7 +31,7 @@ export function Career() {
     <section ref={ref} id="career" className="relative h-[300vh] border-t border-white/6">
       <div className="sticky top-0 flex h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav">
       <motion.div className="font-body text-[11px] tracking-[0.18em] text-teal" style={exit}>
-        03 · CAREER JOURNEY
+        CAREER JOURNEY
       </motion.div>
 
       {/*

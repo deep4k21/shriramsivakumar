@@ -56,14 +56,28 @@ export function Sidebar({
       transition={{ duration: 0.3, ease: EASE_OUT }}
       style={{ pointerEvents: visible ? 'auto' : 'none' }}
     >
-      <div className="flex items-center gap-3 border-b border-white/6 px-1 pt-1 pb-2.5">
+      {/*
+        The avatar and name go home, the way a site's own mark usually does.
+        Routed through `onNavigate` rather than left as a plain anchor jump for
+        the same reason the nav items are: `home` has a settled position, and
+        the default jump lands on the section's top edge instead.
+      */}
+      <a
+        href="#home"
+        title="Home"
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate('home');
+        }}
+        className="flex cursor-pointer items-center gap-3 border-b border-white/6 px-1 pt-1 pb-2.5"
+      >
         <span className="size-7 flex-none overflow-hidden rounded-full border border-white/12">
           <img src="/images/menuicons/avatar.png" alt="" className="size-full object-cover" />
         </span>
         <RailLabel show={hover} className="font-heading text-[12.5px] font-semibold text-white">
           Shriram Sivakumar
         </RailLabel>
-      </div>
+      </a>
 
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
