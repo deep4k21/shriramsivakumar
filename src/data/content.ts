@@ -339,7 +339,7 @@ export const CATEGORIES: Category[] = [
     body: 'Designing intuitive digital experiences that transform complex workflows into scalable products and seamless user journeys.',
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
-    art: '/images/portfolio/uiux.svg',
+    art: '/images/portfolio/UI-UX.svg',
     artScale: 0.39,
     stats: [
       { value: '20+', label: 'PRODUCTS' },
