@@ -49,7 +49,7 @@ const DEFAULT_CONFIG: SiteConfig = {
   gridRadius: 210,
   flipOnHover: false,
   availableForWork: true,
-  backdrop: 'one',
+  backdrop: 'two',
 };
 
 /**

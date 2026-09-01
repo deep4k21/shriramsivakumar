@@ -738,12 +738,15 @@ export function Hero({ flipOnHover }: HeroProps) {
                   <img
                     src={slot.src}
                     alt=""
-                    className="absolute inset-0 size-full object-cover opacity-20 backface-hidden"
+                    // Close to full strength: the sheet above knocks the whole
+                    // field back, so the tile does not also have to fade itself
+                    // to sit behind the card.
+                    className="absolute inset-0 size-full object-cover opacity-100 backface-hidden"
                   />
                   <img
                     src={slot.backSrc}
                     alt=""
-                    className="absolute inset-0 size-full object-cover opacity-20 backface-hidden"
+                    className="absolute inset-0 size-full object-cover opacity-100 backface-hidden"
                     style={{ transform: 'rotateY(180deg)' }}
                   />
                 </motion.div>
@@ -752,6 +755,20 @@ export function Hero({ flipOnHover }: HeroProps) {
           })}
         </AnimatePresence>
       </motion.div>
+
+      {/*
+        A black sheet over the grid, under the card.
+
+        The tiles used to be held at 20% opacity so the site backdrop read
+        straight through them and the two competed. Now the tiles carry their
+        own weight and this sheet knocks the whole field back at once — the
+        backdrop and the checkerboard together — so the card sits clearly in
+        front of one settled surface rather than a busy one.
+
+        `z-0` with the grid, but later in the DOM, so it paints over the tiles
+        while staying beneath the card's own `z-1`.
+      */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-black/75" aria-hidden="true" />
 
       <div className="relative z-1 flex h-full max-h-full flex-col items-center justify-center gap-[clamp(8px,1.5vh,16px)]">
         {/*
@@ -863,7 +880,7 @@ export function Hero({ flipOnHover }: HeroProps) {
         </div>
       </div>
       <motion.span
-        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-grey"
+        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-[#89919F]"
         style={exit}
       >
         {flipOnHover ? 'HOVER TO FLIP' : 'CLICK THE CARD TO FLIP'}

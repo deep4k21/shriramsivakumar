@@ -288,7 +288,7 @@ export function Intro() {
           <div className="h-0.5 w-45 overflow-hidden bg-white/10">
             <motion.div className="h-full bg-teal" style={{ width: progressWidth }} />
           </div>
-          <span className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#4a4a4a]">
+          <span className="font-heading text-[10.5px] font-medium tracking-[0.14em] text-[#89919F]">
             KEEP SCROLLING
           </span>
         </motion.div>
