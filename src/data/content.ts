@@ -997,10 +997,10 @@ export const CATEGORIES: Category[] = [
     lead: 'Decks built to be presented, not read —',
     leadBold: 'the argument is the design.',
     stats: [
-      { value: '30+', label: 'DECKS' },
-      { value: '5', label: 'FORMATS' },
-      { value: '68', label: 'LONGEST DECK' },
-      { value: '500+', label: 'SLIDES DESIGNED' },
+      { value: '100+', label: 'DECKS DELIVERED' },
+      { value: '1500+', label: 'SLIDES DESIGNED' },
+      { value: '12', label: 'DECK SYSTEMS BUILT' },
+      { value: '15+', label: 'INDUSTRIES' },
     ],
     /*
       A reduced variant of the project template, configured per project rather
