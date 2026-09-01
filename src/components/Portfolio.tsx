@@ -225,9 +225,9 @@ const MOSAIC = [
 const COLLECTION_LABEL = '#47C89A';
 
 /**
- * The hover gradient: warm light pooling in the bottom-right corner and
- * falling away toward the top-left. The card is plain at rest — this arrives
- * with the pointer and leaves with it.
+ * The hover gradient: light pooling in the top-right corner and falling away
+ * toward the bottom-left. The card is plain at rest — this arrives with the
+ * pointer and leaves with it.
  *
  * Radial from that corner rather than a linear sweep, so the warmth stays a
  * pool in the corner instead of banding down the whole right edge.
@@ -237,11 +237,11 @@ const COLLECTION_LABEL = '#47C89A';
  * as the gradient came up, wiping out the surface underneath.
  */
 const CARD_GRADIENT_LIT =
-  'radial-gradient(95% 115% at 100% 100%, rgba(184,95,34,1) 0%, rgba(107,59,20,.82) 22%, rgba(51,33,15,.5) 44%, rgba(29,24,19,.18) 66%, rgba(22,23,27,0) 84%)';
+  'radial-gradient(95% 115% at 100% 0%, rgba(0,150,168,1) 0%, rgba(0,96,110,.82) 22%, rgba(14,52,60,.5) 44%, rgba(19,26,30,.18) 66%, rgba(22,23,27,0) 84%)';
 
-/** The bloom around a hovered card, in the gradient's own warm light. */
+/** The bloom around a hovered card, in the gradient's own light. */
 const CARD_BLOOM =
-  '0 0 0 1px rgba(255,154,92,.16), 0 8px 30px -8px rgba(255,154,92,.26), 0 0 52px -14px rgba(255,154,92,.20)';
+  '0 0 0 1px rgba(0,184,201,.16), 0 8px 30px -8px rgba(0,184,201,.26), 0 0 52px -14px rgba(0,184,201,.20)';
 
 function CategoryCard({
   progress,
@@ -307,7 +307,7 @@ function CategoryCard({
         animate={{
           opacity: hidden ? 0 : 1,
           // The bloom is the hover cue, alongside the gradient coming up.
-          boxShadow: filled ? CARD_BLOOM : '0 0 0 0 rgba(255,154,92,0)',
+          boxShadow: filled ? CARD_BLOOM : '0 0 0 0 rgba(0,184,201,0)',
         }}
         transition={{ duration: 0.25 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}

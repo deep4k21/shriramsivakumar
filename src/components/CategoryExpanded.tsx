@@ -1,5 +1,5 @@
 import { animate, motion, useMotionValue, useTransform } from 'motion/react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { Category } from '../data/content';
 import { CARD_GLASS } from '../styles/card';
 
@@ -64,6 +64,51 @@ function StatValue({ value }: { value: string }) {
   return <motion.span>{display}</motion.span>;
 }
 
+/**
+ * Scales the panel's content down so it always fits the viewport, mirroring
+ * what the pinned sections do on short screens.
+ *
+ * Measured rather than guessed at: the content's own height varies with the
+ * project count — the presentations category carries six where the others
+ * carry four or five — so a fixed clamp that fits one overflows another.
+ *
+ * Only ever scales down. Growing the content to fill a tall screen would make
+ * the type larger than the rest of the site's.
+ */
+function useFitToViewport() {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState(1);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const frame = frameRef.current;
+      const content = contentRef.current;
+      if (!frame || !content) return;
+      const avail = frame.clientHeight;
+      // The content's unscaled height: dividing out the scale already applied
+      // keeps this from feeding back on itself and shrinking every pass.
+      const need = content.getBoundingClientRect().height / (fit || 1);
+      const next = need > 0 ? Math.min(1, avail / need) : 1;
+      setFit((prev) => (Math.abs(next - prev) > 0.004 ? next : prev));
+    };
+
+    measure();
+    const raf = requestAnimationFrame(measure);
+    const observer = new ResizeObserver(measure);
+    if (frameRef.current) observer.observe(frameRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [fit]);
+
+  return { frameRef, contentRef, fit };
+}
+
 /** Content fades in slightly after the box has started growing. */
 const CONTENT_DELAY = 0.12;
 
@@ -80,6 +125,7 @@ export function CategoryExpanded({
   onClose,
   onOpenProject,
 }: CategoryExpandedProps) {
+  const { frameRef, contentRef, fit } = useFitToViewport();
   /** The close button's fill; the cards use the shared glass card instead. */
   const inset = 'rgba(255,255,255,.04)';
   /** The section's own palette, which the panel uses throughout. */
@@ -165,8 +211,19 @@ export function CategoryExpanded({
         inner column keeps that true while `overflow-y-auto` still rescues a
         viewport too short to hold it.
       */}
-      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto">
-        <div className="my-auto">
+      {/*
+        `overflow-hidden` rather than `auto`: the content is scaled to fit, so
+        a scrollbar here would only ever appear if that measurement were wrong,
+        and an unreachable one is worse than none.
+      */}
+      <div ref={frameRef} className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden">
+        <div
+          ref={contentRef}
+          className="my-auto"
+          // Scaled from the top so the content stays put as it shrinks rather
+          // than drifting toward the panel's middle.
+          style={{ transform: `scale(${fit.toFixed(3)})`, transformOrigin: 'center top' }}
+        >
         <div className="flex items-start justify-between gap-6 pr-[clamp(24px,2.6vw,40px)] pt-[clamp(20px,2.6vh,32px)] pb-[clamp(16px,2vh,24px)]">
           <motion.div
             className="flex flex-col gap-2"
