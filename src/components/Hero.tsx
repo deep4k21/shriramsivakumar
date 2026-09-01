@@ -2,14 +2,7 @@ import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
-import {
-  CELL_H,
-  FADE_FLOOR,
-  SHRINK_FLOOR,
-  SHRINK_S,
-  flipDelayFor,
-  useHomeGrid,
-} from '../hooks/useHomeGrid';
+import { CELL_H, FADE_FLOOR, FADE_S, flipDelayFor, useHomeGrid } from '../hooks/useHomeGrid';
 import { CardGlow } from './CardGlow';
 
 interface HeroProps {
@@ -646,9 +639,9 @@ export function Hero({ flipOnHover }: HeroProps) {
   /** Signed half-turn count: +1 to show travel, −1 back, so the two sweeps mirror. */
   const [turns, setTurns] = useState(0);
   // Every checkerboard cell is filled, and each image keeps the cell it was
-  // assigned — the layout is fixed. What moves is scale: tiles shrink toward
-  // their own centres and grow back on slow, independent clocks, so the field
-  // keeps breathing without the composition ever changing.
+  // assigned — the layout is fixed. What changes is opacity: tiles fade out
+  // and back in on slow, independent clocks, so the field keeps breathing
+  // without the composition ever changing.
   //
   // Each tile carries both pictures at once — its design image on the front
   // face and its travel image on the back — so the flip reveals the other one
@@ -692,6 +685,25 @@ export function Hero({ flipOnHover }: HeroProps) {
       id="home"
       className="relative flex h-screen w-full items-center justify-center overflow-hidden box-border px-0 py-[clamp(16px,3vh,40px)]"
     >
+      {/*
+        The site's ruled grid, repeated inside the hero — behind the tiles and
+        behind the black sheet, so the checkerboard sits on top of it and the
+        ruling shows only through a cell a fade has emptied.
+
+        The page-level `BackgroundGrid` cannot do this job here: it is painted
+        beneath the hero's own sheet, which knocks it back along with everything
+        else, so a faded tile revealed flat black instead of ruling.
+
+        Stronger than the page grid's 20%: the black sheet above knocks this
+        one back, where the page grid paints straight onto the backdrop. It is
+        also unmasked, so the hero shows the full grid rather than a patch
+        around the cursor.
+      */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 bg-[length:88px_88px] bg-[image:linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px)]"
+        aria-hidden="true"
+      />
+
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 max-[900px]:hidden"
         aria-hidden="true"
@@ -712,24 +724,16 @@ export function Hero({ flipOnHover }: HeroProps) {
                   width: slot.anchor.width,
                   height: CELL_H,
                 }}
-                // Each tile shrinks toward its own centre and grows back, on
-                // its own clock. The cell's box is fixed, so `scale` contracts
-                // about the middle of the tile — the picture never changes and
-                // nothing moves out of place.
+                // Each tile fades out and back in where it sits, on its own
+                // clock. The picture never changes, the cell never moves and
+                // nothing scales — opacity alone, so the composition holds
+                // while the field keeps shifting.
                 //
-                // Opacity rides along with the scale rather than replacing it:
-                // a tile that only shrank would leave a visible gap in the
-                // checkerboard, and one that only faded is the flicker this
-                // replaced. Both stop short of nothing, so the tile recedes.
-                //
-                // Slow and shallow by intent — a long ease with a small range
-                // reads as the field breathing rather than as tiles animating.
-                initial={{ scale: 1, opacity: 1 }}
-                animate={{
-                  scale: slot.visible ? 1 : SHRINK_FLOOR,
-                  opacity: slot.visible ? 1 : FADE_FLOOR,
-                }}
-                transition={{ duration: SHRINK_S, ease: 'easeInOut' }}
+                // Slow by intent: a long ease reads as the field breathing
+                // rather than as tiles animating.
+                initial={{ opacity: 1 }}
+                animate={{ opacity: slot.visible ? 1 : FADE_FLOOR }}
+                transition={{ duration: FADE_S, ease: 'easeInOut' }}
               >
                 {/*
                   The tile turns with the card, so the whole scene flips to the
@@ -772,14 +776,13 @@ export function Hero({ flipOnHover }: HeroProps) {
           })}
       </motion.div>
 
+
       {/*
         A black sheet over the grid, under the card.
 
-        The tiles used to be held at 20% opacity so the site backdrop read
-        straight through them and the two competed. Now the tiles carry their
-        own weight and this sheet knocks the whole field back at once — the
-        backdrop and the checkerboard together — so the card sits clearly in
-        front of one settled surface rather than a busy one.
+        The tiles carry their own weight and this sheet knocks the whole field
+        back at once — the backdrop and the checkerboard together — so the card
+        sits clearly in front of one settled surface rather than a busy one.
 
         `z-0` with the grid, but later in the DOM, so it paints over the tiles
         while staying beneath the card's own `z-1`.

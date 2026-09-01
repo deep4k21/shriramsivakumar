@@ -44,6 +44,36 @@ const BAR_INSET = { left: '24%', right: '19%' };
  */
 export const FRAME_TILT_DEG = 2.6;
 
+const ARROW_BUTTON =
+  'grid size-9 flex-none cursor-pointer place-items-center rounded-md border border-white ' +
+  'bg-transparent text-white transition-colors hover:bg-white/15';
+
+/**
+ * The arrow mark, drawn rather than set as a `‹` glyph.
+ *
+ * The text characters carry asymmetric side bearings and sit above the
+ * baseline, so centring their box leaves the visible mark off-centre — measured
+ * at roughly half a pixel, in a different direction for each character, which
+ * reads as the two buttons being misaligned with each other. A path centred in
+ * a square viewBox has no such bearing, so it sits where it is put.
+ */
+function Chevron({ dir }: { dir: 'left' | 'right' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[15px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={dir === 'left' ? 'M15 5 8 12l7 7' : 'M9 5l7 7-7 7'} />
+    </svg>
+  );
+}
+
 /**
  * A photo in the hand-drawn frame, captioned the way a polaroid is.
  *
@@ -128,24 +158,14 @@ export function PhotoFrame({
       {/* The arrows ride the frame's own lower margin rather than floating below it. */}
       {onPrev && onNext && (
         <div
-          className="absolute inset-x-0 flex items-center justify-center gap-1.75"
+          className="absolute inset-x-0 flex items-center justify-center gap-2.5"
           style={{ top: LOWER_MARGIN.top, height: LOWER_MARGIN.height }}
         >
-          <button
-            type="button"
-            onClick={onPrev}
-            aria-label="Previous slide"
-            className="grid size-7.5 flex-none cursor-pointer place-items-center rounded-md border border-white/12 bg-transparent font-body text-[13px] text-grey hover:text-white"
-          >
-            &lsaquo;
+          <button type="button" onClick={onPrev} aria-label="Previous slide" className={ARROW_BUTTON}>
+            <Chevron dir="left" />
           </button>
-          <button
-            type="button"
-            onClick={onNext}
-            aria-label="Next slide"
-            className="grid size-7.5 flex-none cursor-pointer place-items-center rounded-md border border-white/12 bg-transparent font-body text-[13px] text-grey hover:text-white"
-          >
-            &rsaquo;
+          <button type="button" onClick={onNext} aria-label="Next slide" className={ARROW_BUTTON}>
+            <Chevron dir="right" />
           </button>
         </div>
       )}

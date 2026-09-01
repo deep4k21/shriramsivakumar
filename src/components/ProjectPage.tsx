@@ -260,20 +260,24 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               <AssetSet assets={row.assetSet} height={row.slotHeight} />
             ) : row.prototype ? (
               <div
-                className={row.slotAspect ? 'mx-auto' : 'w-full'}
+                className={row.slotAspect || row.slotAspectVideo ? 'mx-auto' : 'w-full'}
                 style={
-                  row.slotAspect
+                  row.slotAspect || row.slotAspectVideo
                     ? // Height-led: the frame takes the available height and
                       // derives its width from the artboard's ratio, so the
                       // prototype fills it with no letterboxing either side.
+                      //
+                      // Capping the height is what keeps the row inside the
+                      // modal. Width-led sizing — an aspect ratio alone — makes
+                      // the frame as tall as the column is wide, so on a wide
+                      // screen the label and copy above it get pushed out of
+                      // view and the reader has to scroll to see the artefact.
                       {
                         height: row.slotMaxHeight ?? 'min(56vh, 620px)',
-                        aspectRatio: String(row.slotAspect),
+                        aspectRatio: String(row.slotAspect ?? 16 / 9),
                         maxWidth: '100%',
                       }
-                    : row.slotAspectVideo
-                      ? { aspectRatio: '16 / 9' }
-                      : row.stacked
+                    : row.stacked
                         ? // Fits within the modal's viewport alongside its sticky
                           // header, rather than the prototype forcing a tall box
                           // that pushes most of the row off-screen.

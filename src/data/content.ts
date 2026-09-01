@@ -375,13 +375,22 @@ export const CATEGORIES: Category[] = [
             label: 'PREMISE',
             text: 'I set myself a standard healthcare dashboard brief — patient list, scheduling, records, messaging, analytics — and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.',
             slot: 'PERSONA',
-            slotAspectVideo: true,
+            // 2485 × 1574 — the sheet's own ratio, so it is contained rather
+            // than cropped to a 16:9 slot it does not fit.
+            assetSet: [{ src: '/images/UIUX/Healthdesk/Persona.jpg', ratio: 1.579 }],
           },
           {
             label: 'TRIAGE',
             text: "The physician I wrote for doesn't need more capability, she needs less noise. So alerts and messages each split into critical and routine, four counters set the day's shape, and analytics — the flashiest thing in the brief — got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
             slot: 'WIREFRAMES — DESKTOP / TABLET / MOBILE',
-            slotAspectVideo: true,
+            /*
+              1298 × 470 — the three screen sizes end to end, so roughly 2.8:1.
+              Far wider than the 16:9 the slot would otherwise impose; `AssetSet`
+              fits it to the width and letterboxes rather than cropping, which
+              keeps all three widths in the frame. The lightbox is where the
+              wireframes become legible.
+            */
+            assetSet: [{ src: '/images/UIUX/Healthdesk/Wireframes.png', ratio: 2.762 }],
           },
           {
             label: 'INTERFACE',
@@ -443,7 +452,21 @@ export const CATEGORIES: Category[] = [
             text: "Enterprise fintech runs on abstraction — gradients, icons, empty dashboards. This uses cut-out photography of people sitting on and standing beside the product, at full scale. The interface screenshots carry the explanation, which frees the imagery to do the thing abstraction can't: make it look like software people actually use.",
             slot: 'MOCKUPS',
             stacked: true,
-            prototype: { embedUrl: 'about:blank' },
+            // The artboard measures 1.774 — 16:9 within a rounding error — so
+            // the standard video slot fits it with no letterboxing, unlike the
+            // healthcare dashboard's 1.409 which needed its own ratio.
+            slotAspectVideo: true,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. The player's chrome is
+            // switched off — footer bar and prev/next/reset — so only the
+            // artefact shows.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2705-4911&starting-point-node-id=2705%3A4911' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
           },
         ],
         endNote:
@@ -525,7 +548,19 @@ export const CATEGORIES: Category[] = [
             text: "The locked booking panel was the client's requirement, and it takes roughly a third of the viewport permanently. Everything else had to work in a narrower column — shorter measure, tighter cards, no full-width sections. The nav locks with it, so the page scrolls underneath a frame that never moves.",
             slot: 'MOCKUPS',
             stacked: true,
-            prototype: { embedUrl: 'about:blank' },
+            // 1.778 measured off the rendered artboard — 16:9, so the standard
+            // video slot fits it exactly.
+            slotAspectVideo: true,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. Chrome switched off, so the
+            // reader sees the artefact rather than the player.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2705-5319&starting-point-node-id=2705%3A5319' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
           },
           {
             label: 'REASSURANCE',

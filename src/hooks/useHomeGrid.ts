@@ -107,27 +107,22 @@ export interface HomeGridSlot {
   /** Shown on the back face, revealed when the tile turns over. */
   backSrc: string;
   anchor: SlotAnchor;
-  /** False while this tile is contracted. Drives both faces at once. */
+  /** False while this tile is faded out. Drives both faces at once. */
   visible: boolean;
 }
 
 /**
- * How far a tile shrinks toward its own centre — all the way to nothing, so it
- * collapses into the middle of its cell and grows back out of it.
- */
-export const SHRINK_FLOOR = 0;
-/**
- * Opacity at full contraction. Redundant against a scale of zero, but it keeps
- * the tile from reading as a hard-edged shape shrinking to a point.
+ * Opacity at the bottom of the fade — fully out, so the tile clears its cell
+ * and comes back rather than only dimming.
  */
 export const FADE_FLOOR = 0;
-/** One leg of the shrink-and-grow, in seconds. Slow enough not to catch the eye. */
-export const SHRINK_S = 3.4;
+/** One leg of the fade, in seconds. Slow enough not to catch the eye. */
+export const FADE_S = 3.4;
 /**
- * How long the collapsed tile stays gone before growing back, in ms.
+ * How long a faded-out tile stays gone before fading back, in ms.
  *
- * This has to outlast one leg of the animation (`SHRINK_S`) or the tile turns
- * around before it ever reaches the centre — which is what made an earlier,
+ * This has to outlast one leg of the fade (`FADE_S`) or the tile turns around
+ * before it ever reaches full transparency — which is what made an earlier,
  * faster version bottom out halfway and read as a flicker.
  */
 const HIDDEN_MS: [number, number] = [3600, 5200];
@@ -162,12 +157,12 @@ const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file }, i) => ({
  * All 22 pictures are on screen throughout.
  *
  * The life in the grid comes from five tiles at a time, each in its own lane:
- * a tile shrinks into its own centre, pauses, and grows back, and only once it
- * has returned does that lane choose another. No lane repeats its own last
- * cell, and no two lanes hold the same one. Seventeen of the twenty-two are
- * therefore steady at any moment, so the checkerboard still reads as a complete
- * field. That is also why the flip needs no special handling: a contracting
- * tile takes both its faces with it.
+ * a tile fades out, pauses, and fades back, and only once it has returned does
+ * that lane choose another. No lane repeats its own last cell, and no two lanes
+ * hold the same one. Seventeen of the twenty-two are therefore steady at any
+ * moment, so the checkerboard still reads as a complete field. That is also why
+ * the flip needs no special handling: fading a tile takes both its faces with
+ * it.
  */
 export function useHomeGrid() {
   const [slots, setSlots] = useState<HomeGridSlot[]>(SLOTS);
@@ -206,7 +201,7 @@ export function useHomeGrid() {
       return free[Math.floor(Math.random() * free.length)];
     };
 
-    /** One lane's endless cycle: choose, collapse, pause, grow back, repeat. */
+    /** One lane's endless cycle: choose, fade out, pause, fade back, repeat. */
     const step = (lane: number) => {
       const index = pick(lane);
       busy.add(index);
@@ -215,16 +210,16 @@ export function useHomeGrid() {
       setVisible(index, false);
       after(lane, randBetween(HIDDEN_MS), () => {
         setVisible(index, true);
-        // Hold the cell until it has finished growing, so the lane cannot
-        // reclaim it — or hand it to another lane — mid-return.
-        after(lane, SHRINK_S * 1000 + randBetween(BETWEEN_MS), () => {
+        // Hold the cell until it has finished fading back in, so the lane
+        // cannot reclaim it — or hand it to another lane — mid-return.
+        after(lane, FADE_S * 1000 + randBetween(BETWEEN_MS), () => {
           busy.delete(index);
           step(lane);
         });
       });
     };
 
-    // Stagger the lanes' first picks so they do not all collapse together and
+    // Stagger the lanes' first picks so they do not all fade together and
     // leave the grid pulsing in unison rather than shifting continuously.
     for (let lane = 0; lane < CONCURRENT; lane++) {
       after(lane, randBetween(BETWEEN_MS) + lane * 900, () => step(lane));
