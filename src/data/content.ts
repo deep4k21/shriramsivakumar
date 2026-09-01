@@ -19,6 +19,13 @@ export interface ProcessRow {
   /** Locks the image slot to a 16:9 aspect ratio (width-driven) instead of the template default. */
   slotAspectVideo?: boolean;
   /**
+   * The slot's aspect ratio as width/height (e.g. 1.5576), for a prototype
+   * whose artboard is not 16:9. Figma's `contain` scaling letterboxes whatever
+   * the frame doesn't match, so matching the frame to the artboard is what
+   * removes the bars. Height stays capped so the row still fits the modal.
+   */
+  slotAspect?: number;
+  /**
    * Stacks the row as text-on-top, full-width slot below, instead of the
    * standard two-column (text-left, slot-right) layout.
    */
@@ -381,7 +388,21 @@ export const CATEGORIES: Category[] = [
             text: 'Blues carry the calm; a single amber is withheld for what genuinely needs attention. The mark argues the same thing — an H and D whose negative space forms a cross. Simple on the surface, structured underneath.',
             slot: 'MOCKUPS',
             stacked: true,
-            prototype: { embedUrl: 'about:blank' },
+            // The artboard's own ratio, measured off the painted region of the
+            // rendered embed. The frame matches it so `scale-down-width` — which
+            // fills the width exactly — also lands flush top and bottom.
+            slotAspect: 1.4087,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. The starting point is the
+            // prototype's own, carried over. The player's chrome is switched
+            // off — footer bar and prev/next/reset — so only the artefact shows.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2685-1054&starting-point-node-id=2685%3A1054' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
           },
         ],
         endNote: 'The brief asked for five features. The exercise was deciding which four could be quieter.',

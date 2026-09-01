@@ -260,16 +260,25 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               <AssetSet assets={row.assetSet} height={row.slotHeight} />
             ) : row.prototype ? (
               <div
-                className="w-full"
+                className={row.slotAspect ? 'mx-auto' : 'w-full'}
                 style={
-                  row.slotAspectVideo
-                    ? { aspectRatio: '16 / 9' }
-                    : row.stacked
-                      ? // Fits within the modal's viewport alongside its sticky
-                        // header, rather than the prototype forcing a tall box
-                        // that pushes most of the row off-screen.
-                        { height: row.slotMaxHeight ?? 'min(56vh, 620px)' }
-                      : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
+                  row.slotAspect
+                    ? // Height-led: the frame takes the available height and
+                      // derives its width from the artboard's ratio, so the
+                      // prototype fills it with no letterboxing either side.
+                      {
+                        height: row.slotMaxHeight ?? 'min(56vh, 620px)',
+                        aspectRatio: String(row.slotAspect),
+                        maxWidth: '100%',
+                      }
+                    : row.slotAspectVideo
+                      ? { aspectRatio: '16 / 9' }
+                      : row.stacked
+                        ? // Fits within the modal's viewport alongside its sticky
+                          // header, rather than the prototype forcing a tall box
+                          // that pushes most of the row off-screen.
+                          { height: row.slotMaxHeight ?? 'min(56vh, 620px)' }
+                        : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
                 }
               >
                 <PrototypePiP prototype={row.prototype} />
