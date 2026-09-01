@@ -187,8 +187,13 @@ export interface Category {
   icon?: string;
   /** Artwork shown inside the portfolio tile, between the copy and the link. */
   art?: string;
-  /** The same artwork with its accent darkened, shown on the tile's filled side. */
-  artDark?: string;
+  /**
+   * How much of the tile's width the artwork takes; its height follows from the
+   * drawing's own proportions. Set per category because the mosaic's tall and
+   * wide tiles differ enough that one share would read very differently between
+   * them. Defaults to 1.
+   */
+  artScale?: number;
   stats: CategoryStat[];
   projects: Project[];
 }
@@ -316,8 +321,8 @@ export const CATEGORIES: Category[] = [
     body: 'Designing intuitive digital experiences that transform complex workflows into scalable products and seamless user journeys.',
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
-    art: '/images/portfolio/UIUX.svg',
-    artDark: '/images/portfolio/UIUX-dark.svg',
+    art: '/images/portfolio/uiux.svg',
+    artScale: 0.39,
     stats: [
       { value: '20+', label: 'PRODUCTS' },
       { value: '6', label: 'YEARS' },
@@ -508,6 +513,8 @@ export const CATEGORIES: Category[] = [
   {
     id: 'brand-identity',
     icon: '/images/menuicons/brandidentity.svg',
+    art: '/images/portfolio/brand.svg',
+    artScale: 0.49,
     title: 'Brand Identity',
     short: 'Brand Identity',
     tags: 'Identity · Strategy · Guidelines',
@@ -685,6 +692,8 @@ export const CATEGORIES: Category[] = [
   {
     id: 'marketing-campaigns',
     icon: '/images/menuicons/campaigns.svg',
+    art: '/images/portfolio/marketing.svg',
+    artScale: 0.54,
     title: 'Marketing Campaigns',
     short: 'Campaigns',
     tags: 'Creative · Growth · Performance',
@@ -944,6 +953,8 @@ export const CATEGORIES: Category[] = [
   {
     id: 'presentations',
     icon: '/images/menuicons/presentation.svg',
+    art: '/images/portfolio/ppt.svg',
+    artScale: 0.43,
     title: 'Presentations',
     short: 'Presentations',
     tags: 'Pitch · Product · Strategy',

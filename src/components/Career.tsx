@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ROLES } from '../data/content';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
-import { CARD } from '../styles/card';
+import { CARD_GLASS } from '../styles/card';
 import { CardGlow } from './CardGlow';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
@@ -40,7 +40,7 @@ export function Career() {
       */}
       <motion.div
         data-career-first-card
-        className={`group relative flex flex-col gap-1.75 overflow-hidden ${CARD} px-8 py-7`}
+        className={`group relative flex flex-col gap-1.75 overflow-hidden ${CARD_GLASS} px-8 py-7`}
         style={cardBoxExit}
       >
         <CardGlow />
@@ -97,12 +97,17 @@ export function Career() {
                 */
                 className="relative -mb-0.5 flex h-11.5 flex-none cursor-pointer items-center justify-center rounded-t-[10px] border border-b-0 px-6"
                 /*
-                  Opaque, not the panel's 85% surface: this fill is what hides
-                  the panel's top border under the tab, and a translucent one
-                  would let the line show straight through.
+                  Opaque, unlike the glass panel below it: this fill is what
+                  hides the panel's top border under the tab, and a translucent
+                  one would let the line show straight through.
+
+                  The colour is the glass panel's own resolved surface, sampled
+                  from it rather than guessed: the tab has to match what it sits
+                  on exactly, or the border it is meant to cover shows as a seam
+                  along its bottom edge.
                 */
                 animate={{
-                  backgroundColor: on ? 'rgb(24,25,29)' : 'rgba(255,255,255,0)',
+                  backgroundColor: on ? 'rgb(41,43,49)' : 'rgba(255,255,255,0)',
                   borderColor: on ? 'rgba(137,145,159,.7)' : 'rgba(137,145,159,0)',
                 }}
                 transition={{ duration: 0.18 }}
@@ -136,7 +141,7 @@ export function Career() {
             extra line on a narrow viewport can still grow past it, which is
             the right failure — text stays readable rather than being clipped.
           */
-          className={`relative flex min-h-[393px] flex-col overflow-hidden ${CARD} ${
+          className={`relative flex min-h-[393px] flex-col overflow-hidden ${CARD_GLASS} ${
             companyIdx === 0 ? 'rounded-tl-none' : ''
           }`}
         >

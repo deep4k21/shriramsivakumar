@@ -11,7 +11,7 @@ import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { useStageAspect } from '../hooks/useStageAspect';
-import { CARD } from '../styles/card';
+import { CARD_GLASS_FLAT } from '../styles/card';
 import { CardGlow } from './CardGlow';
 import { CategoryExpanded } from './CategoryExpanded';
 import { StylusNoteIcon } from './Icons';
@@ -231,9 +231,13 @@ const COLLECTION_LABEL = '#47C89A';
  *
  * Radial from that corner rather than a linear sweep, so the warmth stays a
  * pool in the corner instead of banding down the whole right edge.
+ *
+ * The outer stops fade to fully transparent rather than to a dark colour: this
+ * sits over the glass card, and opaque stops filled the rest of it with black
+ * as the gradient came up, wiping out the surface underneath.
  */
 const CARD_GRADIENT_LIT =
-  'radial-gradient(95% 115% at 100% 100%, #B85F22 0%, #6B3B14 22%, #33210F 44%, #1D1813 66%, #16171B 84%)';
+  'radial-gradient(95% 115% at 100% 100%, rgba(184,95,34,1) 0%, rgba(107,59,20,.82) 22%, rgba(51,33,15,.5) 44%, rgba(29,24,19,.18) 66%, rgba(22,23,27,0) 84%)';
 
 /** The bloom around a hovered card, in the gradient's own warm light. */
 const CARD_BLOOM =
@@ -299,7 +303,7 @@ function CategoryCard({
           setFill({ x: e.clientX - r.left, y: e.clientY - r.top });
         }}
         onPointerLeave={() => setFill(null)}
-        className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden ${CARD} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
+        className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden ${CARD_GLASS_FLAT} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
         animate={{
           opacity: hidden ? 0 : 1,
           // The bloom is the hover cue, alongside the gradient coming up.
@@ -417,52 +421,33 @@ function CategoryCard({
           driving keeps it square at any tile size.
         */}
         {cat.art && (
-          /*
-            Turns over as the card fills, the way the hero card flips.
+          <img
+            src={cat.art}
+            alt=""
+            aria-hidden="true"
+            /*
+              Anchored to the tile's bottom-right rather than centred on its
+              height: the drawing sits in the corner the copy leaves free, which
+              is what stops it floating in the middle of a tall tile.
 
-            The perspective rides in the transform itself rather than on an
-            ancestor, which would only reach its direct 3D children — without it
-            the turn is orthographic and reads as the art squashing flat rather
-            than rotating.
+              `object-contain` with the box bottom-aligned means the drawing
+              grows into whatever room it is given without ever leaving the
+              tile, so the per-category scale only has to say how much of that
+              room to take.
+            */
+            /*
+              Sized by width, with the height following from the drawing's own
+              proportions — `h-auto`, so nothing is fitted to a box and the
+              artwork is simply as tall as that width makes it.
 
-            The image is mirrored back with `scaleX` at the halfway point, where
-            the wrapper is edge-on and the swap cannot be seen. A 180° turn
-            leaves whatever is on the face reversed, so the artwork would
-            otherwise settle with its phone and tablet on the wrong sides — and
-            counter-rotating the image would cancel the visible turn along with
-            the mirroring.
-          */
-          <motion.div
-            className="pointer-events-none absolute top-0 bottom-0 right-0 my-auto aspect-square h-full select-none"
-            animate={{ rotateY: filled ? 180 : 0, transformPerspective: 900 }}
-            transition={{ duration: 0.85, ease: [0.7, 0, 0.2, 1] }}
-          >
-            <motion.div
-              className="relative size-full"
-              animate={{ scaleX: filled ? -1 : 1 }}
-              transition={{ duration: 0, delay: 0.425 }}
-            >
-              <img src={cat.art} alt="" aria-hidden="true" className="size-full object-contain" />
-              {/*
-                The same artwork with its orange swapped for the card's own
-                dark ink, swapped in at the halfway point while the wrapper is
-                edge-on. A CSS filter cannot do this: every candidate that
-                darkened the orange darkened the white linework with it, since
-                the two differ in hue rather than in a channel a filter can
-                isolate.
-              */}
-              {cat.artDark && (
-                <motion.img
-                  src={cat.artDark}
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute inset-0 size-full object-contain"
-                  animate={{ opacity: filled ? 1 : 0 }}
-                  transition={{ duration: 0, delay: 0.425 }}
-                />
-              )}
-            </motion.div>
-          </motion.div>
+              Height-based sizing does not work here: the mosaic's tall and wide
+              tiles differ by nearly 200px, and `object-contain` then fits each
+              drawing to whichever side is shorter, which left the tall tiles'
+              art at a third the size of the others.
+            */
+            className="pointer-events-none absolute right-[clamp(14px,1.4vw,26px)] bottom-[clamp(14px,1.8vh,24px)] h-auto select-none"
+            style={{ width: `${(cat.artScale ?? 1) * 100}%` }}
+          />
         )}
           <motion.div
             className="flex flex-none items-center gap-2.25 font-body text-[clamp(12.5px,0.95vw,15px)]"
@@ -600,7 +585,17 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
    * visually constant 1px through the collapse.
    */
   /** `CARD`'s #15161A/85 fill, faded out with the rest of the collapsed mark. */
-  const panelFill = useTransform(exit.opacity, (a: number) => `rgba(21,22,26,${0.85 * a})`);
+  /*
+    No fill of its own: `CARD_GLASS_FLAT`'s gradient is the surface, and the
+    whole panel fades out through `exit` anyway.
+
+    It used to paint a solid `rgba(21,22,26,.85)` here, which predated the glass
+    card and sat straight over its gradient — that is why this was the one panel
+    in the section that still looked solid. Layering a translucent fill over the
+    gradient instead cost the collapse real frames (median 22.9ms → 64.4ms), so
+    the gradient carries it alone.
+  */
+  const panelFill = 'transparent';
 
   const panelEdge = useTransform(
     [panelScaleX, panelScaleY, exit.opacity] as const,
@@ -687,7 +682,7 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
             // stretched to the full height between horizontal insets: the card
             // is a contained near-square panel, so its content fills it instead
             // of floating in a tall empty sheet.
-            className={`absolute top-1/2 left-1/2 z-10 grid -translate-x-1/2 -translate-y-1/2 place-items-center overflow-hidden ${CARD} border-0`}
+            className={`absolute top-1/2 left-1/2 z-10 grid -translate-x-1/2 -translate-y-1/2 place-items-center overflow-hidden ${CARD_GLASS_FLAT} border-0`}
             style={{
               height: `${PANEL_HEIGHT_OF_STAGE * 100}%`,
               width: `${PANEL_HEIGHT_OF_STAGE * PANEL_ASPECT * 100 * (stageAspect === 0 ? 1 : 1 / stageAspect)}%`,
