@@ -5,7 +5,7 @@ import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
-import { CARD } from '../styles/card';
+import { CARD_GLASS } from '../styles/card';
 import { CardGlow } from './CardGlow';
 import { BriefcaseIcon, ChipIcon, CompassIcon, SparkleIcon, WrenchIcon } from './Icons';
 
@@ -152,7 +152,7 @@ function IntroTile({
   return (
     <motion.div
       data-about-tile
-      className={`group relative flex flex-col gap-2 overflow-hidden ${CARD} px-6.5 pt-6 pb-11`}
+      className={`group relative flex flex-col gap-2 overflow-hidden ${CARD_GLASS} px-6.5 pt-6 pb-11`}
       style={{ ...reveal, opacity }}
     >
       <CardGlow />
@@ -295,7 +295,7 @@ export function About() {
               row of icons, and a card whose icons wrap further simply grows.
             */}
             <div
-              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 pt-6.5 pb-11`}
+              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD_GLASS} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
@@ -314,7 +314,7 @@ export function About() {
               </div>
             </div>
             <div
-              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD} px-7 pt-6.5 pb-11`}
+              className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD_GLASS} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
               <div className="flex items-baseline justify-between gap-3.5">
