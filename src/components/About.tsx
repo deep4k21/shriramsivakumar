@@ -7,7 +7,6 @@ import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD_GLASS } from '../styles/card';
 import { CardGlow } from './CardGlow';
-import { BriefcaseIcon, ChipIcon, CompassIcon, SparkleIcon, WrenchIcon } from './Icons';
 
 const QUOTE_END = 0.3;
 /**
@@ -26,12 +25,6 @@ const TILE_SIDE_END = 0.42;
 const TOOLKIT_START = 0.42;
 const TOOLKIT_END = 0.6;
 
-
-const TILE_ICON = {
-  sparkle: SparkleIcon,
-  compass: CompassIcon,
-  briefcase: BriefcaseIcon,
-};
 
 function useQuoteCycle<T>(words: T[], intervalMs = 2600) {
   const [index, setIndex] = useState(0);
@@ -137,7 +130,6 @@ function IntroTile({
   start: number;
   end: number;
 }) {
-  const Icon = TILE_ICON[tile.icon];
   const reveal = useRevealStyle(progress, { start, end });
   // The tiles are the ghosts' source for the hop into portfolio (about progress
   // 1.02), so they clear just before it — otherwise the tile sits there as a
@@ -157,7 +149,7 @@ function IntroTile({
     >
       <CardGlow />
       <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
-        <Icon size={16} />
+        <img src={tile.icon} alt="" aria-hidden="true" className="size-4.5" />
         {tile.label}
       </div>
       <div className="font-body text-sm/[1.55] text-grey">
@@ -192,7 +184,7 @@ function ToolIcon({ name, icon }: { name: string; icon: string }) {
         alt={name}
         // No pointer cursor: hovering only reveals the name tooltip, there is
         // nothing here to click.
-        className="size-13 rounded-lg object-contain"
+        className="size-[46.8px] rounded-lg object-contain"
         whileHover={{ y: -3, scale: 1.06 }}
         transition={{ duration: 0.18 }}
       />
@@ -298,16 +290,16 @@ export function About() {
               className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD_GLASS} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
-              <div className="flex items-baseline justify-between gap-3.5">
+              <div className="flex items-center justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
-                  <WrenchIcon size={16} />
+                  <img src="/images/about/mytoolkit.svg" alt="" aria-hidden="true" className="size-4.5" />
                   My Toolkit
                 </div>
                 <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
                   {TOOLKIT.length} TOOLS
                 </span>
               </div>
-              <div className="flex flex-wrap gap-3.5">
+              <div className="flex flex-wrap gap-5.25">
                 {TOOLKIT.map((tool) => (
                   <ToolIcon key={tool.name} name={tool.name} icon={tool.icon} />
                 ))}
@@ -317,16 +309,16 @@ export function About() {
               className={`group relative flex flex-col justify-start gap-4 overflow-hidden ${CARD_GLASS} px-7 pt-6.5 pb-11`}
             >
               <CardGlow />
-              <div className="flex items-baseline justify-between gap-3.5">
+              <div className="flex items-center justify-between gap-3.5">
                 <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
-                  <ChipIcon size={16} />
+                  <img src="/images/about/aiworkflow.svg" alt="" aria-hidden="true" className="size-4.5" />
                   AI Workflow
                 </div>
                 <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
                   {AI_TOOLS.length} TOOLS
                 </span>
               </div>
-              <div className="flex flex-wrap gap-3.5">
+              <div className="flex flex-wrap gap-5.25">
                 {AI_TOOLS.map((tool) => (
                   <ToolIcon key={tool.name} name={tool.name} icon={tool.icon} />
                 ))}

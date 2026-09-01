@@ -1386,7 +1386,8 @@ export const INTRO_QUOTE_WORDS: QuoteWord[] = [
 
 export interface IntroTile {
   label: string;
-  icon: 'sparkle' | 'compass' | 'briefcase';
+  /** Path to the tile's icon, drawn as an image. */
+  icon: string;
   body: string;
   bold: string;
   boldPosition: 'start' | 'end';
@@ -1394,22 +1395,22 @@ export interface IntroTile {
 
 export const INTRO_TILES: IntroTile[] = [
   {
-    label: 'Currently Exploring',
-    icon: 'sparkle',
-    bold: 'Motion systems',
-    boldPosition: 'start',
-    body: 'and speculative rebrands — how a mark behaves once it stops sitting still.',
-  },
-  {
     label: 'After Hours',
-    icon: 'compass',
+    icon: '/images/about/afterhours.svg',
     body: 'Window seats, street signage, and the way a city writes itself down. So far across',
     bold: '14 countries',
     boldPosition: 'end',
   },
   {
+    label: 'Currently Exploring',
+    icon: '/images/about/currentlyexploring.svg',
+    bold: 'Motion systems',
+    boldPosition: 'start',
+    body: 'and speculative rebrands — how a mark behaves once it stops sitting still.',
+  },
+  {
     label: 'Open To',
-    icon: 'briefcase',
+    icon: '/images/about/opento.svg',
     bold: 'Lead Visual design',
     boldPosition: 'start',
     body: 'roles where the system matters as much as the screen it ends up on.',
