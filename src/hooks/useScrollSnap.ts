@@ -10,13 +10,22 @@ const IDLE_MS = 140;
  * Wide enough to catch someone who has stopped just short of a section's
  * settled state, narrow enough that deliberately parking mid-window — to watch
  * a reveal partway through, say — is left alone.
- *
- * 0.52 rather than 0.45 because the portfolio now rests twice, about a viewport
- * apart: at 0.45 a band midway between the two settled points fell outside both
- * and snapped to neither, which is the one place a reader is most likely to
- * stop. Half the gap is what it takes for the two to meet.
  */
 const REACH = 0.52;
+
+/**
+ * A snap point never reaches more than this share of the way to its nearest
+ * neighbour.
+ *
+ * Without it a closely-spaced pair traps the reader: the portfolio's stops sit
+ * as little as 276px apart, and a reach of half a viewport meant an ordinary
+ * wheel scroll could not clear one before being pulled back into it. Capping
+ * the reach at just under half the gap guarantees a normal scroll always ends
+ * up nearer the next point than the one it left, so the page moves on instead
+ * of fighting back. 0.38 rather than a half so that one wheel gesture (~360px)
+ * still clears a stop even where the neighbouring points are a viewport apart.
+ */
+const NEIGHBOUR_REACH = 0.38;
 
 /** Below this the reader is treated as still scrolling, not stopped. */
 const SETTLED_VELOCITY = 0.08;
@@ -77,7 +86,17 @@ export function useScrollSnap(
 
       const distance = Math.abs(best.y - y);
       if (distance < 2) return;
-      if (distance > window.innerHeight * REACH) return;
+
+      // How far this point may pull from: the standard reach, but never so far
+      // that leaving it is impossible. A point close to another only holds the
+      // ground nearer to itself than to its neighbour.
+      let gap = Infinity;
+      for (const p of points) {
+        if (p === best) continue;
+        gap = Math.min(gap, Math.abs(p.y - best.y));
+      }
+      const reach = Math.min(window.innerHeight * REACH, gap * NEIGHBOUR_REACH);
+      if (distance > reach) return;
 
       snapping.current = true;
       // Duration scales with the distance, so a short correction is quick and a

@@ -372,14 +372,13 @@ function HeroCardFace({
       {/*
         Card body — 450 × 700 at x 735.
 
-        Glass rather than a solid fill: a translucent gradient over a blurred
-        backdrop, with inset highlights picking out the top edge and rim the way
-        the connect modal's panel does. The checkerboard behind it stays legible
-        through the surface.
+        A solid fill rather than glass: the same gradient at full opacity, with
+        no backdrop blur behind it. The card reads as its own object on the
+        checkerboard instead of a pane the tiles show through.
 
-        `backdrop-filter` creates a stacking context, which flattens an ancestor
-        3D context — so it lives here on the body rather than on the rotating
-        face, whose `preserve-3d` keeps the flip's backface culling working.
+        Dropping the blur also removes the stacking context `backdrop-filter`
+        created here, which is one less thing flattening the flip's 3D
+        ancestry — the face's own `preserve-3d` was working around it.
       */}
       <motion.div
         // The travelling ghost measures this, not the face — the face spans the
@@ -389,7 +388,7 @@ function HeroCardFace({
         // would hand the ghost a mirrored start.
         ref={bodyRef}
         data-hero-card-body={back ? undefined : ''}
-        className="absolute top-0 left-[24.70%] h-full w-[58.56%] overflow-hidden rounded-[3.90cqw] bg-[linear-gradient(160deg,rgba(38,40,46,.62),rgba(19,19,21,.55)_45%,rgba(28,30,35,.60))] backdrop-blur-2xl backdrop-saturate-150"
+        className="absolute top-0 left-[24.70%] h-full w-[58.56%] overflow-hidden rounded-[3.90cqw] bg-[linear-gradient(160deg,#262830,#131315_45%,#1C1E23)]"
         style={{ transformOrigin: CARD_ORIGIN }}
         /*
           The drop shadows belong to the hover state, so the card sits flat in
@@ -769,19 +768,24 @@ export function Hero({ flipOnHover }: HeroProps) {
 
             The body is 58.56% of this composition's width (24.70%–83.26%) and
             its full height. The grid is an even 5×5 across the hero, so a cell
-            is 20vw × 20vh: the body wants 20vw × 60vh, which puts this
-            composition at 20vw / 0.5856 = 34.153vw wide and 60vh tall.
+            is 20vw × 20vh, and a body filling the centre gap exactly would be
+            20vw × 60vh — putting this composition at 20vw / 0.5856 = 34.153vw.
+
+            Both are scaled 8% past that on purpose, so the card reads a little
+            larger than the gap rather than sitting flush inside it. It now
+            overhangs its cell by about 15px a side, which the tiles behind it
+            absorb without the composition looking cropped.
 
             No width clamp any more. The card is now measured against the grid
             rather than sized for its own sake, and a clamp would hold it still
             while the cells kept growing — which is exactly the drift that left
             it smaller than its own cell on wide screens.
           */
-          className="relative box-content w-[34.153vw] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
+          className="relative box-content w-[36.885vw] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
           // Expressed against the face's own width rather than as a percentage
           // of this wrapper, which also carries horizontal padding and would
           // shift by the wrong amount.
-          style={{ transform: 'translateX(calc(34.153vw * -0.0398))' }}
+          style={{ transform: 'translateX(calc(36.885vw * -0.0398))' }}
         >
           <div
             // No `perspective` here: it would only reach direct 3D children,
@@ -791,7 +795,8 @@ export function Hero({ flipOnHover }: HeroProps) {
             /*
               Height is driven by the grid, not by the artwork's own
               proportions: three rows is 60vh, and the body spans this box's
-              full height.
+              full height — 64.8vh here, the same 8% over that the width takes,
+              so the card grows without changing shape.
 
               The Figma composition is 768.5 × 700, which is a shorter box than
               a 1×3 gap — so holding that aspect would leave the card short of
@@ -800,7 +805,7 @@ export function Hero({ flipOnHover }: HeroProps) {
               the deliberate trade for an even checkerboard and a card that
               lands on it exactly.
             */
-            style={{ width: '100%', height: '60vh' }}
+            style={{ width: '100%', height: '64.8vh' }}
             role="button"
             tabIndex={0}
             aria-pressed={flipped}

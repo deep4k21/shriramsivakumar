@@ -89,15 +89,24 @@ const SECTION_SETTLED: Record<string, number> = {
 };
 
 /**
- * The intro card's settled position inside the portfolio's window.
+ * The portfolio's own stopping points, stepping through the states its window
+ * holds rather than letting the reader free-scroll past them.
  *
- * Portfolio reveals two things in sequence — the "Every Project" card, then the
- * category mosaic — and each has its own resting point. Measured: the card
- * finishes moving at 0.54 and holds, while the mosaic is still arriving. A
- * single snap at the mosaic meant the card had no stopping point of its own, so
- * the reader scrolled straight past the state it settles into.
+ * Measured from the section itself, not chosen by eye:
+ *
+ *   0.30 — the intro card has faded up and is fully readable;
+ *   0.54 — the card reaches its resting position and stops moving;
+ *   0.86 — the tiles have finished growing and the mosaic is at rest.
+ *
+ * `SECTION_SETTLED.portfolio` is 0.86, the section's primary position, so only
+ * the other two are listed as extras.
+ *
+ * The mosaic's own fade-in (~0.62) is deliberately not a stop. It sits 276px
+ * from 0.54 — closer than a single wheel gesture — and two points that near
+ * trap the reader between them: neither can be left without being pulled
+ * straight back into it.
  */
-const PORTFOLIO_CARD_SETTLED = 0.54;
+const PORTFOLIO_STOPS = [0.3, 0.54];
 
 /**
  * Extra settled points beyond each section's primary one, for sections that
@@ -107,7 +116,7 @@ const PORTFOLIO_CARD_SETTLED = 0.54;
  * main position in `SECTION_SETTLED`.
  */
 const EXTRA_SETTLED: Record<string, number[]> = {
-  portfolio: [PORTFOLIO_CARD_SETTLED],
+  portfolio: PORTFOLIO_STOPS,
 };
 
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
