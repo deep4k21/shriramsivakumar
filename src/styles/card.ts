@@ -29,5 +29,5 @@ export const CARD =
  * backdrop with little detail for a blur to soften.
  */
 export const CARD_GLASS =
-  'rounded-[10px] border border-white/12 bg-[linear-gradient(158deg,rgba(46,49,58,.30),rgba(18,19,24,.22)_42%,rgba(32,34,41,.26))] shadow-[0_18px_44px_rgba(0,0,0,.35),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)]';
+  'rounded-[10px] border border-white/12 bg-[linear-gradient(158deg,rgba(46,49,58,.49),rgba(18,19,24,.41)_42%,rgba(32,34,41,.45))] shadow-[0_18px_44px_rgba(0,0,0,.35),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)]';
 
