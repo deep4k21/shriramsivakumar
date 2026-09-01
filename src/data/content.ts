@@ -128,6 +128,18 @@ export interface Project {
    */
   title?: string;
   software: string[];
+  /**
+   * Artwork for the project's tile in the category panel and the banner at the
+   * top of its case study. Optional: a project without one keeps the striped
+   * placeholder in both places.
+   */
+  thumbnail?: string;
+  /**
+   * A dark rendering of `thumbnail`. Where a project has one, its case-study
+   * banner offers a light/dark toggle; the tile in the category panel always
+   * shows the light version.
+   */
+  thumbnailDark?: string;
   problem: string;
   solution: string;
   /**
@@ -332,6 +344,7 @@ export const CATEGORIES: Category[] = [
     projects: [
       {
         name: 'A healthcare dashboard',
+        thumbnail: '/images/UIUX/Healthdesk/thumbnail.svg',
         software: ['Figma', 'Illustrator'],
         problem:
           'A self-directed exploration: clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.',
@@ -369,6 +382,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Prudent',
+        thumbnail: '/images/UIUX/Prudent/thumbnail.svg',
         software: ['Figma'],
         problem:
           "A self-directed redesign exercise. An enterprise lending platform had three distinct products and a page that didn't make clear what any of them did — everything competed for the same level of attention, so nothing held it.",
@@ -410,6 +424,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'PowerBI Dashboards',
+        thumbnail: '/images/UIUX/PowerBI Dashboards/thumbnail.svg',
         software: ['Figma', 'Power BI'],
         // A collection rather than a single case study, so the two-column row is
         // relabelled: there is no one problem/solution pair across four builds.
@@ -452,6 +467,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'GlobeIA',
+        thumbnail: '/images/UIUX/GlobelA/thumbnail.svg',
         software: ['Figma'],
         problem:
           "People arriving here don't know which check they need — the answer depends on which country is asking, not what they want. And the client wanted the booking form locked on screen at all times, since it's the only conversion that matters.",
@@ -544,6 +560,8 @@ export const CATEGORIES: Category[] = [
       // this sits 2nd and that sits 4th, per instruction.
       {
         name: 'Freshstart',
+        thumbnail: '/images/Brand Identity/Freshstart/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Freshstart/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
           'A startup partnership programme lived inside a larger SaaS brand with no mark of its own — nothing signalled that it belonged to the family, or that it stood for something distinct within it.',
@@ -579,6 +597,8 @@ export const CATEGORIES: Category[] = [
       // podcast identity per instruction (2026-08-25).
       {
         name: 'A podcast identity',
+        thumbnail: '/images/Brand Identity/Orbitshift Podcast/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Orbitshift Podcast/thumbnail-dark.svg',
         title: 'Orbitshift Podcast',
         software: ['Illustrator', 'Figma'],
         problem:
@@ -624,6 +644,8 @@ export const CATEGORIES: Category[] = [
       // 2nd, swapped with "A sub logo system" above).
       {
         name: 'Uplift',
+        thumbnail: '/images/Brand Identity/Uplift/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Uplift/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
           "A global marketing technology brand needed an identity for its New York chapter — something with its own energy that still read as family, not a separate company.",
@@ -658,6 +680,8 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Forge',
+        thumbnail: '/images/Brand Identity/Forge/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Forge/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
           'An accelerator programme for early-stage founders needed a mark of its own — one that described what the programme does to a company, not just who runs it.',
@@ -719,6 +743,7 @@ export const CATEGORIES: Category[] = [
       */
       {
         name: 'Brochures and reports',
+        thumbnail: '/images/Marketing Campaigns/Brochures and reports/thumbnail.svg',
         software: ['InDesign', 'Illustrator', 'PowerPoint'],
         problemLabel: 'RANGE',
         problem:
@@ -770,6 +795,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Social campaign systems',
+        thumbnail: '/images/Marketing Campaigns/Social campaign systems/thumbnail.svg',
         software: ['Illustrator', 'Figma', 'Photoshop'],
         problemLabel: 'FORMATS',
         problem:
@@ -835,6 +861,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Illustration and iconography',
+        thumbnail: '/images/Marketing Campaigns/Illustration and iconography/thumbnail.svg',
         software: ['Illustrator', 'After Effects', 'Photoshop'],
         problemLabel: 'RANGE',
         problem:
@@ -892,6 +919,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Environmental graphics',
+        thumbnail: '/images/Marketing Campaigns/Environmental graphics/thumbnail.svg',
         software: ['Illustrator', 'Photoshop'],
         problemLabel: 'SETTING',
         problem:

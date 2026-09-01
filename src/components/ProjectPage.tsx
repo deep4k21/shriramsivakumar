@@ -25,12 +25,20 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   // differs from its (shorter, tab-strip) name; otherwise the name doubles as both.
   const displayTitle = project.title ?? project.name;
 
+  /*
+    Which rendering the banner shows. Reset with the project below, so opening
+    a new case study starts on its light version rather than inheriting the
+    previous one's setting.
+  */
+  const [bannerDark, setBannerDark] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   // Switching projects (tab strip or "Next project") starts the new one from
   // the top, rather than leaving the reader wherever the previous project's
   // scroll position happened to land.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
+    setBannerDark(false);
   }, [pIdx]);
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
@@ -59,7 +67,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         gives the sheet an edge and a direction, where pure transparency would
         read as a missing background.
       */
-      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.07),rgba(16,17,21,.04)_42%,rgba(28,30,36,.06))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
+      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.90),rgba(16,17,21,.85)_42%,rgba(28,30,36,.87))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
     >
       {/* The scroll container, so the sticky header stays put while the body moves. */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
@@ -128,8 +136,48 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         </div>
 
         <div className="flex flex-col gap-6.5 p-8">
-          <div className="grid h-[340px] w-full place-items-center rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
-            <span className="font-body text-[11px] tracking-[0.14em] text-grey">HERO BANNER — {displayTitle}</span>
+          <div className="relative grid h-[340px] w-full place-items-center overflow-hidden rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
+            {project.thumbnail ? (
+              <img
+                src={bannerDark && project.thumbnailDark ? project.thumbnailDark : project.thumbnail}
+                alt=""
+                aria-hidden="true"
+                className="size-full object-cover"
+              />
+            ) : (
+              <span className="font-body text-[11px] tracking-[0.14em] text-grey">
+                HERO BANNER — {displayTitle}
+              </span>
+            )}
+
+            {/*
+              Only where the project actually has both renderings — a banner
+              with one version has nothing to toggle between, so the control
+              would be dead weight on it.
+            */}
+            {project.thumbnailDark && (
+              <div className="absolute top-3 right-3 flex items-center gap-0.5 rounded-full bg-black/55 p-0.5 backdrop-blur-md">
+                {([
+                  ['light', 'Light'],
+                  ['dark', 'Dark'],
+                ] as const).map(([mode, label]) => {
+                  const on = (mode === 'dark') === bannerDark;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setBannerDark(mode === 'dark')}
+                      aria-pressed={on}
+                      className={`cursor-pointer rounded-full border-0 px-2.5 py-1 font-body text-[10px] tracking-[0.1em] uppercase transition-colors duration-180 ${
+                        on ? 'bg-white/90 text-black' : 'bg-transparent text-white/70 hover:text-white'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>

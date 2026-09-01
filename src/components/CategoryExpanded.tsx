@@ -16,7 +16,6 @@ interface CategoryExpandedProps {
  * own. Painted here rather than left transparent because the panel has to be
  * opaque — the mosaic it grew from is still behind it.
  */
-const PANEL_BG = '#16181D';
 const PANEL_BACKDROP = "url('/images/bg 2.svg')";
 
 /**
@@ -94,16 +93,24 @@ export function CategoryExpanded({
   return (
     <motion.div
       layoutId={`category-${categoryIndex}`}
-      // Breaks out of the stage's own padding so the panel reaches the top,
-      // right and bottom edges of the viewport. The left inset is kept — that
-      // is the sidebar's clearance — and the corners on that side stay rounded
-      // while the three that now meet an edge are squared off.
-      className="absolute inset-y-[calc(var(--stage-inset-y)*-1)] right-[calc(var(--spacing-gutter)*-1)] left-0 z-30 flex flex-col overflow-hidden rounded-l-[10px] border border-white/8"
+      /*
+        Breaks out of the stage's own padding so the panel reaches the top,
+        right and bottom edges of the viewport. The left inset is kept — that
+        is the sidebar's clearance.
+
+        No border or radius: with those it read as a card laid over the
+        section rather than as the section's own body, which is the whole point
+        of expanding in place instead of opening a modal.
+      */
+      className="absolute inset-y-[calc(var(--stage-inset-y)*-1)] right-[calc(var(--spacing-gutter)*-1)] left-0 z-30 flex flex-col overflow-hidden"
       style={{ '--stage-inset-y': 'clamp(16px, 2.2vh, 32px)' } as React.CSSProperties}
-      // Opens straight onto the page's own surface: the tile's colour flooding
-      // the screen first read as a flash rather than as the panel growing.
-      initial={{ backgroundColor: PANEL_BG }}
-      animate={{ backgroundColor: PANEL_BG }}
+      /*
+        No fill of its own: the backing layer's backdrop is the surface, and a
+        colour over it lightened the panel against the page beside it — which
+        is what still read as a separate card once the border was gone.
+      */
+      initial={{ backgroundColor: 'transparent' }}
+      animate={{ backgroundColor: 'transparent' }}
     >
       {/*
         A fully opaque backing layer. This panel shares a `layoutId` with the
@@ -115,11 +122,32 @@ export function CategoryExpanded({
       */}
       <motion.div
         className="absolute inset-0 -z-10"
+        /*
+          The page's own backdrop, sized and positioned against the viewport
+          rather than this box.
+
+          The panel starts at the sidebar's right edge, so a `cover` image
+          inside it crops from a different origin and lands on a different part
+          of the texture — which is what made the panel read as its own surface
+          even with no border and no fill. Sizing to `100vw × 100vh` and pulling
+          the image left by the panel's own offset lines it up with the page
+          exactly, so the two are continuous across the boundary.
+        */
         style={{
-          backgroundColor: PANEL_BG,
           backgroundImage: PANEL_BACKDROP,
+          /*
+            `cover` against the viewport, exactly as `body::before` paints it —
+            the page preserves the image's aspect ratio and crops, so stretching
+            to `100vw × 100vh` here sampled a differently-scaled part of the
+            texture and the two drifted apart down the panel's height.
+
+            `fixed` attachment is what makes `cover` resolve against the
+            viewport rather than this box, so the offset comes for free and the
+            image lands on exactly the same pixels the page's does.
+          */
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
           backgroundRepeat: 'no-repeat',
         }}
       />
@@ -139,7 +167,7 @@ export function CategoryExpanded({
       */}
       <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto">
         <div className="my-auto">
-        <div className="flex items-start justify-between gap-6 px-[clamp(24px,2.6vw,40px)] pt-[clamp(20px,2.6vh,32px)] pb-[clamp(16px,2vh,24px)]">
+        <div className="flex items-start justify-between gap-6 pr-[clamp(24px,2.6vw,40px)] pt-[clamp(20px,2.6vh,32px)] pb-[clamp(16px,2vh,24px)]">
           <motion.div
             className="flex flex-col gap-2"
             initial={{ opacity: 0, y: 8 }}
@@ -187,7 +215,7 @@ export function CategoryExpanded({
         </div>
 
         <motion.div
-          className="flex flex-col gap-[clamp(18px,2.4vh,30px)] px-[clamp(24px,2.6vw,40px)] pb-[clamp(24px,3vh,36px)]"
+          className="flex flex-col gap-[clamp(18px,2.4vh,30px)] pr-[clamp(24px,2.6vw,40px)] pb-[clamp(24px,3vh,36px)]"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: CONTENT_DELAY + 0.06, duration: 0.3 }}
@@ -256,12 +284,21 @@ export function CategoryExpanded({
                     className="grid w-full place-items-center"
                     style={{ backgroundColor: 'rgba(255,255,255,.03)', aspectRatio: '934 / 340' }}
                   >
-                    <span
-                      className="font-body text-[10px] tracking-[0.14em] opacity-55"
-                      style={{ color: MUTED }}
-                    >
-                      PROJECT SHOT
-                    </span>
+                    {p.thumbnail ? (
+                      <img
+                        src={p.thumbnail}
+                        alt=""
+                        aria-hidden="true"
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <span
+                        className="font-body text-[10px] tracking-[0.14em] opacity-55"
+                        style={{ color: MUTED }}
+                      >
+                        PROJECT SHOT
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5 px-[clamp(12px,1.1vw,18px)] py-[clamp(12px,1.6vh,20px)]">
                     <div
