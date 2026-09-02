@@ -102,6 +102,13 @@ export interface RowAsset {
    * looking arbitrarily scaled.
    */
   ratio?: number;
+  /**
+   * Swaps the tile's dark striped placeholder for a plain light backing.
+   * For an asset exported with a transparent or white background — a mark or
+   * study meant to sit on paper — the dark tile reads as the artefact floating
+   * on an unrelated card rather than showing its own surface.
+   */
+  light?: boolean;
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
@@ -439,13 +446,16 @@ export const CATEGORIES: Category[] = [
             label: 'DIAGNOSIS',
             text: "The original page had the components but not the order. Products sat in a flat block with no way to tell them apart, proof and capability were interleaved, and a first-time visitor couldn't answer what the thing does before being asked to book a demo.",
             slot: 'BEFORE / AUDIT',
-            slotAspectVideo: true,
+            // 2940 × 1464 — wider than 16:9, so contained rather than cropped
+            // to a ratio it doesn't fit.
+            assetSet: [{ src: '/images/UIUX/Prudent/Diagnosis.png', ratio: 2.0082 }],
           },
           {
             label: 'HIERARCHY',
             text: "I rebuilt it as a sequence: how it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section — wholesale, correspondent, retail — because a feature grid speaks to none of them.",
             slot: 'STRUCTURE / SECTION FLOW',
-            slotAspectVideo: true,
+            // 2486 × 1308.
+            assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.png', ratio: 1.9006 }],
           },
           {
             label: 'PRESENCE',
@@ -491,25 +501,45 @@ export const CATEGORIES: Category[] = [
             label: 'COMPLIANCE',
             text: 'Five exception counters and three charts kept fighting for the top of the screen. Nothing won until the filters moved out into their own panel — once narrowing a query stopped costing the overview, the counters could stay loud and the charts could stay quiet.',
             slot: 'VENDOR COMPLIANCE',
-            slotHeight: '460px',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/COMPLIANCE.png', ratio: 1.646 }],
           },
           {
             label: 'ENGAGEMENT',
             text: 'Account teams open this between calls, so it had about four seconds to work. RAG status and pursuit numbers went up top and everything else went below. The illustration was the argument I had with myself — a screen this commercial reads cold without it.',
             slot: 'CLIENT 360',
-            slotHeight: '460px',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/ENGAGEMENT.png', ratio: 1.7708 }],
           },
           {
             label: 'PERFORMANCE',
             text: "Four KPIs, all genuinely important, none more important than the others. Colour ended up doing the separating that hierarchy couldn't, and everything underneath was sequenced to explain those four in order rather than compete with them.",
             slot: 'REVENUE OVERVIEW',
-            slotHeight: '460px',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PERFORMANCE.png', ratio: 1.7751 }],
           },
           {
             label: 'PORTFOLIO',
             text: 'Six markets, each with subsidiaries, each with its own numbers. Collapsing the subsidiaries by default was the only way the parent view stayed readable. On mobile it broke entirely, so the country list became the navigation instead of a sidebar.',
             slot: 'MULTI-MARKET — DESKTOP / MOBILE',
-            slotHeight: '460px',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PORTFOLIO.png', ratio: 1.4742 }],
           },
         ],
         endNote:
@@ -538,7 +568,8 @@ export const CATEGORIES: Category[] = [
             label: 'ORIENTATION',
             text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion — RCMP, FBI, apostille, fingerprinting — each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
             slot: 'SERVICE SELECTION',
-            slotAspectVideo: true,
+            // 2486 × 1142.
+            assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.png', ratio: 2.1769 }],
           },
           {
             // The prototype sits here rather than on the final row: the locked
@@ -566,7 +597,8 @@ export const CATEGORIES: Category[] = [
             label: 'REASSURANCE',
             text: 'This is a category where people are anxious about getting it wrong. So: a with-and-without comparison making the alternative concrete, country-specific guides for the two audiences actually moving to Spain, trust numbers, and an FAQ that answers the question the accordion already started.',
             slot: 'TRUST + FAQ',
-            slotAspectVideo: true,
+            // 1667 × 617.
+            assetSet: [{ src: '/images/UIUX/GlobelA/REASSURANCE.jpg', ratio: 2.7018 }],
           },
         ],
         endNote:
@@ -640,16 +672,19 @@ export const CATEGORIES: Category[] = [
             label: 'ORIGIN',
             text: 'Started from the parent brand’s existing community icon — three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.',
             slot: 'SOURCE ICON',
+            assetSet: [{ src: '/images/Brand Identity/Freshstart/ORIGIN.jpg', ratio: 2.4786 }],
           },
           {
             label: 'TRANSLATION',
             text: 'Morphed that icon toward the parent brand’s signature drop shape, so the sub-mark would sit inside the existing visual family rather than beside it.',
             slot: 'SHAPE STUDIES',
+            assetSet: [{ src: '/images/Brand Identity/Freshstart/TRANSLATION.jpg', ratio: 4.7885 }],
           },
           {
             label: 'INVERSION',
             text: 'Inverting the colour direction turned the drop’s negative space into a rocket silhouette. Partnership and startup became the same shape.',
             slot: 'FINAL MARK',
+            assetSet: [{ src: '/images/Brand Identity/Freshstart/INVERSION.jpg', ratio: 2.9305 }],
           },
         ],
         endNote:
@@ -676,11 +711,13 @@ export const CATEGORIES: Category[] = [
             label: 'TRAJECTORY',
             text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up — and the same thing an hour with someone further along is meant to trigger.",
             slot: 'CONCEPT',
+            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.jpg', ratio: 7.1308 }],
           },
           {
             label: 'ESCAPE',
             text: 'The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably; breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.',
             slot: 'MARK CONSTRUCTION',
+            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.jpg', ratio: 3.368 }],
           },
           {
             label: 'SURFACE',
@@ -689,6 +726,7 @@ export const CATEGORIES: Category[] = [
             // the hero is shown.
             text: 'The system extended into a site that opens in deep space and resolves into daylight as you scroll, with guest portraits duotoned into the palette, then out again across episode artwork, launch banners and social posts.',
             slot: 'WEBSITE + APPLICATION',
+            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/SURFACE.png', ratio: 1.7778 }],
           },
         ],
         metrics: {
@@ -725,16 +763,19 @@ export const CATEGORIES: Category[] = [
             label: 'REFERENCES',
             text: "Four starting points, all pointing the same way: the parent brand's arrow, the physical act of being lifted, a torch held above a city, and the rising axis of a growth chart.",
             slot: 'MOODBOARD',
+            assetSet: [{ src: '/images/Brand Identity/Uplift/REFERENCES.png', ratio: 1.9326 }],
           },
           {
             label: 'CONSTRUCTION',
             text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
             slot: 'LETTERFORM STUDIES',
+            assetSet: [{ src: '/images/Brand Identity/Uplift/CONSTRUCTION.jpg', ratio: 6.3976 }],
           },
           {
             label: 'EXTENSION',
             text: "The arrow scales out of the logo and into the environment — repeated as a backdrop pattern over a mapped world, so the mark's single gesture becomes the brand's ambient texture.",
             slot: 'BACKDROP + APPLICATION',
+            assetSet: [{ src: '/images/Brand Identity/Uplift/EXTENSION.png', ratio: 1.4151 }],
           },
         ],
         endNote:
@@ -758,16 +799,19 @@ export const CATEGORIES: Category[] = [
             label: 'PREMISE',
             text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge — a fair description of what an accelerator does to an early company.",
             slot: 'NAME + CONCEPT',
+            assetSet: [{ src: '/images/Brand Identity/Forge/PREMISE.png', ratio: 1.892, light: true }],
           },
           {
             label: 'FUSION',
             text: 'An anvil profile and a capital F share the same structure: flat top, stepped shoulder, vertical base. Overlaying them produced a single mark that holds both readings.',
             slot: 'ANVIL / F STUDIES',
+            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.png', ratio: 5.4839, light: true }],
           },
           {
             label: 'HEAT',
             text: 'The wordmark stays graphite; only the leading edge of the F ignites. Orange reads as the moment of striking rather than as decoration.',
             slot: 'FINAL MARK + APPLICATION',
+            assetSet: [{ src: '/images/Brand Identity/Forge/HEAT.png', ratio: 3.6776 }],
           },
         ],
         endNote:
@@ -872,15 +916,23 @@ export const CATEGORIES: Category[] = [
             text: 'Six industries, one layout. The template fixes everything structural — logo position, headline pattern, bullet list, phone frame — and lets colour and illustration carry the whole difference. Healthcare pink, e-commerce green, food delivery amber. Someone could add a seventh vertical without asking me anything.',
             slot: 'VERTICAL BANNER SET',
             slotHeight: SOCIAL_SLOT_HEIGHT,
-            // TODO: supply the real banner artwork.
-            document: { title: 'Vertical banner set', pages: placeholderPages(6, 0) },
+            document: {
+              title: 'Vertical banner set',
+              pages: Array.from(
+                { length: 6 },
+                (_, i) => `/images/Marketing Campaigns/Social campaign systems/VERTICALS/${i + 1}.png`,
+              ),
+            },
           },
           {
             label: 'LIST',
             text: 'A carousel gets read by thumb, one card at a time, so each card had to work alone and in order. Large numeral for position, one line of copy, one line-art icon. The cover does the selling; the six cards only have to keep the swipe going.',
             slot: 'LIST CAROUSEL',
             slotHeight: SOCIAL_SLOT_HEIGHT,
-            assetSet: placeholderAssets(1, 6),
+            // 6401 × 4801 — a composed sheet of all six cards, not a strip.
+            assetSet: [
+              { src: '/images/Marketing Campaigns/Social campaign systems/LIST.jpg', ratio: 1.3333 },
+            ],
           },
           {
             /*
@@ -893,29 +945,45 @@ export const CATEGORIES: Category[] = [
             slot: 'NARRATIVE CAROUSEL',
             slotHeight: SOCIAL_SLOT_HEIGHT,
             /*
-              The real artwork is roughly 5:1 — all five cards end to end. It is
-              fitted to the slot width and letterboxed vertically rather than
-              cropped to the slot's shape, so the sequence stays readable as one
-              continuous scene; the lightbox is where the card copy becomes
-              legible. `AssetSet` contains rather than crops, which is exactly
-              that behaviour, so a single-asset set is the right slot here.
+              Five separate 1080×1080 cards rather than one strip, so `AssetSet`
+              would space them apart and break the continuous-scene effect the
+              text describes. The paginated viewer keeps them one at a time with
+              prior/next arrows, which is closer to the actual swipe besides.
             */
-            assetSet: placeholderAssets(1, 7),
+            document: {
+              title: 'Narrative carousel',
+              pages: Array.from(
+                { length: 5 },
+                (_, i) => `/images/Marketing Campaigns/Social campaign systems/NARRATIVE/${i + 1}.png`,
+              ),
+            },
           },
           {
             label: 'INTERACTION',
             text: 'A display advert for a sportswear collaboration where the ad was the interaction rather than a static frame. Built as a working prototype so the behaviour could be tested before anyone wrote code for it.',
             slot: 'DISPLAY AD',
-            slotMaxHeight: SOCIAL_SLOT_HEIGHT,
-            // TODO: supply the real display-ad prototype URL.
-            prototype: { embedUrl: 'about:blank' },
+            stacked: true,
+            slotAspectVideo: true,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. Chrome switched off, so the
+            // reader sees the artefact rather than the player.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2765-6203&starting-point-node-id=2765%3A6203' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
           },
           {
             label: 'PLACE',
             text: "An event campaign set at a stadium in Barcelona. The headline plays on the club's own motto, and the illustration puts the venue inside its real skyline rather than a generic sports frame — this only lands if it feels local to the people who are actually going.",
             slot: 'EVENT CAMPAIGN',
             slotHeight: SOCIAL_SLOT_HEIGHT,
-            assetSet: placeholderAssets(1, 8),
+            // 1440 × 750.
+            assetSet: [
+              { src: '/images/Marketing Campaigns/Social campaign systems/PLACE.jpg', ratio: 1.92 },
+            ],
           },
         ],
         endNote:

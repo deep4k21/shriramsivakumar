@@ -77,7 +77,11 @@ export function AssetSet({ assets, height }: { assets: RowAsset[]; height?: stri
               type="button"
               onClick={() => setOpen(a)}
               aria-label={a.caption ? `View ${a.caption}` : 'View asset'}
-              className="flex min-h-0 flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)] p-0 transition-colors duration-180 hover:border-white/20"
+              className={`flex min-h-0 flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-xl border p-0 transition-colors duration-180 ${
+                a.light
+                  ? 'border-black/10 bg-[#F3F1EC] hover:border-black/20'
+                  : 'border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)] hover:border-white/20'
+              }`}
             >
               <img
                 src={a.src}
