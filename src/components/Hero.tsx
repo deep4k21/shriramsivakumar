@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { animate, motion, useMotionValue } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
@@ -316,6 +316,17 @@ function HeroStatCycle({ stats, accent }: { stats: HeroStat[]; accent: string })
 /** How much the four badges grow on hover. */
 const BADGE_HOVER_SCALE = 1.12;
 /**
+ * How far each badge slides outward on hover, in css `px` (container units
+ * don't support arithmetic inside a `translate`, so this rides the face's own
+ * font-size-independent box instead — small enough not to visibly change scale
+ * at any card size, since it is a flat offset rather than a percentage).
+ *
+ * Each badge moves away from the card's own centre rather than growing in
+ * place, so hovering reads as the badges popping loose from the card rather
+ * than just getting bigger where they already sit.
+ */
+const BADGE_HOVER_OFFSET = 30;
+/**
  * How much the card panel itself grows on hover — a gentler lift than the
  * badges', so it rises with them without swamping them.
  *
@@ -478,7 +489,14 @@ function HeroCardFace({
         // Above the portrait's `z-10` while hovered, so a growing badge lifts
         // over its neighbours rather than sliding under them.
         style={{ zIndex: hovered ? 20 : undefined }}
-        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        // Slides up and left — away from the card's centre — on top of the
+        // existing grow, so the pill reads as popping loose toward the corner
+        // it already sits in rather than only swelling in place.
+        animate={{
+          scale: hovered ? BADGE_HOVER_SCALE : 1,
+          x: hovered ? -BADGE_HOVER_OFFSET : 0,
+          y: hovered ? -BADGE_HOVER_OFFSET : 0,
+        }}
         transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
       >
         {/*
@@ -529,7 +547,13 @@ function HeroCardFace({
       <motion.div
         className="absolute top-[23.35%] left-[59.93%] flex h-[8.58%] w-[40.07%] items-center justify-center gap-[1.6cqw] rounded-full bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         style={{ zIndex: hovered ? 20 : undefined }}
-        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        // Slides up and right — away from the card's centre — matching the
+        // quote pill's outward pop on the opposite corner.
+        animate={{
+          scale: hovered ? BADGE_HOVER_SCALE : 1,
+          x: hovered ? BADGE_HOVER_OFFSET : 0,
+          y: hovered ? -BADGE_HOVER_OFFSET : 0,
+        }}
         transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
       >
         <span className="font-body text-[2.86cqw]/[1] font-semibold whitespace-nowrap text-[#d9effc]">
@@ -568,7 +592,10 @@ function HeroCardFace({
       <motion.div
         className="absolute inset-0"
         style={{ transformOrigin: '27.51% 52.31%', zIndex: hovered ? 20 : undefined }}
-        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        // Slides left — away from the card's centre — since this block sits on
+        // the card's left side. `inset-0`, so the offset carries the panel and
+        // its text together rather than one drifting from the other.
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1, x: hovered ? -BADGE_HOVER_OFFSET : 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
       >
         <div className="absolute top-[36.78%] left-[15.43%] h-[31.05%] w-[24.16%] rounded-[2.60cqw] bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]" />
@@ -593,7 +620,9 @@ function HeroCardFace({
         // content-width pill grew and shrank on every keystroke.
         className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[24%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         style={{ zIndex: hovered ? 20 : undefined }}
-        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1 }}
+        // Slides right — away from the card's centre — since this pill sits on
+        // the card's right side.
+        animate={{ scale: hovered ? BADGE_HOVER_SCALE : 1, x: hovered ? BADGE_HOVER_OFFSET : 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 26, mass: 0.7 }}
       >
         <HeroTraitCycle traits={content.traits} accent={accent} />
@@ -638,6 +667,81 @@ export function Hero({ flipOnHover }: HeroProps) {
   const [hovered, setHovered] = useState(false);
   /** Signed half-turn count: +1 to show travel, −1 back, so the two sweeps mirror. */
   const [turns, setTurns] = useState(0);
+
+  /*
+    A small idle rotation that hints the card can be turned over, in place of
+    the "CLICK THE CARD TO FLIP" caption that used to say so in words. A card
+    that visibly rocks a few degrees and settles back reads as an object with
+    another side, the way nudging a real card on a table would.
+
+    One motion value drives `rotateY` throughout — the click flip and the idle
+    wobble both animate it imperatively rather than each owning a separate
+    prop. Two separately-rotated elements would each need their own
+    `transformPerspective` to read as a 3D tilt (the flip's own comment below
+    explains why perspective doesn't inherit through a flat ancestor), and
+    nested perspectives do not compose the way a single rotation does — so one
+    value, taken over by whichever animation is running, is what keeps the
+    tilt reading as one object rather than two stacked ones.
+  */
+  const cardRotateY = useMotionValue(turns * 180);
+  /**
+   * True once the reader has clicked (or hovered, in hover-flip mode) —
+   * the strongest possible sign they already know the card turns over. The
+   * wobble hint keeps repeating until this flips, then never runs again.
+   */
+  const dismissed = useRef(false);
+  /** True while the click-triggered flip owns `cardRotateY` — the wobble waits. */
+  const flipping = useRef(false);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let cancelled = false;
+    const cycle = async () => {
+      while (!cancelled && !dismissed.current) {
+        // Idle stretch between wobbles — long enough that the hint reads as an
+        // occasional nudge, not a tic. Re-awaited every pass, including a pass
+        // skipped because a flip was in progress — without that, a flip mid-
+        // wait would turn this into a synchronous spin: `continue` alone jumps
+        // straight back to the loop condition with no `await` in between.
+        await new Promise((r) => setTimeout(r, 3200 + Math.random() * 2600));
+        if (cancelled || dismissed.current || flipping.current) continue;
+        // Rocks toward the travel side and back — the same direction a click
+        // would turn it — overshooting slightly past rest before settling, the
+        // way a nudged card would. Relative to the current resting angle, so
+        // it rocks the same amount whichever face is up.
+        const rest = cardRotateY.get();
+        await animate(cardRotateY, [rest, rest - 26, rest + 6, rest], {
+          duration: 1.1,
+          ease: ['easeOut', 'easeInOut', 'easeOut'],
+        });
+      }
+    };
+    cycle();
+    return () => {
+      cancelled = true;
+    };
+  }, [cardRotateY]);
+
+  // The click flip takes the motion value over from wherever the wobble left
+  // it, so a click mid-wobble does not snap the card back to true first.
+  //
+  // `dismissed` is set in the click/hover handlers themselves, not here: this
+  // effect also runs once on mount, when `turns` is 0 for the first time and
+  // nobody has touched anything — setting it here would retire the hint before
+  // it ever got to play.
+  useEffect(() => {
+    flipping.current = true;
+    const controls = animate(cardRotateY, turns * 180, {
+      duration: FLIP_MS / 1000,
+      ease: FLIP_EASE,
+    });
+    controls.then(() => {
+      flipping.current = false;
+    });
+    return () => controls.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [turns]);
+
   // Every checkerboard cell is filled, and each image keeps the cell it was
   // assigned — the layout is fixed. What changes is opacity: tiles fade out
   // and back in on slow, independent clocks, so the field keeps breathing
@@ -666,6 +770,10 @@ export function Hero({ flipOnHover }: HeroProps) {
     // Already showing that face (hover re-entry, a repeat click) — nothing to
     // turn, and stepping anyway would spin a full extra revolution.
     if (dir === flipped) return;
+    // The reader is turning the card themselves — the wobble hint has done its
+    // job and stops for good, here rather than in the effect `turns` triggers
+    // below: that effect also runs once on mount, before any real interaction.
+    dismissed.current = true;
     setFlipped(dir);
     setTurns((t) => (dir ? t + 1 : t - 1));
   };
@@ -867,11 +975,11 @@ export function Hero({ flipOnHover }: HeroProps) {
             <motion.div className="relative size-full" style={{ opacity: exit.opacity }}>
             <motion.div
               className="relative size-full"
-              style={{ transformStyle: 'preserve-3d' }}
-              // Driven by the accumulating half-turn count, not by `flipped`.
-              // Toggling between 0 and 180 made the return trip retrace the
-              // outbound arc backwards; always advancing means the design side
-              // turns away one way and the travel side turns away the other.
+              // `transformPerspective` is a static prop here, not part of the
+              // animated `rotateY` any more: the click flip and the idle
+              // wobble both drive `cardRotateY` imperatively now (see where it
+              // is created above), so this element no longer owns the value
+              // via `animate`.
               //
               // The perspective belongs here, in the transform itself, not as a
               // `perspective` property on an ancestor: that only reaches an
@@ -881,8 +989,7 @@ export function Hero({ flipOnHover }: HeroProps) {
               // rotating orthographically — scaling to zero width and back,
               // which reads as a rectangle folding shut rather than an object
               // turning over.
-              animate={{ rotateY: turns * 180, transformPerspective: 1400 }}
-              transition={{ duration: FLIP_MS / 1000, ease: FLIP_EASE }}
+              style={{ transformStyle: 'preserve-3d', rotateY: cardRotateY, transformPerspective: 1400 }}
             >
               {/* Front — design side. */}
               <HeroCardFace content={HERO_DESIGN} hovered={hovered} />

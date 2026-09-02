@@ -42,6 +42,10 @@ export const CELL_H = '20%';
  *
  * The full 5×5 less the three cells the card covers — column 2, rows 1–3 —
  * leaves exactly 22, one per image in the set.
+ *
+ * Files live in `Design/`, not the flat `homegrid/` folder — the original set
+ * moved there when two of them (04, 17) became GIFs, which is what these paths
+ * point at now.
  */
 const CELLS: Array<{ cell: [number, number]; file: string }> = [
   // Top row, left to right.
@@ -52,7 +56,7 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
   { cell: [4, 0], file: 'card08_ufo_desert.png' },
 
   // Second row — the card blocks the middle from here down.
-  { cell: [0, 1], file: 'card04_pale_blue.png' },
+  { cell: [0, 1], file: 'card04_pale_blue.gif' },
   { cell: [1, 1], file: 'card15_project_agresar.png' },
   { cell: [3, 1], file: 'card02_experience_nxt.png' },
   { cell: [4, 1], file: 'card11_food_illustration.png' },
@@ -67,7 +71,7 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
   { cell: [0, 3], file: 'card14_city_illustration.png' },
   { cell: [1, 3], file: 'card21_icons_grid.png' },
   { cell: [3, 3], file: 'card07_iprovision.png' },
-  { cell: [4, 3], file: 'card17_lavender_blank.png' },
+  { cell: [4, 3], file: 'card17_lavender_blank.gif' },
 
   // Bottom row — card10 sits dead centre, as specified.
   { cell: [0, 4], file: 'card12_phones_travel.png' },
@@ -78,11 +82,40 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
 ];
 
 /**
- * The back face's image for a given cell, offset through the list so a tile
- * never shows the same picture on both sides. Fixed like the front: the same
- * cell reveals the same second picture every time it turns.
+ * The back face's pool — one photo per cell, in the same reading order as
+ * `CELLS` above, so cell *i*'s travel photo is `TRAVEL_FILES[i]`.
+ *
+ * 21 real photos against 22 cells: the last one repeats the first rather than
+ * falling back to a Design image, so every back face is a genuine travel
+ * photo. `travel20_portrait` is a placeholder for the one video in the
+ * source set (`20220103_183611.mp4`) — the grid has no video tile yet, so
+ * this holds its place until a poster frame or a video tile exists.
  */
-const BACK_OFFSET = Math.floor(CELLS.length / 2);
+const TRAVEL_FILES: string[] = [
+  'travel01_lakeshore_snow.jpg',
+  'travel02_night_wide.jpg',
+  'travel03_landscape.jpg',
+  'travel04_lanka_pano.jpg',
+  'travel05_sikkim_pano.jpg',
+  'travel06_landscape.jpg',
+  'travel07_landscape.jpg',
+  'travel08_landscape.jpg',
+  'travel09_landscape.jpg',
+  'travel10_landscape.jpg',
+  'travel11_landscape.jpg',
+  'travel12_portrait.jpg',
+  'travel13_pano.jpg',
+  'travel14_portrait.jpg',
+  'travel15_portrait.jpg',
+  'travel16_portrait.jpg',
+  'travel17_portrait.jpg',
+  'travel18_portrait.jpg',
+  'travel19_portrait.jpg',
+  'travel20_portrait.jpg',
+  'travel21_portrait.jpg',
+  // Repeats travel01 — 21 photos for 22 cells.
+  'travel01_lakeshore_snow.jpg',
+];
 
 /** Wait between one column starting its flip and the next, in seconds. */
 const FLIP_STAGGER = 0.11;
@@ -116,8 +149,8 @@ export interface HomeGridSlot {
  * and comes back rather than only dimming.
  */
 export const FADE_FLOOR = 0;
-/** One leg of the fade, in seconds. Slow enough not to catch the eye. */
-export const FADE_S = 3.4;
+/** One leg of the fade, in seconds. */
+export const FADE_S = 2;
 /**
  * How long a faded-out tile stays gone before fading back, in ms.
  *
@@ -125,26 +158,28 @@ export const FADE_S = 3.4;
  * before it ever reaches full transparency — which is what made an earlier,
  * faster version bottom out halfway and read as a flicker.
  */
-const HIDDEN_MS: [number, number] = [3600, 5200];
+const HIDDEN_MS: [number, number] = [2200, 3200];
 /** The pause after a tile has returned before that lane picks another, in ms. */
-const BETWEEN_MS: [number, number] = [1200, 3200];
+const BETWEEN_MS: [number, number] = [800, 2000];
 /**
  * How many tiles are animating at once.
  *
- * Five of twenty-two: enough that the grid always has something moving in it,
- * while leaving seventeen steady so the checkerboard still reads as a complete
- * field rather than a dissolving one. Each runs in its own lane — an
- * independent shrink-pause-grow loop — and the lanes never collide on the same
- * cell.
+ * Eleven of twenty-two — half the grid — so the field always has real movement
+ * in it, while the other eleven stay steady so the checkerboard still reads as
+ * a complete field rather than a dissolving one. Each runs in its own lane —
+ * an independent fade-out/fade-in loop — and the lanes never collide on the
+ * same cell.
  */
-const CONCURRENT = 5;
+const CONCURRENT = 11;
 
 const randBetween = ([lo, hi]: [number, number]) => lo + Math.random() * (hi - lo);
 
 const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file }, i) => ({
   key: `cell-${cell[0]}-${cell[1]}`,
-  src: `/images/homegrid/${file}`,
-  backSrc: `/images/homegrid/${CELLS[(i + BACK_OFFSET) % CELLS.length].file}`,
+  src: `/images/homegrid/Design/${file}`,
+  // The travel photo for the same cell — index-matched to CELLS, not offset,
+  // since these are two distinct pools rather than one pool split in half.
+  backSrc: `/images/homegrid/Travel/${TRAVEL_FILES[i]}`,
   anchor: { top: ROW[cell[1]], left: COL[cell[0]], width: CELL_W, col: cell[0] },
   visible: true,
 }));
