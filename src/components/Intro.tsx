@@ -190,12 +190,20 @@ export function Intro() {
                   // page has scrolled or the layout has reflowed.
                   const r = e.currentTarget.getBoundingClientRect();
                   setFlightPath({
-                    from: { x: r.right - 22, y: r.top + r.height / 2 },
-                    to: { x: window.innerWidth - 28, y: 24 },
+                    // Starts on the button's own download icon rather than its
+                    // edge, so the trail reads as leaving the thing clicked.
+                    from: { x: r.right - 30, y: r.top + r.height / 2 },
+                    /*
+                      Runs right off the top edge, towards where browsers put
+                      their downloads UI. The page cannot draw on that chrome —
+                      it is outside the DOM — so the trail reaches the boundary
+                      and stops there rather than claiming to land on it.
+                    */
+                    to: { x: window.innerWidth - 120, y: 0 },
                   });
                   // Clears the path once the flight has finished, so the same
                   // click can trigger it again rather than leaving it "used up".
-                  window.setTimeout(() => setFlightPath(null), 1000);
+                  window.setTimeout(() => setFlightPath(null), 2700);
                 }}
                 className="inline-flex items-center gap-3.5 rounded-xl border border-teal bg-[#005961]/10 py-3 pr-4 pl-5 font-heading text-[clamp(14px,1.15vw,19px)] font-bold text-teal"
                 whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}
