@@ -96,7 +96,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 {project.software.map((s) => (
                   <span
                     key={s}
-                    className="rounded-[7px] border border-orange/18 bg-orange/8 px-2.75 py-1.5 font-heading text-[11.5px] font-medium text-orange"
+                    className="rounded-[7px] border border-white/18 bg-white/8 px-2.75 py-1.5 font-heading text-[11.5px] font-medium text-white"
                   >
                     {s}
                   </span>
@@ -124,7 +124,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   animate={{
                     backgroundColor: on ? 'rgba(255,154,92,.12)' : 'rgba(255,255,255,0)',
                     borderColor: on ? 'rgba(255,154,92,.4)' : 'rgba(255,255,255,.1)',
-                    color: on ? '#FF9A5C' : '#808080',
+                    color: on ? '#FF9A5C' : '#A5AEBB',
                   }}
                   transition={{ duration: 0.18 }}
                 >

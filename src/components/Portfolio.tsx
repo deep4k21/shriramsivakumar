@@ -390,7 +390,7 @@ function CategoryCard({
                 </div>
                 <p
                   className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
-                  style={{ color: '#808080' }}
+                  style={{ color: '#A5AEBB' }}
                 >
                   {cat.collection}
                 </p>
@@ -399,7 +399,7 @@ function CategoryCard({
               <motion.p
                 key="body"
                 className="m-0 max-w-[38ch] font-body text-[clamp(13px,1vw,16px)]/[1.65] text-pretty"
-                style={{ color: '#808080' }}
+                style={{ color: '#A5AEBB' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

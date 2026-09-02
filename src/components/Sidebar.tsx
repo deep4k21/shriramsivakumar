@@ -114,7 +114,7 @@ export function Sidebar({
                 className="flex items-center gap-3 rounded-[9px] px-1 py-2 font-body"
                 animate={{
                   backgroundColor: on ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,0)',
-                  color: on ? '#ffffff' : '#808080',
+                  color: on ? '#ffffff' : '#A5AEBB',
                 }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.06)', color: '#ffffff' }}
                 transition={{ duration: 0.18 }}
@@ -177,7 +177,7 @@ export function Sidebar({
                           className="flex cursor-pointer items-center gap-3 rounded-[9px] bg-transparent px-1 py-1.5 text-left font-body"
                           animate={{
                             backgroundColor: open ? 'rgba(255,154,92,.1)' : 'rgba(255,255,255,0)',
-                            color: open ? '#FF9A5C' : '#808080',
+                            color: open ? '#FF9A5C' : '#A5AEBB',
                           }}
                           // Orange on hover as well as when open, so the whole
                           // category list stays in the accent rather than

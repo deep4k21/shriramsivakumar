@@ -93,7 +93,7 @@ const HERO_TRAVEL: HeroCardContent = {
   stats: [
     { icon: '/images/hero/projects-delivered.svg', value: '14', label: ['Countries', 'visited'] },
     { icon: '/images/hero/globe.svg', value: '30+', label: ['Cities', 'explored'] },
-    { icon: '/images/hero/briefcase.svg', value: '6', label: ['Continents', 'covered'] },
+    { icon: '/images/hero/briefcase.svg', value: '50+', label: ['Flights', 'taken'] },
   ],
   role: 'Avid Traveller',
 };
@@ -270,7 +270,7 @@ function HeroStatCycle({ stats, accent }: { stats: HeroStat[]; accent: string })
         transition={{ duration: 0.45, ease: 'easeOut' }}
       />
       <span
-        className="absolute top-[48.58%] left-[18.95%] font-body text-[4.16cqw]/[1] font-semibold whitespace-nowrap"
+        className="absolute top-[48.58%] left-[18.95%] font-body text-[5.8cqw]/[1] font-semibold whitespace-nowrap"
         style={{ color: accent }}
       >
         {value}
@@ -899,7 +899,7 @@ export function Hero({ flipOnHover }: HeroProps) {
         </div>
       </div>
       <motion.span
-        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-[#89919F]"
+        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-[#A5AEBB]"
         style={exit}
       >
         {flipOnHover ? 'HOVER TO FLIP' : 'CLICK THE CARD TO FLIP'}

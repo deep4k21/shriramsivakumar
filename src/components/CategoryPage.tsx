@@ -67,7 +67,7 @@ export function CategoryPage({ category, categoryIndex, onClose, onOpenProject }
                   transition={{ duration: 0.2 }}
                 >
                   <div className="grid h-[150px] place-items-center bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171a1e_9px,#171a1e_18px)]">
-                    <span className="font-body text-[10px] tracking-[0.14em] text-[#5a5a5a]">PROJECT SHOT</span>
+                    <span className="font-body text-[10px] tracking-[0.14em] text-[#A5AEBB]">PROJECT SHOT</span>
                   </div>
                   <div className="flex flex-col gap-2 px-5.5 py-5">
                     <div className="font-heading text-[16.5px]/[1.35] font-semibold tracking-[-0.01em] text-white">

@@ -1544,10 +1544,13 @@ export const TOOLKIT: ToolIcon[] = [
 export const AI_TOOLS: ToolIcon[] = [
   { name: 'ChatGPT', icon: '/images/aiworkflow/image 20.png' },
   { name: 'Claude', icon: '/images/aiworkflow/image 21.png' },
-  { name: 'Perplexity', icon: '/images/aiworkflow/image 22.png' },
   { name: 'Midjourney', icon: '/images/aiworkflow/image 24.png' },
   { name: 'Figma AI', icon: '/images/aiworkflow/image 25.png' },
   { name: 'Stitch', icon: '/images/aiworkflow/image 26.png' },
+  // TODO: no icon supplied yet — placeholder path, will 404 until one lands.
+  { name: 'Figma Make', icon: '/images/aiworkflow/figmamake.svg' },
+  { name: 'Higgsfield', icon: '/images/aiworkflow/higgsfield.png' },
+  { name: 'Cursor', icon: '/images/aiworkflow/cursor.png' },
 ];
 
 export const HERO_STATS = [

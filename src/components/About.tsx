@@ -295,7 +295,7 @@ export function About() {
                   <img src="/images/about/mytoolkit.svg" alt="" aria-hidden="true" className="size-4.5" />
                   My Toolkit
                 </div>
-                <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
+                <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#A5AEBB]">
                   {TOOLKIT.length} TOOLS
                 </span>
               </div>
@@ -314,7 +314,7 @@ export function About() {
                   <img src="/images/about/aiworkflow.svg" alt="" aria-hidden="true" className="size-4.5" />
                   AI Workflow
                 </div>
-                <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#5a5a5a]">
+                <span className="whitespace-nowrap font-heading text-[10px] font-medium tracking-[0.1em] text-[#A5AEBB]">
                   {AI_TOOLS.length} TOOLS
                 </span>
               </div>

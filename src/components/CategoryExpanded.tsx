@@ -132,8 +132,8 @@ export function CategoryExpanded({
   const TITLE = '#FF9A5C';
   /** The stat numbers, in the site's own teal rather than the title's orange. */
   const STAT = '#00B8C9';
-  const BODY = '#808080';
-  const MUTED = '#5a5a5a';
+  const BODY = '#A5AEBB';
+  const MUTED = '#A5AEBB';
   const LINK = '#00B8C9';
 
   return (
