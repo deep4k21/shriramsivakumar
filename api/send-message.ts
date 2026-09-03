@@ -7,11 +7,15 @@ import { Resend } from 'resend';
  * browser code — so this runs server-side as a Vercel serverless function,
  * holding the Resend API key as an environment variable instead.
  *
- * Uses the plain Web `Request`/`Response` signature rather than
- * `@vercel/node`'s types: Vercel's Node runtime supports this directly, and
- * the alternative pulled in transitive dependencies with known
- * vulnerabilities for no functional benefit here.
+ * Runs on the Edge runtime rather than Node — declared explicitly below,
+ * since the plain Web `Request`/`Response` handler signature this uses is
+ * the Edge one. Left undeclared, Vercel defaults an `/api` function to the
+ * Node runtime, which expects the older `(req, res)` callback shape; when a
+ * Node function is invoked with a handler that never calls anything on
+ * `res`, the platform just waits — the request never completes, which is
+ * what a stuck-pending request in devtools with zero bytes transferred means.
  */
+export const config = { runtime: 'edge' };
 
 const TO_EMAIL = 'deep4k2105@gmail.com';
 /**
