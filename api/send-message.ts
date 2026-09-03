@@ -17,7 +17,7 @@ import { Resend } from 'resend';
  */
 export const config = { runtime: 'edge' };
 
-const TO_EMAIL = 'deep4k2105@gmail.com';
+const TO_EMAIL = 'shriramsiva18726@gmail.com';
 /**
  * Resend's own shared sending address — the free tier can only send from a
  * domain verified with Resend, and this site has no custom domain (it's
@@ -85,6 +85,16 @@ export default async function handler(request: Request): Promise<Response> {
       headers: { 'Content-Type': 'application/json' },
     });
   }
+  // Resend's own `reply_to` validation rejects the send outright on a
+  // malformed address — checked here first so a bad email produces a normal
+  // 400 with a message the visitor can act on, rather than a 502 from deep
+  // inside the send call with no useful detail surfaced to them.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return new Response(JSON.stringify({ error: 'That email address doesn’t look right' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   const resend = new Resend(apiKey);
 
@@ -94,8 +104,11 @@ export default async function handler(request: Request): Promise<Response> {
       to: TO_EMAIL,
       // The visitor's own address as reply-to, so replying from the inbox
       // goes straight back to them instead of to Resend's shared sender.
-      replyTo: email,
-      subject: `New message from ${name} via the portfolio site`,
+      // Trimmed — Resend's format check rejects surrounding whitespace, and
+      // the earlier validation above only confirms the address is shaped
+      // right, not that it's already been stripped of it.
+      replyTo: email.trim(),
+      subject: `New message from ${name.trim()} via the portfolio site`,
       html: `
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
