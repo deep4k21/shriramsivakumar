@@ -169,11 +169,20 @@ export function DocumentViewer({
   doc,
   height,
   spread,
+  fitHeight,
 }: {
   doc: RowDocument;
   height?: string;
   /** Shows two pages side by side instead of one — for a `wideSlot` row whose column is wide enough to hold a spread. */
   spread?: boolean;
+  /**
+   * The page image's own aspect ratio (width ÷ height). When set, the image
+   * area sizes itself to this ratio at the column's full width instead of
+   * stretching to `height`/`DEFAULT_HEIGHT` regardless of the image's own
+   * proportions — for a wide landscape asset that height otherwise leaves the
+   * frame taller than the image needs, with empty glass above or below it.
+   */
+  fitHeight?: number;
 }) {
   const total = doc.pages.length;
   const inline = usePager(total);
@@ -209,13 +218,18 @@ export function DocumentViewer({
         aria-label={`${doc.title} — ${total} pages`}
         onKeyDown={onKeyDown}
         className={`flex w-full flex-col overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal ${GLASS}`}
-        style={{ height: height ?? `${DEFAULT_HEIGHT}px` }}
+        style={fitHeight ? undefined : { height: height ?? `${DEFAULT_HEIGHT}px` }}
       >
         <button
           type="button"
           onClick={openLightbox}
           aria-label={`View ${doc.title} full size`}
-          className="grid min-h-0 flex-1 cursor-pointer place-items-center border-0 bg-transparent p-3"
+          className={
+            fitHeight
+              ? 'grid w-full cursor-pointer place-items-center border-0 bg-transparent p-3'
+              : 'grid min-h-0 flex-1 cursor-pointer place-items-center border-0 bg-transparent p-3 pb-5'
+          }
+          style={fitHeight ? { aspectRatio: String(fitHeight) } : undefined}
         >
           {spread ? (
             <SpreadPages doc={doc} left={pair.page} className="max-h-full max-w-full flex-1 object-contain" />

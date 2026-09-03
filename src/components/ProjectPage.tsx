@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import type { Category } from '../data/content';
+import type { ProcessRow, Category } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 import { ProjectMetricsRow } from './ProjectMetricsRow';
@@ -8,6 +8,79 @@ import { PrototypePiP } from './PrototypePiP';
 import { AssetSet } from './AssetSet';
 import { DocumentViewer } from './DocumentViewer';
 import { MotionClip } from './MotionClip';
+
+/**
+ * The slot's content for one process row — the document viewer, prototype
+ * frame, asset set or placeholder box a row's `slot`-family field selects.
+ * Pulled out of the row renderer so a `pairWithNext` pair can build both
+ * sides' slots the same way a standalone row does.
+ */
+function renderSlot(row: ProcessRow) {
+  return row.document ? (
+    <DocumentViewer doc={row.document} height={row.slotHeight} spread={row.wideSlot} fitHeight={row.slotAspect} />
+  ) : row.motion ? (
+    <MotionClip clip={row.motion} height={row.slotHeight} fitHeight={row.slotAspect} />
+  ) : row.assetSet ? (
+    <AssetSet assets={row.assetSet} height={row.slotHeight} />
+  ) : row.prototype ? (
+    <div
+      className={row.slotAspect || row.slotAspectVideo ? 'mx-auto' : 'w-full'}
+      style={
+        row.slotAspect || row.slotAspectVideo
+          ? // Height-led: the frame takes the available height and derives
+            // its width from the artboard's ratio, so the prototype fills it
+            // with no letterboxing either side.
+            //
+            // Capping the height is what keeps the row inside the modal.
+            // Width-led sizing — an aspect ratio alone — makes the frame as
+            // tall as the column is wide, so on a wide screen the label and
+            // copy above it get pushed out of view and the reader has to
+            // scroll to see the artefact.
+            {
+              height: row.slotMaxHeight ?? 'min(56vh, 620px)',
+              aspectRatio: String(row.slotAspect ?? 16 / 9),
+              maxWidth: '100%',
+            }
+          : row.stacked
+              ? // Fits within the modal's viewport alongside its sticky
+                // header, rather than the prototype forcing a tall box that
+                // pushes most of the row off-screen.
+                { height: row.slotMaxHeight ?? 'min(56vh, 620px)' }
+              : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
+      }
+    >
+      <PrototypePiP prototype={row.prototype} />
+    </div>
+  ) : (
+    <div
+      className="grid min-h-[160px] place-items-center rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
+      style={
+        row.slotAspectVideo
+          ? { aspectRatio: '16 / 9', minHeight: 0 }
+          : row.slotHeight
+            ? { height: row.slotHeight, minHeight: row.slotHeight }
+            : row.slotMaxHeight
+              ? { maxHeight: row.slotMaxHeight }
+              : undefined
+      }
+    >
+      <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
+    </div>
+  );
+}
+
+/** A `pairWithNext` column's own label, text and slot, stacked vertically. */
+function PairColumn({ row }: { row: ProcessRow }) {
+  return (
+    <div className="flex flex-col gap-20">
+      <div className="flex flex-col gap-2">
+        <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
+        <p className="m-0 font-body text-[15px]/[1.7] text-grey">{row.text}</p>
+      </div>
+      <div className="w-full">{renderSlot(row)}</div>
+    </div>
+  );
+}
 
 interface ProjectPageProps {
   category: Category;
@@ -250,7 +323,31 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             the row) size to whichever is taller instead of forcing every row
             to match the image's height.
           */}
-          {project.processRows.map((row) => {
+          {project.processRows.map((row, i) => {
+            // Rendered as the right half of the previous row's pair, not on
+            // its own — see `pairWithNext` below.
+            if (i > 0 && project.processRows[i - 1].pairWithNext) return null;
+
+            /*
+              Two rows shown as one block: a left and a right column, each
+              stacking its own label, text and slot, with a vertical rule
+              between them — the same `border-white/7` line the rows
+              themselves are divided by, turned sideways.
+            */
+            if (row.pairWithNext) {
+              const next = project.processRows[i + 1];
+              return (
+                <div
+                  key={row.label}
+                  className="grid items-start gap-8 divide-x divide-white/7 border-t border-white/7 py-5"
+                  style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
+                >
+                  <PairColumn row={row} />
+                  <PairColumn row={next} />
+                </div>
+              );
+            }
+
             /*
               A text-only row has no slot at all — not an empty one. It keeps
               the two-column shape so the labels stay aligned with every other
@@ -270,58 +367,6 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 </div>
               );
             }
-
-            const slot = row.document ? (
-              <DocumentViewer doc={row.document} height={row.slotHeight} spread={row.wideSlot} />
-            ) : row.motion ? (
-              <MotionClip clip={row.motion} height={row.slotHeight} />
-            ) : row.assetSet ? (
-              <AssetSet assets={row.assetSet} height={row.slotHeight} />
-            ) : row.prototype ? (
-              <div
-                className={row.slotAspect || row.slotAspectVideo ? 'mx-auto' : 'w-full'}
-                style={
-                  row.slotAspect || row.slotAspectVideo
-                    ? // Height-led: the frame takes the available height and
-                      // derives its width from the artboard's ratio, so the
-                      // prototype fills it with no letterboxing either side.
-                      //
-                      // Capping the height is what keeps the row inside the
-                      // modal. Width-led sizing — an aspect ratio alone — makes
-                      // the frame as tall as the column is wide, so on a wide
-                      // screen the label and copy above it get pushed out of
-                      // view and the reader has to scroll to see the artefact.
-                      {
-                        height: row.slotMaxHeight ?? 'min(56vh, 620px)',
-                        aspectRatio: String(row.slotAspect ?? 16 / 9),
-                        maxWidth: '100%',
-                      }
-                    : row.stacked
-                        ? // Fits within the modal's viewport alongside its sticky
-                          // header, rather than the prototype forcing a tall box
-                          // that pushes most of the row off-screen.
-                          { height: row.slotMaxHeight ?? 'min(56vh, 620px)' }
-                        : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
-                }
-              >
-                <PrototypePiP prototype={row.prototype} />
-              </div>
-            ) : (
-              <div
-                className="grid min-h-[160px] place-items-center rounded-xl border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]"
-                style={
-                  row.slotAspectVideo
-                    ? { aspectRatio: '16 / 9', minHeight: 0 }
-                    : row.slotHeight
-                      ? { height: row.slotHeight, minHeight: row.slotHeight }
-                      : row.slotMaxHeight
-                        ? { maxHeight: row.slotMaxHeight }
-                        : undefined
-                }
-              >
-                <span className="font-body text-[10px] tracking-[0.14em] text-grey">{row.slot}</span>
-              </div>
-            );
 
             return (
               <div
@@ -353,7 +398,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                     {row.text}
                   </p>
                 </div>
-                <div className={row.stacked ? 'w-full' : 'self-start'}>{slot}</div>
+                <div className={row.stacked ? 'w-full' : 'self-start'}>{renderSlot(row)}</div>
               </div>
             );
           })}

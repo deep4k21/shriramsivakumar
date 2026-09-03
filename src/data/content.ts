@@ -26,10 +26,15 @@ export interface ProcessRow {
    */
   wideSlot?: boolean;
   /**
-   * The slot's aspect ratio as width/height (e.g. 1.5576), for a prototype
-   * whose artboard is not 16:9. Figma's `contain` scaling letterboxes whatever
-   * the frame doesn't match, so matching the frame to the artboard is what
-   * removes the bars. Height stays capped so the row still fits the modal.
+   * The slot's aspect ratio as width/height (e.g. 1.5576).
+   *
+   * For a `prototype` row, this is the artboard's own ratio — Figma's
+   * `contain` scaling otherwise letterboxes whatever the frame doesn't match.
+   * For a `document` row, it shrinks the frame to the page image's actual
+   * height at the column's full width instead of stretching to `slotHeight`
+   * regardless of the image's proportions — a single landscape banner at a
+   * tall fixed height otherwise sits inside a frame with empty glass above
+   * and below it.
    */
   slotAspect?: number;
   /**
@@ -68,6 +73,17 @@ export interface ProcessRow {
    * fills the slot. Omit for a standard single slot.
    */
   document?: RowDocument;
+  /**
+   * Combines this row with the one immediately after it into a single block:
+   * two columns side by side, each stacking its own label, text and slot,
+   * with a vertical rule between them — rather than two separate full-width
+   * rows stacked top to bottom. For a pair of short, similar pieces (two
+   * standing banners, say) that reads as one comparison rather than as two
+   * unrelated sections. The row this is set on supplies the left column; the
+   * next row in the array supplies the right column and is not rendered
+   * again on its own.
+   */
+  pairWithNext?: boolean;
 }
 
 export interface ProjectPrototype {
@@ -110,12 +126,27 @@ export interface RowAsset {
    */
   ratio?: number;
   /**
-   * Swaps the tile's dark striped placeholder for a plain light backing.
+   * Swaps the tile's dark striped placeholder for a plain cream backing.
    * For an asset exported with a transparent or white background — a mark or
    * study meant to sit on paper — the dark tile reads as the artefact floating
    * on an unrelated card rather than showing its own surface.
    */
   light?: boolean;
+  /**
+   * Same as `light`, but plain white rather than cream — for an asset whose
+   * own background is white, so the tile's backing reads as a continuation
+   * of the artwork's surface rather than a visibly different shade next to
+   * it. Takes precedence over `light` if both are set.
+   */
+  white?: boolean;
+  /**
+   * Gives the tile inner padding instead of the image filling it edge to
+   * edge, so the tile's own backing shows as a margin around the artefact —
+   * a mat around a print, rather than a crop. Meant to pair with `light` or
+   * `white`: a study or mark shot tight to its own edges otherwise touches
+   * the tile's border directly.
+   */
+  padded?: boolean;
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
@@ -329,24 +360,6 @@ const SOCIAL_SLOT_HEIGHT = '480px';
  * finding its own height.
  */
 const ILLO_SLOT_HEIGHT = '480px';
-
-/** Stands in for the motion piece's poster frame until the real clip arrives. */
-const PLACEHOLDER_POSTER = PLACEHOLDER_POOL[19];
-
-/**
- * One slot height across the environmental showcase's three rows.
- *
- * These pieces are tall — a roll-up is roughly 1:3 — so the slot is sized by
- * how much height the modal can spare rather than by the artwork, and the
- * pieces letterbox within it. Filling the slot instead would mean cropping a
- * banner's top or bottom off, which is the one thing a roll-up cannot survive.
- */
-const ENV_SLOT_HEIGHT = '520px';
-
-/** Real proportions of the standing pieces, used while the artwork is stood in for. */
-const ROLLUP_RATIO = 850 / 2000;
-const BOOTH_RATIO = 1000 / 2200;
-const STANDEE_RATIO = 600 / 1500;
 
 export const CATEGORIES: Category[] = [
   {
@@ -611,6 +624,7 @@ export const CATEGORIES: Category[] = [
         endNote:
           "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem.",
       },
+      /*
       ...['Client onboarding flow'].map(
         (name) => ({
           name,
@@ -625,6 +639,7 @@ export const CATEGORIES: Category[] = [
           endNote: 'The system outlived the project — later teams shipped screens without design review.',
         }),
       ),
+      */
     ],
   },
   {
@@ -685,13 +700,17 @@ export const CATEGORIES: Category[] = [
             label: 'TRANSLATION',
             text: 'Morphed that icon toward the parent brand’s signature drop shape, so the sub-mark would sit inside the existing visual family rather than beside it.',
             slot: 'SHAPE STUDIES',
-            assetSet: [{ src: '/images/Brand Identity/Freshstart/TRANSLATION.jpg', ratio: 4.7885 }],
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/TRANSLATION.jpg', ratio: 4.7885, white: true, padded: true },
+            ],
           },
           {
             label: 'INVERSION',
             text: 'Inverting the colour direction turned the drop’s negative space into a rocket silhouette. Partnership and startup became the same shape.',
             slot: 'FINAL MARK',
-            assetSet: [{ src: '/images/Brand Identity/Freshstart/INVERSION.jpg', ratio: 2.9305 }],
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/INVERSION.jpg', ratio: 2.9305, white: true, padded: true },
+            ],
           },
         ],
         endNote:
@@ -718,13 +737,22 @@ export const CATEGORIES: Category[] = [
             label: 'TRAJECTORY',
             text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up — and the same thing an hour with someone further along is meant to trigger.",
             slot: 'CONCEPT',
-            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.jpg', ratio: 7.1308 }],
+            assetSet: [
+              {
+                src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.jpg',
+                ratio: 7.1308,
+                white: true,
+                padded: true,
+              },
+            ],
           },
           {
             label: 'ESCAPE',
             text: 'The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably; breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.',
             slot: 'MARK CONSTRUCTION',
-            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.jpg', ratio: 3.368 }],
+            assetSet: [
+              { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.jpg', ratio: 3.368, white: true, padded: true },
+            ],
           },
           {
             label: 'SURFACE',
@@ -776,7 +804,9 @@ export const CATEGORIES: Category[] = [
             label: 'CONSTRUCTION',
             text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
             slot: 'LETTERFORM STUDIES',
-            assetSet: [{ src: '/images/Brand Identity/Uplift/CONSTRUCTION.jpg', ratio: 6.3976 }],
+            assetSet: [
+              { src: '/images/Brand Identity/Uplift/CONSTRUCTION.jpg', ratio: 6.3976, white: true, padded: true },
+            ],
           },
           {
             label: 'EXTENSION',
@@ -806,13 +836,13 @@ export const CATEGORIES: Category[] = [
             label: 'PREMISE',
             text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge — a fair description of what an accelerator does to an early company.",
             slot: 'NAME + CONCEPT',
-            assetSet: [{ src: '/images/Brand Identity/Forge/PREMISE.png', ratio: 1.892, light: true }],
+            assetSet: [{ src: '/images/Brand Identity/Forge/PREMISE.png', ratio: 1.892, light: true, padded: true }],
           },
           {
             label: 'FUSION',
             text: 'An anvil profile and a capital F share the same structure: flat top, stepped shoulder, vertical base. Overlaying them produced a single mark that holds both readings.',
             slot: 'ANVIL / F STUDIES',
-            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.png', ratio: 5.4839, light: true }],
+            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.png', ratio: 5.4839, light: true, padded: true }],
           },
           {
             label: 'HEAT',
@@ -855,7 +885,7 @@ export const CATEGORIES: Category[] = [
         metrics arrive per project. The structure below is what each will fill.
       */
       {
-        name: 'Brochures and reports',
+        name: 'Brochures',
         thumbnail: '/images/Marketing Campaigns/Brochures and reports/thumbnail.svg',
         software: ['InDesign', 'Illustrator', 'PowerPoint'],
         problemLabel: 'RANGE',
@@ -867,8 +897,8 @@ export const CATEGORIES: Category[] = [
         // `chips`/`typeface` omitted: three clients, three palettes.
         processRows: [
           {
-            label: 'COMPRESSION',
-            text: "Four pages to explain an enterprise logistics platform. Everything that didn't survive the cut became a number — shipments per day, carrier network, freight spend — so page two carries all the proof and the other three can stay quiet.",
+            label: 'ORIENTATION',
+            text: "Built to be glanced at in a meeting, not read afterward. Everything that didn't survive the cut became a number — shipments per day, carrier network, freight spend — so the proof sits on one page and the rest can stay quiet.",
             slot: '4-PAGE LOGISTICS BROCHURE',
             slotHeight: '480px',
             wideSlot: true,
@@ -883,8 +913,8 @@ export const CATEGORIES: Category[] = [
             },
           },
           {
-            label: 'EDITORIAL',
-            text: 'A thirty-page guide that had to read like a magazine rather than a sales document. Statistics moved into their own sidebar column so the body copy could stay conversational, and every spread was built to work if opened at random.',
+            label: 'VOICE',
+            text: 'Trying to be a magazine rather than a technical document. Statistics moved into their own sidebar column so the body copy could stay conversational instead of doubling as a data appendix.',
             slot: 'BEAUTY INDUSTRY GROWTH GUIDE',
             slotHeight: '480px',
             wideSlot: true,
@@ -903,7 +933,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'DENSITY',
-            text: 'Long lists of technical use cases with no natural hierarchy. Splitting them into labelled bands — predictive, LLM, anomaly, clustering — gave the reader four places to stop instead of one continuous run of bullets.',
+            text: 'A genuinely long list of technical use cases with no natural hierarchy. Splitting them into labelled bands — predictive, LLM, anomaly, clustering — gave the reader four places to stop instead of one continuous run of bullets.',
             slot: 'FINANCIAL SERVICES AI FLYER',
             slotHeight: '480px',
             wideSlot: true,
@@ -939,7 +969,10 @@ export const CATEGORIES: Category[] = [
             label: 'VERTICALS',
             text: 'Six industries, one layout. The template fixes everything structural — logo position, headline pattern, bullet list, phone frame — and lets colour and illustration carry the whole difference. Healthcare pink, e-commerce green, food delivery amber. Someone could add a seventh vertical without asking me anything.',
             slot: 'VERTICAL BANNER SET',
-            slotHeight: SOCIAL_SLOT_HEIGHT,
+            // 3000 × 1570 — a single landscape banner, so the frame sizes to
+            // its own ratio instead of stretching to the other rows' fixed
+            // height with empty glass above and below it.
+            slotAspect: 3000 / 1570,
             document: {
               title: 'Vertical banner set',
               pages: Array.from(
@@ -952,8 +985,11 @@ export const CATEGORIES: Category[] = [
             label: 'LIST',
             text: 'A carousel gets read by thumb, one card at a time, so each card had to work alone and in order. Large numeral for position, one line of copy, one line-art icon. The cover does the selling; the six cards only have to keep the swipe going.',
             slot: 'LIST CAROUSEL',
-            slotHeight: SOCIAL_SLOT_HEIGHT,
             // 6401 × 4801 — a composed sheet of all six cards, not a strip.
+            // No `slotHeight`: with one landscape asset that stretched the row
+            // to the other rows' fixed height, leaving empty space above and
+            // below a much-shorter image. Unset, `AssetSet` sizes to the asset
+            // itself instead, capped at its own default rather than stretched.
             assetSet: [
               { src: '/images/Marketing Campaigns/Social campaign systems/LIST.jpg', ratio: 1.3333 },
             ],
@@ -967,7 +1003,10 @@ export const CATEGORIES: Category[] = [
             label: 'NARRATIVE',
             text: "A five-card carousel that only works in order: agents are overwhelmed, here's the mechanism, here's the speed, here's the result, here's the ask. The isometric illustration runs continuously across all five cards so the swipe feels like panning across one scene rather than turning pages, and only the final card carries a button — everything before it is earning the right to ask.",
             slot: 'NARRATIVE CAROUSEL',
-            slotHeight: SOCIAL_SLOT_HEIGHT,
+            // Square cards (1080×1080): sizing to their own ratio instead of
+            // the fixed slot height is what gives the pager room to breathe
+            // below them, rather than the image nearly filling the frame.
+            slotAspect: 1,
             /*
               Five separate 1080×1080 cards rather than one strip, so `AssetSet`
               would space them apart and break the continuous-scene effect the
@@ -1003,8 +1042,9 @@ export const CATEGORIES: Category[] = [
             label: 'PLACE',
             text: "An event campaign set at a stadium in Barcelona. The headline plays on the club's own motto, and the illustration puts the venue inside its real skyline rather than a generic sports frame — this only lands if it feels local to the people who are actually going.",
             slot: 'EVENT CAMPAIGN',
-            slotHeight: SOCIAL_SLOT_HEIGHT,
-            // 1440 × 750.
+            // 1440 × 750. No `slotHeight`, same as LIST above: a landscape
+            // asset stretched to the other rows' fixed height leaves empty
+            // space around it, so this sizes to the asset itself instead.
             assetSet: [
               { src: '/images/Marketing Campaigns/Social campaign systems/PLACE.jpg', ratio: 1.92 },
             ],
@@ -1029,43 +1069,76 @@ export const CATEGORIES: Category[] = [
             label: 'SCALE',
             text: "Twelve feet wide, read from across the room and from a foot away. Density solves both — the lettering holds the centre at distance, and the doodle field only pays off when you're standing next to it with a plate in your hand. Nothing precious about it, because it's a cafeteria.",
             slot: 'CAFETERIA MURAL',
-            slotHeight: ILLO_SLOT_HEIGHT,
             /*
-              Mural proportions, roughly 3:2 landscape. `AssetSet` contains
-              rather than crops, so the wall keeps its shape inside the slot
-              instead of being trimmed to it, and the lightbox is where the
-              doodle detail becomes legible.
+              10224 × 4093, roughly 2.5:1. No `slotHeight`: a single wide
+              mural stretched to the other rows' fixed height leaves empty
+              space around it, so this sizes to the asset itself instead.
+              `AssetSet` contains rather than crops, so the wall keeps its
+              shape, and the lightbox is where the doodle detail becomes
+              legible.
             */
-            // TODO: supply the real mural artwork.
-            assetSet: placeholderAssets(1, 9, ['Cafeteria mural']),
+            assetSet: [
+              {
+                src: '/images/Marketing Campaigns/Illustration and iconography/SCALE.jpg',
+                caption: 'Cafeteria mural',
+                ratio: 10224 / 4093,
+              },
+            ],
           },
           {
             label: 'SERIES',
             text: 'Seven illustrations, one per category, each carrying different meaning while staying recognisably siblings. Fixed line weight, one accent colour, one figure proportion. That constraint is the whole reason the seventh took twenty minutes instead of a day.',
             slot: 'ILLUSTRATION SERIES',
-            slotHeight: ILLO_SLOT_HEIGHT,
-            // TODO: supply the real series artwork.
-            document: { title: 'Illustration series', pages: placeholderPages(7, 10) },
+            // 3334 × 2500 — 4:3, so the frame sizes to the artwork's own
+            // ratio instead of the fixed slot height.
+            slotAspect: 4 / 3,
+            document: {
+              title: 'Illustration series',
+              pages: Array.from(
+                { length: 7 },
+                (_, i) =>
+                  `/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-0${i + 1}.jpg`,
+              ),
+            },
           },
           {
             label: 'MOTION',
             text: 'Drawn for movement rather than for a still. Every element separated onto its own layer from the outset, which changes how you draw — no shared outlines, no overlapping strokes, every object discrete enough to move independently.',
             slot: 'MOTION STUDY',
-            slotHeight: ILLO_SLOT_HEIGHT,
-            // TODO: supply the real clip; `poster` stands in until it arrives,
-            // and is also what a reduced-motion reader sees.
-            motion: { src: '', poster: PLACEHOLDER_POSTER, title: 'Motion study' },
+            // 800 × 600 — 4:3, so the frame sizes to the clip's own ratio
+            // instead of the fixed slot height.
+            slotAspect: 4 / 3,
+            motion: {
+              src: '/images/Marketing Campaigns/Illustration and iconography/MOTION.gif',
+              title: 'Motion study',
+            },
           },
           {
             label: 'SYSTEM',
             text: 'At icon scale every decision is subtraction: what can be removed and still read. Consistent stroke, consistent corner radius, consistent optical weight — without those, a set of icons is just a set of drawings.',
             slot: 'ICON SETS',
-            slotHeight: ILLO_SLOT_HEIGHT,
-            // Stacked for the same reason as the event set: three pieces in the
-            // two-column row share ~455px and cap out well short of the slot.
+            // Stacked for the same reason as the event set: three pieces in
+            // the two-column row share the full width. No `slotHeight`: the
+            // icons are 4:3, well short of the other rows' fixed height, so
+            // this sizes to the assets themselves instead of stretching.
             stacked: true,
-            // TODO: supply the real icon sheets.
-            assetSet: placeholderAssets(3, 17, ['Product icons', 'Editorial icons', 'Interface icons']),
+            assetSet: [
+              {
+                src: '/images/Marketing Campaigns/Illustration and iconography/SYSTEM/1.webp',
+                caption: 'Product icons',
+                ratio: 4 / 3,
+              },
+              {
+                src: '/images/Marketing Campaigns/Illustration and iconography/SYSTEM/2.webp',
+                caption: 'Editorial icons',
+                ratio: 4 / 3,
+              },
+              {
+                src: '/images/Marketing Campaigns/Illustration and iconography/SYSTEM/3.webp',
+                caption: 'Interface icons',
+                ratio: 4 / 3,
+              },
+            ],
           },
         ],
         endNote:
@@ -1087,44 +1160,73 @@ export const CATEGORIES: Category[] = [
             label: 'DISTANCE',
             text: 'A roll-up gets read from across a hall, so it’s built as three bands top to bottom: the promise, the proof, the action. The map isn’t decoration — it says “everywhere” faster than a sentence can, and it still works at ten feet where the client logos have already stopped being legible.',
             slot: 'ROLL-UP BANNER',
-            slotHeight: ENV_SLOT_HEIGHT,
-            // TODO: supply the real roll-up artwork.
-            assetSet: placeholderAssets(1, 0, ['Roll-up banner'], [ROLLUP_RATIO]),
+            // Paired with VOLUME below into one two-column block with a
+            // vertical rule between them, rather than two stacked full-width
+            // rows — both are tall, narrow standing pieces, so side by side
+            // reads as a comparison.
+            pairWithNext: true,
+            // No `slotHeight`: a single portrait banner stretched to the other
+            // rows' fixed height leaves empty space beside it, so this sizes
+            // to the artwork's own 5616 × 6912 ratio instead.
+            assetSet: [
+              {
+                src: '/images/Marketing Campaigns/Environmental graphics/DISTANCE.png',
+                caption: 'Roll-up banner',
+                ratio: 5616 / 6912,
+              },
+            ],
           },
           {
             label: 'VOLUME',
             text: 'Exhibition floors are loud, and everyone on them runs the same playbook: bright, white, big claims. Going dark was the whole decision. A deep green field with one glowing figure holds its own in that room, and the stats orbit it rather than compete — the figure catches the eye, the numbers arrive second.',
             slot: 'BOOTH PANEL',
-            slotHeight: ENV_SLOT_HEIGHT,
-            // TODO: supply the real booth panel artwork.
-            assetSet: placeholderAssets(1, 1, ['Booth panel'], [BOOTH_RATIO]),
+            // No `slotHeight`, same reason as DISTANCE — sized to the
+            // artwork's own 2267.7 × 5669.3 ratio.
+            assetSet: [
+              {
+                src: '/images/Marketing Campaigns/Environmental graphics/VOLUME.png',
+                caption: 'Booth panel',
+                ratio: 2267.7 / 5669.3,
+              },
+            ],
           },
           {
             label: 'ARRIVAL',
             text: 'One event, three objects, three jobs. A standee by the lift that answers where and when. A welcome board at the door with an arrow, because an arrow beats a floor plan nobody asked for. And a photo frame — people post the event whether you design for it or not, so you may as well decide what’s in the shot.',
             slot: 'EVENT SET',
-            slotHeight: ENV_SLOT_HEIGHT,
             /*
-              Stacked so the three pieces get the modal's full width. Side by
-              side in the standard two-column row they share about 455px, which
-              caps them near 170px tall however tall the slot is — the width is
-              the binding constraint, not the height, and a 520px slot would sit
-              two-thirds empty.
+              Stacked so the three pieces get the modal's full width. No
+              `slotHeight`: side by side in the standard two-column row they'd
+              share about 455px, capping them near 170px tall however tall the
+              slot is — the width is the binding constraint, not the height,
+              so a fixed slot height would sit mostly empty. Unset, `AssetSet`
+              sizes each piece to its own ratio instead.
             */
             stacked: true,
             /*
               Mixed shapes: the standee is portrait and the other two are
-              square, so the ratios are given explicitly. `AssetSet` sizes each
-              piece by its ratio, which is what keeps the standee narrower than
-              the boards rather than all three sharing the row equally.
+              close to square, so the ratios are given explicitly — 2592×5184,
+              3456×3456, 2376×2592. `AssetSet` sizes each piece by its ratio,
+              which is what keeps the standee narrower than the boards rather
+              than all three sharing the row equally.
             */
-            // TODO: supply the real event artwork.
-            assetSet: placeholderAssets(
-              3,
-              2,
-              ['Standee', 'Welcome board', 'Photo frame'],
-              [STANDEE_RATIO, 1, 1],
-            ),
+            assetSet: [
+              {
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/standee.png',
+                caption: 'Standee',
+                ratio: 2592 / 5184,
+              },
+              {
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/welcome-board.png',
+                caption: 'Welcome board',
+                ratio: 1,
+              },
+              {
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/photo-frame.png',
+                caption: 'Photo frame',
+                ratio: 2376 / 2592,
+              },
+            ],
           },
         ],
         endNote:
