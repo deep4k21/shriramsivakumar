@@ -1236,17 +1236,10 @@ export const CATEGORIES: Category[] = [
             textOnly: true,
           },
         ],
-        // Rendered via Microsoft's public Office Online viewer, pointed at
-        // the pptx as served from the deployed site — there is no in-browser
-        // viewer for a raw pptx file otherwise. Only resolves once deployed;
-        // on localhost the source file isn't publicly reachable so the
-        // viewer can't fetch it.
+        // Published Google Slides embed.
         prototype: {
           embedUrl:
-            'https://view.officeapps.live.com/op/embed.aspx?src=' +
-            encodeURIComponent(
-              'https://shriramsivakumar.vercel.app/images/Presentation/A product pitch deck/PayDay_Proposal.pptx',
-            ),
+            'https://docs.google.com/presentation/d/e/2PACX-1vR0bAgBcT6J0bPXc9ANkySvtKWl_tKBXNjLIYqLIKQv2v7yHVc2MNn56u2JtT0lP8LzwBlFAaL748-t/pubembed?start=true&loop=true&delayms=3000',
         },
       },
       {
