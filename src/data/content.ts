@@ -1631,16 +1631,17 @@ export interface IntroSlide {
 }
 
 /*
-  Placeholders, borrowed from the home grid until the real photographs exist.
-  Matched to their captions where the artwork allows — the travel illustration
-  for "On the road", the desert scene for "Window seat" — so the sequence reads
-  deliberately rather than as six unrelated pictures.
+  Real travel photographs. Picked for aspect ratio, not scene content: the
+  frame is `PhotoFrame`'s near-square 438.5/442.4 with `object-cover`, so a
+  photo near 1.33:1 crops a bit off the sides and stays legible, while a
+  panorama (up to 3:1 in this pool) would lose most of its width. Captions are
+  unchanged from the placeholder set and do not describe these specific shots.
 */
 export const INTRO_SLIDES: IntroSlide[] = [
-  { caption: 'At the desk', image: '/images/homegrid/card01_portrait_man.png' },
-  { caption: 'On the road', image: '/images/homegrid/card12_phones_travel.png' },
-  { caption: 'Studio setup', image: '/images/homegrid/card19_mobily_dashboard.png' },
-  { caption: 'Speaking', image: '/images/homegrid/card20_man_thinking.png' },
-  { caption: 'Sketchbook', image: '/images/homegrid/card14_city_illustration.png' },
-  { caption: 'Window seat', image: '/images/homegrid/card08_ufo_desert.png' },
+  { caption: 'At the desk', image: '/images/homegrid/Travel/travel01_lakeshore_snow.jpg' },
+  { caption: 'On the road', image: '/images/homegrid/Travel/travel03_landscape.jpg' },
+  { caption: 'Studio setup', image: '/images/homegrid/Travel/travel06_landscape.jpg' },
+  { caption: 'Speaking', image: '/images/homegrid/Travel/travel07_landscape.jpg' },
+  { caption: 'Sketchbook', image: '/images/homegrid/Travel/travel08_landscape.jpg' },
+  { caption: 'Window seat', image: '/images/homegrid/Travel/travel09_landscape.jpg' },
 ];
