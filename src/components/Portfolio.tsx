@@ -7,6 +7,7 @@ import {
 } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 import { CATEGORIES } from '../data/content';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
@@ -513,6 +514,13 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
   // centre hole and the panel's collapsed width, so the two stay agreed on
   // where the square mark sits at any viewport.
   const stageAspect = useStageAspect('[data-portfolio-stage]');
+
+  // Locks the page still while a category is expanded — hides the scrollbar
+  // and blocks scroll input, the same treatment every modal on the site gets.
+  // The "scroll away closes it" effect below stays in as a safety net even
+  // though it should now rarely fire on its own: scroll cannot move to
+  // trigger it while this lock holds.
+  useBodyScrollLock(openIdx !== null);
 
   // Collapse an expanded category as soon as the reader scrolls away from the
   // section in either direction. Left open, the mosaic behind it keeps scrubbing

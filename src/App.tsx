@@ -19,6 +19,7 @@ import { releaseBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useEscapeKey } from './hooks/useEscapeKey';
 import { useSmoothScrollTo } from './hooks/useSmoothScrollTo';
 import { useScrollSnap, type SnapPoint } from './hooks/useScrollSnap';
+import { usePagedSnap } from './hooks/usePagedSnap';
 import { CATEGORIES } from './data/content';
 import './styles/global.css';
 
@@ -71,6 +72,17 @@ const MOSAIC_SETTLED_TO = 0.89;
 const MOSAIC_SETTLED_TARGET = 0.86;
 
 /**
+ * Where the paginated Intro→Career chain lands for the mosaic's settled
+ * stop — also what `SECTION_SETTLED.portfolio` uses, so a sidebar click
+ * lands on the same point. Kept separate from `MOSAIC_SETTLED_TARGET`, which
+ * only feeds the category-open logic's 0.82–0.89 "settled and opaque" band
+ * above. Sits right at the edge of Portfolio's own exit fade (noted above as
+ * starting at 0.9) — tried pulling it back to 0.88 and 0.89, but 0.90 read
+ * best on review.
+ */
+const PAGED_MOSAIC_SETTLED = 0.9;
+
+/**
  * Where in each section's scroll window its content has finished revealing.
  *
  * Every pinned section is several viewports tall, and its *top* is the state
@@ -84,40 +96,24 @@ const SECTION_SETTLED: Record<string, number> = {
   home: 0,
   intro: 0.92,
   about: 0.86,
-  portfolio: MOSAIC_SETTLED_TARGET,
+  // Matches `PAGED_MOSAIC_SETTLED` (not `MOSAIC_SETTLED_TARGET`), so a
+  // sidebar click on Portfolio lands on the exact same stop the paginated
+  // snap between Intro and Career settles on — the two navigation paths
+  // should never disagree about where "Portfolio, settled" actually is.
+  portfolio: PAGED_MOSAIC_SETTLED,
   career: 0.35,
 };
 
-/**
- * The portfolio's own stopping points, stepping through the states its window
- * holds rather than letting the reader free-scroll past them.
- *
- * Measured from the section itself, not chosen by eye:
- *
- *   0.30 — the intro card has faded up and is fully readable;
- *   0.54 — the card reaches its resting position and stops moving;
- *   0.86 — the tiles have finished growing and the mosaic is at rest.
- *
- * `SECTION_SETTLED.portfolio` is 0.86, the section's primary position, so only
- * the other two are listed as extras.
- *
- * The mosaic's own fade-in (~0.62) is deliberately not a stop. It sits 276px
- * from 0.54 — closer than a single wheel gesture — and two points that near
- * trap the reader between them: neither can be left without being pulled
- * straight back into it.
- */
-const PORTFOLIO_STOPS = [0.3, 0.54];
 
 /**
- * Extra settled points beyond each section's primary one, for sections that
- * reveal more than one thing.
- *
- * These are snap targets only — sidebar navigation still goes to the section's
- * main position in `SECTION_SETTLED`.
+ * Where the intro card's headline reaches full opacity — see `HEAD.end` in
+ * Portfolio.tsx. `PORTFOLIO_STOPS[0]` (0.30) turned out to be past the point
+ * the copy is actually readable: `SHRINK` already starts at 0.18, right after
+ * `HEAD` finishes at 0.20, so by 0.30 the panel is well into collapsing away
+ * from it. 0.20 still read as slightly faded on review, so this sits just
+ * under `SHRINK.start` instead.
  */
-const EXTRA_SETTLED: Record<string, number[]> = {
-  portfolio: PORTFOLIO_STOPS,
-};
+const PORTFOLIO_CARD_READABLE = 0.19;
 
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const { active } = useActiveSection();
@@ -138,6 +134,10 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   // The expanded portfolio category. Owned here rather than inside Portfolio so
   // the sidebar's category list can open one directly.
   const [portfolioCategory, setPortfolioCategory] = useState<number | null>(null);
+  // Bumped to play the Career → connect-modal ghost once, in place of the
+  // scroll-scrubbed runway the paginated snap replaced — see `usePagedSnap`'s
+  // `onPastLastStop` below and `PortfolioTravelGhosts`'s `playCount` prop.
+  const [connectGhostPlay, setConnectGhostPlay] = useState(0);
   // Mirrors `connectOpen` for the Escape handler, which must not re-create
   // itself on every open/close.
   const connectOpenRef = useRef(connectOpen);
@@ -171,24 +171,101 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
    *
    * Measured on demand rather than cached: the pinned sections are sized in
    * viewport units, so every one of these moves when the window is resized.
+   *
+   * `intro`, `about`, `portfolio` and `career` are excluded: that whole
+   * stretch is now handled entirely by `usePagedSnap` below, which owns the
+   * input itself rather than easing toward a point after the reader stops.
+   * Running both there would have them fight — the idle-snap correcting a
+   * position the paginated jump just finished settling on. Only `home`
+   * remains an idle-snap target.
    */
   const snapPoints = useCallback(
     (): SnapPoint[] =>
-      Object.entries(SECTION_SETTLED).flatMap(([id, fraction]) => {
-        const el = document.getElementById(id);
-        if (!el) return [];
-        const top = el.getBoundingClientRect().top + window.scrollY;
-        const span = Math.max(0, el.offsetHeight - window.innerHeight);
-        // A section can rest at more than one place on the way through.
-        const fractions = [fraction, ...(EXTRA_SETTLED[id] ?? [])];
-        return fractions.map((f) => ({ id, y: top + span * f }));
-      }),
+      Object.entries(SECTION_SETTLED)
+        .filter(([id]) => id !== 'intro' && id !== 'about' && id !== 'portfolio' && id !== 'career')
+        .flatMap(([id, fraction]) => {
+          const el = document.getElementById(id);
+          if (!el) return [];
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          const span = Math.max(0, el.offsetHeight - window.innerHeight);
+          return [{ id, y: top + span * fraction }];
+        }),
     [],
   );
 
   // Suspended while an overlay owns the screen: the body is scroll-locked then,
   // and a snap firing behind a modal would move the page out from under it.
   useScrollSnap(snapPoints, smoothScrollTo, view === null && !connectOpen && portfolioCategory === null);
+
+  /**
+   * Document-Y of every stop in the paginated stretch from Intro through to
+   * Career: Intro settled, About settled, the portfolio card fully faded up
+   * and readable (`PORTFOLIO_CARD_READABLE`), the mosaic at rest
+   * (`PAGED_MOSAIC_SETTLED`), then Career's own settled point
+   * (`SECTION_SETTLED.career`) — reused as-is since Career has no reveal-in
+   * animation of its own; its content is already in full view from the top
+   * of its pinned window. Same measurement as `snapPoints`, kept separate
+   * since this hook needs a plain number array rather than `SnapPoint`s
+   * carrying a section id.
+   */
+  const getPagedStops = useCallback((): number[] => {
+    const stops: number[] = [];
+    const push = (id: string, fraction: number) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const span = Math.max(0, el.offsetHeight - window.innerHeight);
+      stops.push(top + span * fraction);
+    };
+    push('intro', SECTION_SETTLED.intro);
+    push('about', SECTION_SETTLED.about);
+    push('portfolio', PORTFOLIO_CARD_READABLE);
+    push('portfolio', PAGED_MOSAIC_SETTLED);
+    push('career', SECTION_SETTLED.career);
+    return stops;
+  }, []);
+
+  // Replaces free scrolling from Intro through the mosaic's rest state
+  // entirely: one wheel tick or swipe jumps straight from one settled state
+  // to the next, skipping the reveal animation in between. Suspended on the
+  // same terms as the idle-snap above.
+  //
+  // Pushing forward once more from Career — the last stop — has nothing left
+  // to scroll to, so it plays the closing ghost instead: `usePagedSnap` fires
+  // this rather than jumping, and `PortfolioTravelGhosts` opens the modal once
+  // the flight lands.
+  const playConnectGhost = useCallback(() => setConnectGhostPlay((n) => n + 1), []);
+  usePagedSnap(
+    getPagedStops,
+    view === null && !connectOpen && portfolioCategory === null,
+    playConnectGhost,
+  );
+
+  // Whether scroll currently sits at the mosaic's settled stop — the sidebar's
+  // portfolio category list only shows there, not across the whole time
+  // Portfolio is on screen, since the tiles themselves aren't in their final
+  // positions (or aren't on screen at all) at any other point in its window.
+  const [showPortfolioSubmenu, setShowPortfolioSubmenu] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const el = document.getElementById('portfolio');
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const span = Math.max(0, el.offsetHeight - window.innerHeight);
+      const stopY = top + span * PAGED_MOSAIC_SETTLED;
+      // A tolerance band rather than an exact match: the reader is never
+      // pixel-perfect on the stop even right after the paginated jump lands
+      // there, and idle-snap or a scrollbar drag can settle a few pixels off.
+      setShowPortfolioSubmenu(Math.abs(window.scrollY - stopY) < window.innerHeight * 0.04);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
+  }, []);
 
   /**
    * Opens a category from the sidebar.
@@ -275,7 +352,7 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         <>
           <CardTravelGhost />
           <AboutTravelGhosts />
-          <PortfolioTravelGhosts onOpenConnect={openConnect} />
+          <PortfolioTravelGhosts onOpenConnect={openConnect} playCount={connectGhostPlay} />
         </>
       )}
 
@@ -287,6 +364,7 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         activeCategory={portfolioCategory}
         onOpenCategory={openPortfolioCategory}
         onNavigate={navigateToSection}
+        showPortfolioSubmenu={showPortfolioSubmenu}
       />
 
       <main className="min-w-0">
@@ -300,13 +378,6 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
           setOpenIdx={setPortfolioCategory}
         />
         <Career />
-
-        {/*
-          Runway past the last section. Career ends exactly at the document
-          bottom, so without this there is no scroll left for the closing ghost
-          to travel through on its way into the connect modal.
-        */}
-        <div data-connect-runway aria-hidden="true" className="h-[70vh]" />
       </main>
 
       {/*

@@ -137,12 +137,14 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
       z="z-60"
       onClose={onClose}
       /*
-        A lighter scrim than the shared default, so the page actually shows
-        through the glass rather than the panel floating on a near-black field.
-        Passed here rather than changed in `Overlay`, which every other modal
-        and lightbox on the site also uses.
+        A visible scrim behind the glass panel — without one the page reads
+        through so crisply the modal has no backdrop to sit on at all, and its
+        edge is hard to tell from the page behind it. Lighter than the shared
+        default still, so the panel's own glass keeps doing the work rather
+        than the scrim doing it for the panel. Passed here rather than changed
+        in `Overlay`, which every other modal and lightbox on the site also uses.
       */
-      scrimClassName="bg-black/10 p-[clamp(24px,5vh,64px)]"
+      scrimClassName="bg-black/30 p-[clamp(24px,5vh,64px)] backdrop-blur-sm"
       // Capped to well inside the viewport, so the dimmed page frames it the way a
       // dialog should. Content scrolls within the panel rather than growing it
       // past the screen and scrolling the scrim instead.

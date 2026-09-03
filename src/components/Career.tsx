@@ -15,6 +15,11 @@ export function Career() {
   // Now that career pins, it has a scroll window of its own — the exit rides
   // that rather than the runway, so the copy holds while the section is in full
   // view and only clears as it unpins, matching every other section.
+  //
+  // Reachable only under `prefers-reduced-motion` (or a scrollbar drag):
+  // ordinarily `usePagedSnap` in App.tsx jumps straight from Career's settled
+  // stop to playing the closing ghost, and this fade is never scrubbed. It
+  // stays as the fallback for the one path that still free-scrolls through here.
   const { ref, progress } = useSectionScroll<HTMLElement>();
   const exit = useExitStyle(progress, { start: 0.72, end: 0.94 });
   // The academic card is the closing ghost's source, so its box clears a beat
@@ -25,10 +30,18 @@ export function Career() {
 
   // Pinned like the other sections: a tall outer section gives the scroll
   // something to travel through while the inner `sticky top-0` child holds the
-  // content still in full view. The content itself is one viewport tall and
-  // centred in it, so it stays balanced on any screen height.
+  // content still in full view.
+  //
+  // Shorter than the other pinned sections (110vh, not 300vh): this used to
+  // carry a 70vh runway past it for the closing ghost to scrub through, which
+  // is gone now that `usePagedSnap` plays that flight on its own clock instead
+  // of scrubbing it. The height that's left is just enough room to pin and
+  // hold the content steady, plus the exit-fade's own reduced-motion fallback
+  // window above — any more than that was dead scroll space with nothing in
+  // it, reachable only by a scrollbar drag since `usePagedSnap` already blocks
+  // wheel and touch input from reaching past Career's own settled stop.
   return (
-    <section ref={ref} id="career" className="relative h-[300vh] border-t border-white/6">
+    <section ref={ref} id="career" className="relative h-[110vh] border-t border-white/6">
       <div className="sticky top-0 flex h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav">
       <motion.div className="font-body text-[11px] tracking-[0.18em] text-teal" style={exit}>
         CAREER JOURNEY

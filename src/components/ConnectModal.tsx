@@ -36,8 +36,15 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
     <Overlay
       z="z-70"
       onClose={onClose}
-      scrimClassName="bg-black/60 p-[clamp(24px,5vh,64px)] backdrop-blur-md"
-      className="flex max-h-full w-[min(560px,100%)] flex-col gap-5.5 overflow-y-auto rounded-[20px] bg-[linear-gradient(155deg,rgba(40,42,48,.97),rgba(20,21,25,.95)_40%,rgba(28,30,35,.96))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-3xl backdrop-saturate-150"
+      // Matches the project modal's scrim: visible dimming and a light blur,
+      // so the panel actually has a backdrop to sit on rather than floating
+      // over a nearly unchanged page.
+      scrimClassName="bg-black/30 p-[clamp(24px,5vh,64px)] backdrop-blur-sm"
+      // The project modal's own body is even lighter than its outer panel —
+      // that panel's opacity is offset by an opaque header sitting on top of
+      // it, which this modal has none of. Without that header to compensate,
+      // this goes straight to the body's own lighter mix instead.
+      className="flex max-h-full w-[min(560px,100%)] flex-col gap-5.5 overflow-y-auto rounded-[20px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,42,48,.72),rgba(20,21,25,.66)_40%,rgba(28,30,35,.70))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-2xl backdrop-saturate-150"
     >
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">

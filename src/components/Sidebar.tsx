@@ -12,6 +12,12 @@ interface SidebarProps {
   onOpenCategory: (idx: number) => void;
   /** Scrolls to a section's settled position rather than its top edge. */
   onNavigate: (id: string) => void;
+  /**
+   * Whether scroll currently sits at the mosaic's settled stop — the category
+   * list only shows there, since the tiles aren't in their final positions
+   * (or aren't visible at all) at any other point in Portfolio's window.
+   */
+  showPortfolioSubmenu: boolean;
 }
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
@@ -37,6 +43,7 @@ export function Sidebar({
   activeCategory,
   onOpenCategory,
   onNavigate,
+  showPortfolioSubmenu,
 }: SidebarProps) {
   const [hover, setHover] = useState(false);
 
@@ -134,12 +141,15 @@ export function Sidebar({
               </motion.a>
 
               {/*
-                The categories, listed only while portfolio is the active
-                section. Collapsing the height rather than unmounting keeps the
-                open and close symmetrical.
+                The categories, listed only once scroll has actually settled
+                at the mosaic's rest stop — not for the whole time Portfolio is
+                on screen, since the tiles aren't in their final positions (or
+                aren't visible at all) anywhere else in its window. Collapsing
+                the height rather than unmounting keeps the open and close
+                symmetrical.
               */}
               <AnimatePresence initial={false}>
-                {isPortfolio && on && (
+                {isPortfolio && showPortfolioSubmenu && (
                   <motion.div
                     /*
                       Indented so the nested list reads as belonging to
