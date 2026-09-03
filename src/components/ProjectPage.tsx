@@ -158,7 +158,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         gives the sheet an edge and a direction, where pure transparency would
         read as a missing background.
       */
-      className="flex max-h-full w-[min(1000px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.90),rgba(16,17,21,.85)_42%,rgba(28,30,36,.87))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
+      className="flex max-h-full w-[min(1280px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.90),rgba(16,17,21,.85)_42%,rgba(28,30,36,.87))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
     >
       {/* The scroll container, so the sticky header stays put while the body moves. */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
