@@ -347,20 +347,6 @@ export function placeholderAssets(
   }));
 }
 
-/**
- * One slot height across all five rows of the social campaign showcase, so the
- * document viewer, the single-asset sets and the prototype line up rather than
- * each finding its own height from its content.
- */
-const SOCIAL_SLOT_HEIGHT = '480px';
-
-/**
- * One slot height across the illustration showcase's four rows, so the asset
- * sets, the document viewer and the motion clip line up rather than each
- * finding its own height.
- */
-const ILLO_SLOT_HEIGHT = '480px';
-
 export const CATEGORIES: Category[] = [
   {
     id: 'ui-ux',
