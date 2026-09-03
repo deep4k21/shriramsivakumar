@@ -1,4 +1,4 @@
-import { animate, motion, useMotionValue } from 'motion/react';
+import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
@@ -760,6 +760,12 @@ export function Hero({ flipOnHover }: HeroProps) {
   // and only its painted faces go.
   const heroProgress = useHeroProgress();
   const exit = useExitStyle(heroProgress, { start: 0.12, end: 0.42, shift: 0 });
+  // The dark sheet over the grid (below) holds at full strength while the
+  // reader sits on the hero, then clears as they scroll away — rather than a
+  // fixed gradient painted at the section's bottom edge, which brightened the
+  // tiles there regardless of scroll position and read as a glow rising off
+  // the bottom of an otherwise still section.
+  const sheetOpacity = useTransform(heroProgress, [0, 0.5], [0.75, 0], { clamp: true });
 
   // The two directions mirror each other: showing the travel side sweeps one
   // way, returning to the design side sweeps back the other. Stepping the
@@ -803,12 +809,13 @@ export function Hero({ flipOnHover }: HeroProps) {
         else, so a faded tile revealed flat black instead of ruling.
 
         Stronger than the page grid's 20%: the black sheet above knocks this
-        one back, where the page grid paints straight onto the backdrop. It is
-        also unmasked, so the hero shows the full grid rather than a patch
-        around the cursor.
+        one back, where the page grid paints straight onto the backdrop.
+        Masked the same way as `BackgroundGrid` (`bg-grid-mask`, driven by
+        `usePointerGlow`'s CSS vars), so the hero shows a patch around the
+        cursor like every other page instead of the whole grid at once.
       */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-[length:88px_88px] bg-[image:linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px)]"
+        className="bg-grid-mask pointer-events-none absolute inset-0 z-0 bg-[length:88px_88px] bg-[image:linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px)]"
         aria-hidden="true"
       />
 
@@ -894,8 +901,19 @@ export function Hero({ flipOnHover }: HeroProps) {
 
         `z-0` with the grid, but later in the DOM, so it paints over the tiles
         while staying beneath the card's own `z-1`.
+
+        Full strength while the reader sits on the hero, clearing as
+        `heroProgress` advances — driven by scroll, not by position within the
+        section. A static gradient pinned to the section's bottom edge instead
+        brightened the tiles there regardless of scroll position, which read
+        as a glow rising off the bottom of an otherwise still section rather
+        than a transition that only happens once scrolling actually starts.
       */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-black/75" aria-hidden="true" />
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-0 bg-black"
+        style={{ opacity: sheetOpacity }}
+        aria-hidden="true"
+      />
 
       <div className="relative z-1 flex h-full max-h-full flex-col items-center justify-center gap-[clamp(8px,1.5vh,16px)]">
         {/*
