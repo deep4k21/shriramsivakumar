@@ -1657,9 +1657,9 @@ export interface ConnectLink {
 }
 
 export const CONNECT_LINKS: ConnectLink[] = [
-  { label: 'Email', value: 'hello@shriram.design', href: 'mailto:hello@shriram.design' },
-  { label: 'LinkedIn', value: '/in/shriramsivakumar', href: '#' },
-  { label: 'Behance', value: '/shriram', href: '#' },
+  { label: 'Email', value: 'shriramsiva18726@gmail.com', href: 'mailto:shriramsiva18726@gmail.com' },
+  { label: 'LinkedIn', value: '/in/shriramsiva', href: 'https://www.linkedin.com/in/shriramsiva/' },
+  { label: 'Dribbble', value: '/shriramsiva', href: 'https://dribbble.com/shriramsiva' },
   { label: 'Resume', value: 'PDF', href: '#' },
 ];
 

@@ -14,19 +14,36 @@ interface FormState {
   message: string;
 }
 
+/** Idle before the first submit; the rest track one submit attempt's outcome. */
+type SendStatus = 'idle' | 'sending' | 'sent' | 'error';
+
 export function ConnectModal({ onClose }: ConnectModalProps) {
   useBodyScrollLock(true);
   const [form, setForm] = useState<FormState>({ name: '', email: '', message: '' });
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<SendStatus>('idle');
 
   const updateField = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    setSent(false);
+    if (status !== 'sending') setStatus('idle');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Posts to the site's own serverless function (`api/send-message.ts`) —
+  // the form can't email the site owner directly from the browser, since
+  // that needs an API key that can't live in frontend code.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    if (status === 'sending') return;
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      setStatus(res.ok ? 'sent' : 'error');
+    } catch {
+      setStatus('error');
+    }
   };
 
   const fieldClass =
@@ -93,20 +110,28 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
           <div className="flex flex-wrap items-center gap-4">
             <motion.button
               type="submit"
+              disabled={status === 'sending'}
               // Matches the resume button in Intro — see the note in ProjectPage.
-              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-6 py-3.5 font-heading text-[14.5px] font-bold text-teal"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-6 py-3.5 font-heading text-[14.5px] font-bold text-teal disabled:cursor-default disabled:opacity-60"
+              whileHover={status === 'sending' ? undefined : { y: -2 }}
+              whileTap={status === 'sending' ? undefined : { scale: 0.97 }}
               transition={{ duration: 0.18 }}
             >
-              {sent ? 'Sent' : 'Send message'}
+              {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Sent' : 'Send message'}
             </motion.button>
             <motion.span
               className="font-body text-[13px] text-green"
-              animate={{ opacity: sent ? 1 : 0 }}
+              animate={{ opacity: status === 'sent' ? 1 : 0 }}
               transition={{ duration: 0.2 }}
             >
               Thanks — I&rsquo;ll reply within a day.
+            </motion.span>
+            <motion.span
+              className="font-body text-[13px] text-orange"
+              animate={{ opacity: status === 'error' ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              Something went wrong — try again, or email me directly below.
             </motion.span>
           </div>
         </form>
@@ -116,6 +141,13 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
             <a
               key={l.label}
               href={l.href}
+              // Real external profiles open in a new tab rather than
+              // navigating the reader away from the site entirely — unlike
+              // the rest of the site's in-page convention, which is about
+              // content the site itself hosts, not third-party profiles. A
+              // placeholder (`#`) or `mailto:` link has nowhere else to go,
+              // so it's left as a plain same-tab link.
+              {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className="rounded-[9px] bg-surface px-3.5 py-2.25 font-body text-[13px] text-grey transition-colors duration-180 hover:text-teal"
             >
               {l.label} <span className="text-[#4a4a4a]">{l.value}</span>
