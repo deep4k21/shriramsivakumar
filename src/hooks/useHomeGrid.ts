@@ -47,7 +47,7 @@ export const CELL_H = '20%';
  * moved there when two of them (04, 17) became GIFs, which is what these paths
  * point at now.
  */
-const CELLS: Array<{ cell: [number, number]; file: string }> = [
+const CELLS: Array<{ cell: [number, number]; file: string; bg?: string }> = [
   // Top row, left to right.
   { cell: [0, 0], file: 'card01_portrait_man.png' },
   { cell: [1, 0], file: 'card06_phone_screens.png' },
@@ -56,7 +56,12 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
   { cell: [4, 0], file: 'card08_ufo_desert.png' },
 
   // Second row — the card blocks the middle from here down.
-  { cell: [0, 1], file: 'card04_pale_blue.gif' },
+  // `bg`: the phone mockup this gif animates sits tall and centred in a wide
+  // canvas, so `object-cover` crops its top and bottom off in most tile
+  // shapes. Contained instead, with the gif's own backing colour filling the
+  // margin `object-contain` leaves — sampled off its background — rather than
+  // whatever's behind the tile showing through as a mismatched letterbox.
+  { cell: [0, 1], file: 'card04_pale_blue.gif', bg: '#E6DDF4' },
   { cell: [1, 1], file: 'card15_project_agresar.png' },
   { cell: [3, 1], file: 'card02_experience_nxt.png' },
   { cell: [4, 1], file: 'card11_food_illustration.png' },
@@ -71,7 +76,10 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
   { cell: [0, 3], file: 'card14_city_illustration.png' },
   { cell: [1, 3], file: 'card21_icons_grid.png' },
   { cell: [3, 3], file: 'card07_iprovision.png' },
-  { cell: [4, 3], file: 'card17_lavender_blank.gif' },
+  // Same reasoning as card04 above — the illustration's head and desk sit
+  // close to the top and bottom edges of its own canvas, so a crop clips one
+  // or the other in most tile shapes.
+  { cell: [4, 3], file: 'card17_lavender_blank.gif', bg: '#FFFFFF' },
 
   // Bottom row — card10 sits dead centre, as specified.
   { cell: [0, 4], file: 'card12_phones_travel.png' },
@@ -91,12 +99,20 @@ const CELLS: Array<{ cell: [number, number]; file: string }> = [
  * source set (`20220103_183611.mp4`) — the grid has no video tile yet, so
  * this holds its place until a poster frame or a video tile exists.
  */
+/*
+ * Index-matched to `CELLS`' reading order, so position here is position on
+ * the grid — see the note on `TRAVEL_FILES` above. `travel04_lanka_pano` (3)
+ * and `travel05_sikkim_pano` (4) land on `[3,0]`/`[4,0]`, adjacent cells in
+ * the top row, which put the two panoramas next to each other. Swapped
+ * `travel05` with `travel19_portrait` (18, `[3,4]` — the bottom row, four
+ * rows away) so the panos land apart instead.
+ */
 const TRAVEL_FILES: string[] = [
   'travel01_lakeshore_snow.jpg',
   'travel02_night_wide.jpg',
   'travel03_landscape.jpg',
   'travel04_lanka_pano.jpg',
-  'travel05_sikkim_pano.jpg',
+  'travel19_portrait.jpg',
   'travel06_landscape.jpg',
   'travel07_landscape.jpg',
   'travel08_landscape.jpg',
@@ -110,7 +126,7 @@ const TRAVEL_FILES: string[] = [
   'travel16_portrait.jpg',
   'travel17_portrait.jpg',
   'travel18_portrait.jpg',
-  'travel19_portrait.jpg',
+  'travel05_sikkim_pano.jpg',
   'travel20_portrait.jpg',
   'travel21_portrait.jpg',
   // Repeats travel01 — 21 photos for 22 cells.
@@ -142,6 +158,16 @@ export interface HomeGridSlot {
   anchor: SlotAnchor;
   /** False while this tile is faded out. Drives both faces at once. */
   visible: boolean;
+  /**
+   * The front image's own backing colour, for a source whose content doesn't
+   * reach its own edges — a phone mockup centred in a wider canvas, say.
+   * `object-cover` would crop that content itself in most tile shapes, so a
+   * front face with this set is contained instead and this fills the margin
+   * that leaves, matching the artwork's own background rather than showing
+   * whatever's behind the tile through a mismatched letterbox. Omitted for
+   * every other tile, which stay `object-cover` as before.
+   */
+  frontBg?: string;
 }
 
 /**
@@ -164,17 +190,16 @@ const BETWEEN_MS: [number, number] = [800, 2000];
 /**
  * How many tiles are animating at once.
  *
- * Eleven of twenty-two — half the grid — so the field always has real movement
- * in it, while the other eleven stay steady so the checkerboard still reads as
- * a complete field rather than a dissolving one. Each runs in its own lane —
- * an independent fade-out/fade-in loop — and the lanes never collide on the
- * same cell.
+ * Eight of twenty-two, so the field still has real movement in it while more
+ * of the grid stays steady — a calmer field than half the tiles turning over
+ * at once. Each runs in its own lane — an independent fade-out/fade-in loop —
+ * and the lanes never collide on the same cell.
  */
-const CONCURRENT = 11;
+const CONCURRENT = 8;
 
 const randBetween = ([lo, hi]: [number, number]) => lo + Math.random() * (hi - lo);
 
-const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file }, i) => ({
+const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file, bg }, i) => ({
   key: `cell-${cell[0]}-${cell[1]}`,
   src: `/images/homegrid/Design/${file}`,
   // The travel photo for the same cell — index-matched to CELLS, not offset,
@@ -182,6 +207,7 @@ const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file }, i) => ({
   backSrc: `/images/homegrid/Travel/${TRAVEL_FILES[i]}`,
   anchor: { top: ROW[cell[1]], left: COL[cell[0]], width: CELL_W, col: cell[0] },
   visible: true,
+  frontBg: bg,
 }));
 
 /**

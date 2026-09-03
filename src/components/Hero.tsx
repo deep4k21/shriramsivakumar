@@ -877,7 +877,15 @@ export function Hero({ flipOnHover }: HeroProps) {
                     // Close to full strength: the sheet above knocks the whole
                     // field back, so the tile does not also have to fade itself
                     // to sit behind the card.
-                    className="absolute inset-0 size-full object-cover opacity-100 backface-hidden"
+                    //
+                    // `frontBg` set means this source doesn't reach its own
+                    // edges (see `HomeGridSlot`) — contained instead of
+                    // cropped, with its own backing colour filling the margin
+                    // that leaves.
+                    className={`absolute inset-0 size-full opacity-100 backface-hidden ${
+                      slot.frontBg ? 'object-contain' : 'object-cover'
+                    }`}
+                    style={slot.frontBg ? { backgroundColor: slot.frontBg } : undefined}
                   />
                   <img
                     src={slot.backSrc}
