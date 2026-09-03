@@ -47,7 +47,7 @@ export interface SiteConfig {
 
 const DEFAULT_CONFIG: SiteConfig = {
   showGrid: true,
-  gridRadius: 210,
+  gridRadius: 140,
   flipOnHover: false,
   availableForWork: true,
   backdrop: 'two',
