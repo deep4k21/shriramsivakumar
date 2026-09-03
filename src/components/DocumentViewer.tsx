@@ -41,6 +41,20 @@ function useWindowed(page: number, total: number) {
   );
 }
 
+/**
+ * Paging in twos for the spread view: `page` is always the left sheet's
+ * index, stepping by 2 so the reader advances a full spread at a time rather
+ * than shifting one page and leaving the pairing to drift.
+ */
+function usePairPager(total: number) {
+  const [page, setPage] = useState(0);
+  const lastLeft = total % 2 === 0 ? total - 2 : total - 1;
+  const clamp = useCallback((n: number) => Math.max(0, Math.min(lastLeft, n)), [lastLeft]);
+  const prev = useCallback(() => setPage((p) => clamp(p - 2)), [clamp]);
+  const next = useCallback(() => setPage((p) => clamp(p + 2)), [clamp]);
+  return { page, prev, next, lastLeft };
+}
+
 function Pages({
   doc,
   page,
@@ -73,32 +87,64 @@ function Pages({
   );
 }
 
+/**
+ * Two pages side by side with a gap, for a `wideSlot` row whose column has
+ * room for a spread rather than one portrait page surrounded by empty space.
+ * A single trailing page (odd page count) sits alone rather than stretching
+ * to fill both slots, which would misrepresent it as a spread it isn't.
+ */
+function SpreadPages({ doc, left, className }: { doc: RowDocument; left: number; className: string }) {
+  const right = left + 1;
+  return (
+    <div className="flex h-full min-h-0 w-full max-w-full items-center justify-center gap-4 self-stretch justify-self-stretch">
+      <img
+        src={doc.pages[left]}
+        alt={`${doc.title}, page ${left + 1} of ${doc.pages.length}`}
+        className={className}
+        decoding="async"
+      />
+      {right < doc.pages.length && (
+        <img
+          src={doc.pages[right]}
+          alt={`${doc.title}, page ${right + 1} of ${doc.pages.length}`}
+          className={className}
+          decoding="async"
+        />
+      )}
+    </div>
+  );
+}
+
 function Controls({
   page,
   total,
+  atStart,
+  atEnd,
   onPrev,
   onNext,
+  label,
 }: {
   page: number;
   total: number;
+  /** Overrides the disabled state the plain page/total numbers would imply — needed for the spread pager, which steps by 2 and doesn't always land exactly on `total - 1`. */
+  atStart?: boolean;
+  atEnd?: boolean;
   onPrev: () => void;
   onNext: () => void;
+  /** Overrides the default "NN / NN" label — the spread pager shows a page range instead of a single index. */
+  label?: string;
 }) {
+  const start = atStart ?? page === 0;
+  const end = atEnd ?? page === total - 1;
   return (
     <div className="flex flex-none items-center justify-center gap-3 pt-2">
-      <button type="button" onClick={onPrev} disabled={page === 0} aria-label="Previous page" className={CONTROL}>
+      <button type="button" onClick={onPrev} disabled={start} aria-label="Previous page" className={CONTROL}>
         &lsaquo;
       </button>
       <span className="font-body text-[10px] tracking-[0.14em] text-grey uppercase tabular-nums">
-        {pad(page + 1)} / {pad(total)}
+        {label ?? `${pad(page + 1)} / ${pad(total)}`}
       </span>
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={page === total - 1}
-        aria-label="Next page"
-        className={CONTROL}
-      >
+      <button type="button" onClick={onNext} disabled={end} aria-label="Next page" className={CONTROL}>
         &rsaquo;
       </button>
     </div>
@@ -119,9 +165,19 @@ function Controls({
  * Clicking a page opens it full-size in a lightbox that keeps paging — never a
  * new tab and never a download, matching the rest of the site.
  */
-export function DocumentViewer({ doc, height }: { doc: RowDocument; height?: string }) {
+export function DocumentViewer({
+  doc,
+  height,
+  spread,
+}: {
+  doc: RowDocument;
+  height?: string;
+  /** Shows two pages side by side instead of one — for a `wideSlot` row whose column is wide enough to hold a spread. */
+  spread?: boolean;
+}) {
   const total = doc.pages.length;
   const inline = usePager(total);
+  const pair = usePairPager(total);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
@@ -134,12 +190,15 @@ export function DocumentViewer({ doc, height }: { doc: RowDocument; height?: str
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      inline.prev();
+      spread ? pair.prev() : inline.prev();
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      inline.next();
+      spread ? pair.next() : inline.next();
     }
   };
+
+  const openLightbox = () => setLightbox(spread ? pair.page : inline.page);
+  const rightOfPair = Math.min(pair.page + 1, total - 1);
 
   return (
     <>
@@ -154,14 +213,34 @@ export function DocumentViewer({ doc, height }: { doc: RowDocument; height?: str
       >
         <button
           type="button"
-          onClick={() => setLightbox(inline.page)}
+          onClick={openLightbox}
           aria-label={`View ${doc.title} full size`}
           className="grid min-h-0 flex-1 cursor-pointer place-items-center border-0 bg-transparent p-3"
         >
-          <Pages doc={doc} page={inline.page} visible={visible} className="max-h-full max-w-full object-contain" />
+          {spread ? (
+            <SpreadPages doc={doc} left={pair.page} className="max-h-full max-w-full flex-1 object-contain" />
+          ) : (
+            <Pages doc={doc} page={inline.page} visible={visible} className="max-h-full max-w-full object-contain" />
+          )}
         </button>
         <div className="px-3 pb-3">
-          <Controls page={inline.page} total={total} onPrev={inline.prev} onNext={inline.next} />
+          {spread ? (
+            <Controls
+              page={pair.page}
+              total={total}
+              atStart={pair.page === 0}
+              atEnd={pair.page === pair.lastLeft}
+              onPrev={pair.prev}
+              onNext={pair.next}
+              label={
+                rightOfPair > pair.page
+                  ? `${pad(pair.page + 1)}–${pad(rightOfPair + 1)} / ${pad(total)}`
+                  : `${pad(pair.page + 1)} / ${pad(total)}`
+              }
+            />
+          ) : (
+            <Controls page={inline.page} total={total} onPrev={inline.prev} onNext={inline.next} />
+          )}
         </div>
       </div>
 

@@ -272,7 +272,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             }
 
             const slot = row.document ? (
-              <DocumentViewer doc={row.document} height={row.slotHeight} />
+              <DocumentViewer doc={row.document} height={row.slotHeight} spread={row.wideSlot} />
             ) : row.motion ? (
               <MotionClip clip={row.motion} height={row.slotHeight} />
             ) : row.assetSet ? (
@@ -331,7 +331,15 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                     ? 'flex flex-col gap-5 border-t border-white/7 py-5'
                     : 'grid items-start gap-6 border-t border-white/7 py-5'
                 }
-                style={row.stacked ? undefined : { gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
+                style={
+                  row.stacked
+                    ? undefined
+                    : {
+                        gridTemplateColumns: row.wideSlot
+                          ? 'minmax(220px, 1fr) 3fr'
+                          : 'repeat(auto-fit, minmax(300px, 1fr))',
+                      }
+                }
               >
                 <div className="flex flex-col gap-2">
                   <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>

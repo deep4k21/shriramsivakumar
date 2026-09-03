@@ -19,6 +19,13 @@ export interface ProcessRow {
   /** Locks the image slot to a 16:9 aspect ratio (width-driven) instead of the template default. */
   slotAspectVideo?: boolean;
   /**
+   * Gives the slot column three times the text column's width (1:3) instead
+   * of the template's even split. For a `document` slot, pairing this with a
+   * fixed `slotHeight` also switches the viewer to a two-page spread — the
+   * extra width otherwise sits empty next to a single portrait page.
+   */
+  wideSlot?: boolean;
+  /**
    * The slot's aspect ratio as width/height (e.g. 1.5576), for a prototype
    * whose artboard is not 16:9. Figma's `contain` scaling letterboxes whatever
    * the frame doesn't match, so matching the frame to the artboard is what
@@ -853,51 +860,68 @@ export const CATEGORIES: Category[] = [
         software: ['InDesign', 'Illustrator', 'PowerPoint'],
         problemLabel: 'RANGE',
         problem:
-          'Five documents between four and forty-seven pages — a logistics brochure, a beauty industry guide, two consulting pieces and an annual sustainability report.',
+          'Three documents from four to thirty pages — a logistics brochure, a beauty industry guide and a financial services flyer.',
         solutionLabel: 'CONSTANT',
         solution:
           'Every one had the same job: decide what the reader sees first, then protect that decision for the rest of the document.',
-        // `chips`/`typeface` omitted: five clients, five palettes.
+        // `chips`/`typeface` omitted: three clients, three palettes.
         processRows: [
           {
             label: 'COMPRESSION',
             text: "Four pages to explain an enterprise logistics platform. Everything that didn't survive the cut became a number — shipments per day, carrier network, freight spend — so page two carries all the proof and the other three can stay quiet.",
             slot: '4-PAGE LOGISTICS BROCHURE',
             slotHeight: '480px',
-            // TODO: supply the real page images.
-            document: { title: '4-page logistics brochure', pages: placeholderPages(4, 0) },
+            wideSlot: true,
+            document: {
+              title: '4-page logistics brochure',
+              pages: [
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-01.png',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-02.png',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-03.png',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-04.png',
+              ],
+            },
           },
           {
             label: 'EDITORIAL',
             text: 'A thirty-page guide that had to read like a magazine rather than a sales document. Statistics moved into their own sidebar column so the body copy could stay conversational, and every spread was built to work if opened at random.',
             slot: 'BEAUTY INDUSTRY GROWTH GUIDE',
             slotHeight: '480px',
-            document: { title: 'Beauty industry growth guide', pages: placeholderPages(30, 4) },
+            wideSlot: true,
+            document: {
+              title: 'Beauty industry growth guide',
+              pages: [
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Cover.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Ebook TOC.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 1.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 2.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 3.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 4.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 5.png',
+              ],
+            },
           },
           {
             label: 'DENSITY',
             text: 'Long lists of technical use cases with no natural hierarchy. Splitting them into labelled bands — predictive, LLM, anomaly, clustering — gave the reader four places to stop instead of one continuous run of bullets.',
             slot: 'FINANCIAL SERVICES AI FLYER',
             slotHeight: '480px',
-            document: { title: 'Financial services AI flyer', pages: placeholderPages(6, 9) },
-          },
-          {
-            label: 'SCALE',
-            text: 'Forty-seven pages across five industrial sectors. At that length consistency does the work: one grid, one chart language, one photographic treatment, repeated until the whole thing reads in a single voice.',
-            slot: 'ANNUAL SUSTAINABILITY REPORT',
-            slotHeight: '480px',
-            document: { title: 'Annual sustainability report', pages: placeholderPages(47, 12) },
-          },
-          {
-            label: 'MODULARITY',
-            text: 'Every service offering shared the same three-part shape — issue, solution, benefit. Designing that block once and repeating it meant a reader who understood the first page could navigate the rest without relearning anything.',
-            slot: 'RISK ADVISORY SERVICE BROCHURE',
-            slotHeight: '480px',
-            document: { title: 'Risk advisory service brochure', pages: placeholderPages(8, 16) },
+            wideSlot: true,
+            document: {
+              title: 'Financial services AI flyer',
+              pages: [
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-01.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-02.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-03.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-04.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-05.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-06.png',
+              ],
+            },
           },
         ],
         endNote:
-          "Four pages or forty-seven, the problem doesn't change. Only how long you have to keep solving it.",
+          "Four pages or thirty, the problem doesn't change. Only how long you have to keep solving it.",
       },
       {
         name: 'Social campaign systems',
