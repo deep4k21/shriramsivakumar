@@ -1161,8 +1161,15 @@ export const CATEGORIES: Category[] = [
             textOnly: true,
           },
         ],
-        // TODO: supply the real slides.
-        deck: { title: 'A self-presentation deck', pages: placeholderPages(10, 0) },
+        // Public Figma deck link, embedded live rather than exported to
+        // static page images — matches the pattern the proposal project uses.
+        prototype: {
+          embedUrl:
+            'https://www.figma.com/embed?embed_host=share&url=' +
+            encodeURIComponent(
+              'https://www.figma.com/deck/xvajWVwWsFbXmw3WhechWh/Pixis_Shriram?node-id=2-370&viewport=-109%2C-38%2C0.52&t=T3xy6oH7bcwrnkAk-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&footer=0',
+            ),
+        },
       },
       {
         name: 'A proposal prototype',
@@ -1191,8 +1198,18 @@ export const CATEGORIES: Category[] = [
         ],
         // The artefact is interactive, so this takes the prototype frame rather
         // than the paginated deck viewer the other five use.
-        // TODO: supply the real Figma embed URL.
-        prototype: { embedUrl: 'about:blank' },
+        // Public Figma prototype link, embedded live — same pattern as the
+        // self-presentation deck. `footer=0` drops the bottom info bar while
+        // keeping the click-through nav; the sidebar param from the share
+        // link is dropped since that sidebar is exactly the chrome we don't
+        // want inside the modal.
+        prototype: {
+          embedUrl:
+            'https://www.figma.com/embed?embed_host=share&url=' +
+            encodeURIComponent(
+              'https://www.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio?node-id=1-2&viewport=115%2C-1518%2C0.17&t=YHyKuvYBS1ZBOICU-1&scaling=contain&content-scaling=fixed&starting-point-node-id=1%3A2&page-id=0%3A1&footer=0',
+            ),
+        },
       },
       {
         name: 'A product pitch deck',
@@ -1219,8 +1236,18 @@ export const CATEGORIES: Category[] = [
             textOnly: true,
           },
         ],
-        // TODO: supply the real slides.
-        deck: { title: 'A product pitch deck', pages: placeholderPages(6, 3) },
+        // Rendered via Microsoft's public Office Online viewer, pointed at
+        // the pptx as served from the deployed site — there is no in-browser
+        // viewer for a raw pptx file otherwise. Only resolves once deployed;
+        // on localhost the source file isn't publicly reachable so the
+        // viewer can't fetch it.
+        prototype: {
+          embedUrl:
+            'https://view.officeapps.live.com/op/embed.aspx?src=' +
+            encodeURIComponent(
+              'https://shriramsivakumar.vercel.app/images/Presentation/A product pitch deck/PayDay_Proposal.pptx',
+            ),
+        },
       },
       {
         name: 'A presentation system',
@@ -1247,9 +1274,12 @@ export const CATEGORIES: Category[] = [
             textOnly: true,
           },
         ],
-        // TODO: supply the real slides — the blank template and the
-        // placeholder-filled examples.
-        deck: { title: 'A presentation system', pages: placeholderPages(9, 6) },
+        // Public OneDrive/PowerPoint Online embed — same live-embed pattern
+        // as the Figma decks, via the URL from File > Share > Embed.
+        prototype: {
+          embedUrl:
+            'https://1drv.ms/p/c/0089860d2b548344/IQQ8-0NwDLi2RL169xq2YTEFATAvW7WeJyh-clK599cVzl8?em=2&wdAr=1.7777777777777777',
+        },
       },
       {
         name: 'An interactive deck',
@@ -1276,10 +1306,14 @@ export const CATEGORIES: Category[] = [
             textOnly: true,
           },
         ],
-        // TODO: supply the real slides. Figures, names and chart values shown
-        // are placeholder.
-        deck: { title: 'An interactive deck', pages: placeholderPages(33, 9) },
+        // Public OneDrive/PowerPoint Online embed — same live-embed pattern
+        // as the Figma decks, via the URL from File > Share > Embed.
+        prototype: {
+          embedUrl:
+            'https://1drv.ms/p/c/0089860d2b548344/IQSx89peE29AQoaIsxUvcfmOAUEmLpxRvRAxnalVJIV5rSE?em=2&wdAr=1.7777777777777777',
+        },
       },
+      /*
       {
         name: 'A long-form report',
         thumbnail: '/images/Presentation/A long-form report/thumbnail.svg',
@@ -1309,6 +1343,7 @@ export const CATEGORIES: Category[] = [
         // shown are placeholder.
         deck: { title: 'A long-form report', pages: placeholderPages(68, 12) },
       },
+      */
     ],
   },
 ];

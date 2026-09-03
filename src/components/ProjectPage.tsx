@@ -43,6 +43,22 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
 
+  // The sticky header's real height, so the deck/prototype viewer below it can
+  // fill the rest of the viewport rather than guessing at a fixed vh number.
+  // The header's content (title length, tab-strip wrapping) changes it per
+  // project, so it's measured live rather than assumed.
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const measure = () => setHeaderHeight(el.getBoundingClientRect().height);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <Overlay
       z="z-60"
@@ -77,7 +93,10 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           as it passes. The glass belongs to the body, where there is something
           behind the modal worth seeing.
         */}
-        <div className="sticky top-0 z-20 flex flex-col gap-4.5 border-b border-white/10 bg-[#111216] px-8 py-5.5">
+        <div
+          ref={headerRef}
+          className="sticky top-0 z-20 flex flex-col gap-4.5 border-b border-white/10 bg-[#111216] px-8 py-5.5"
+        >
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
               <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
@@ -352,9 +371,26 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           {/*
             A live prototype in the same frame the deck uses, for a project
             whose artefact is interactive rather than a run of slides.
+
+            Height-led rather than width-led: a plain 16:9-by-width box falls
+            well short of the modal's available height on a wide screen, since
+            width is what the row's own max-width caps. Filling the space
+            actually left below the sticky header — not the raw viewport —
+            is what makes it read as the modal's own scroll area rather than
+            a guessed vh fraction; the scrim's own top+bottom padding and this
+            row's padding both come off the same total.
           */}
           {project.prototype && (
-            <div className="w-full min-h-0 flex-none" style={{ aspectRatio: '16 / 9' }}>
+            <div
+              className="mx-auto w-full min-h-0 flex-none"
+              style={{
+                height: headerHeight
+                  ? `min(calc(100dvh - 2 * clamp(24px, 5vh, 64px) - ${headerHeight}px - 4rem), 900px)`
+                  : 'min(75vh, 900px)',
+                aspectRatio: '16 / 9',
+                maxWidth: '100%',
+              }}
+            >
               <PrototypePiP prototype={project.prototype} />
             </div>
           )}
