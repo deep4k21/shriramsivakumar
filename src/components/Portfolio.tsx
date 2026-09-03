@@ -153,6 +153,14 @@ function useEnteredView(selector: string) {
  */
 function useIconHome() {
   const [home, setHome] = useState(ICON_HOME_FALLBACK);
+  // The panel's own unscaled box, in pixels — measured alongside `home` so the
+  // icon's travel can be driven by a `transform` (pixel offset from its
+  // resting centre) instead of animating `left`/`top` percentages every
+  // frame. `left`/`top` are layout properties: changing them forces the
+  // browser to recompute layout on every frame of the travel, where a
+  // `transform` only recomposites. This box converts `home`'s percentages
+  // into the pixel delta that transform needs.
+  const [panelBox, setPanelBox] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const measure = () => {
@@ -176,6 +184,7 @@ function useIconHome() {
         left: ((s.left + s.width / 2 - p.left) / p.width) * 100,
         top: ((s.top + s.height / 2 - headY - p.top) / p.height) * 100,
       });
+      setPanelBox({ width: p.width, height: p.height });
     };
 
     // The eyebrow's position depends on fonts resolving, so measure again as
@@ -189,7 +198,7 @@ function useIconHome() {
     };
   }, []);
 
-  return home;
+  return { home, panelBox };
 }
 
 /**
@@ -647,19 +656,31 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
   // rather than hardcoded: the headline's type and leading are clamped against
   // the viewport, so the eyebrow's position as a share of the panel shifts
   // between breakpoints and no fixed percentage sits on it everywhere.
-  const home = useIconHome();
+  const { home, panelBox } = useIconHome();
 
   // Travels from that resting spot to the panel's centre, waiting out the
   // headline fade first so the copy has cleared before the mark moves.
+  //
+  // Driven as a pixel `transform` offset from the resting centre (`left`/`top`
+  // stay a static 50%) rather than animating `left`/`top` percentages every
+  // frame: those are layout properties, and changing them forces the browser
+  // to recompute layout on every frame of the travel — during the same
+  // stretch the panel is also shrinking and the four cards are flying in,
+  // that extra layout work on top of everything else reads as real jank. A
+  // `transform` only recomposites, which is what GPU-accelerates it.
   const iconTravel: [number, number] = [SHRINK.start + HEAD_FADE, SHRINK.end];
-  const iconLeft = useTransform(progress, iconTravel, [`${home.left}%`, '50%'], {
-    clamp: true,
-    ease: EASE,
-  });
-  const iconTop = useTransform(progress, iconTravel, [`${home.top}%`, '50%'], {
-    clamp: true,
-    ease: EASE,
-  });
+  const iconX = useTransform(
+    progress,
+    iconTravel,
+    [((home.left - 50) / 100) * panelBox.width, 0],
+    { clamp: true, ease: EASE },
+  );
+  const iconY = useTransform(
+    progress,
+    iconTravel,
+    [((home.top - 50) / 100) * panelBox.height, 0],
+    { clamp: true, ease: EASE },
+  );
   // Grows from the eyebrow's 14px to a mark sized for the collapsed panel,
   // counter-scaled so the panel's own contraction doesn't shrink it with it.
   // Counters the *larger* remaining scale so the icon never overflows the
@@ -791,16 +812,22 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
 
             {/*
               The persistent mark. It starts on the eyebrow line at icon size
-              and ends centred in the collapsed panel, never fading — the
-              `-translate-*` keeps it centred on its own box at the destination.
+              and ends centred in the collapsed panel, never fading.
+              `left-1/2 top-1/2` plus the static `-translate-*` anchor it at
+              the panel's centre and keep it centred on its own box there; the
+              travel itself is `x`/`y` — a pixel offset from that anchor, which
+              `iconX`/`iconY` starts non-zero (the eyebrow position) and eases
+              to zero (arrived at centre) — so the whole thing composites as a
+              transform instead of the browser re-laying-out `left`/`top` on
+              every frame of the travel.
             */}
             <motion.div
-              className="absolute -translate-x-1/2 -translate-y-1/2 text-teal"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-teal"
               // Clears alongside the mosaic, just before the outline departs for
               // career: the mark is the ghost's source, so leaving it lit would
               // duplicate the shape that is now travelling away. The panel keeps
               // its layout so the ghost can still measure it.
-              style={{ left: iconLeft, top: iconTop, opacity: exit.opacity }}
+              style={{ x: iconX, y: iconY, opacity: exit.opacity }}
             >
               <motion.div style={{ width: iconSize }}>
                 <StylusNoteIcon className="block h-auto w-full" />

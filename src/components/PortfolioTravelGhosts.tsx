@@ -3,6 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { HandoffGhost } from './AboutTravelGhosts';
 
 /**
+ * Matches `usePagedSnap`'s own easing exactly (duplicated rather than
+ * imported — that hook's internal curve, not something meant to be shared
+ * outward), so the Portfolio → career flight below stays in lockstep with
+ * the scroll jump it's standing in for.
+ */
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
+/**
  * An invisible stand-in for the connect modal, so the closing ghost has a real
  * element to measure rather than hardcoded numbers.
  *
@@ -76,9 +86,19 @@ const TO_CONNECT = { start: 0, end: 1 } as const;
  */
 const CONNECT_FLIGHT_MS = 900;
 
+/**
+ * How long the Portfolio → career flight takes when played on its own clock.
+ * Matches `JUMP_MS` in `usePagedSnap` (duplicated rather than imported — it's
+ * that hook's own internal constant, not something meant to be shared
+ * outward) so the ghost's flight and the page's own scroll jump land at
+ * exactly the same moment.
+ */
+const CAREER_FLIGHT_MS = 3000;
+
 export function PortfolioTravelGhosts({
   onOpenConnect,
   playCount,
+  careerPlayCount,
 }: {
   onOpenConnect: () => void;
   /**
@@ -89,6 +109,18 @@ export function PortfolioTravelGhosts({
    * own clock, timed to finish as the modal opens.
    */
   playCount: number;
+  /**
+   * Bumped to play the Portfolio → career flight on its own clock instead of
+   * leaving it to scroll-scrubbing, for the same reason as `playCount`: the
+   * paginated jump between the mosaic's rest stop and Career covers far more
+   * scroll distance than `TO_CAREER`'s own narrow window (1.02–1.24, a span
+   * designed for free-scroll), so scrubbing it against the jump's actual
+   * travel only gave the ghost a few hundred milliseconds of a 3-second jump
+   * — barely a flicker. Free-scroll (and reduced motion, where the paginated
+   * hook disables itself) still scrubs `TO_CAREER` normally; this only
+   * overrides it while a paginated jump is actually driving the page there.
+   */
+  careerPlayCount: number;
 }) {
   const { scrollY } = useScroll();
   const [windows, setWindows] = useState<{
@@ -129,13 +161,18 @@ export function PortfolioTravelGhosts({
   const aboutProgress = useMotionValue(0);
   const portfolioProgress = useMotionValue(0);
   const connectProgress = useMotionValue(0);
+  // Set while a fixed-duration Portfolio → career flight (below) is driving
+  // `portfolioProgress` on its own clock, so the scroll listener backs off
+  // instead of fighting it — both would otherwise call `.set()` on the same
+  // value every frame, one from scroll position and one from the animation.
+  const careerFlightActive = useRef(false);
 
   useMotionValueEvent(scrollY, 'change', (y) => {
     if (!windows) return;
     if (windows.about.span > 0) {
       aboutProgress.set((y - windows.about.start) / windows.about.span);
     }
-    if (windows.portfolio.span > 0) {
+    if (windows.portfolio.span > 0 && !careerFlightActive.current) {
       portfolioProgress.set((y - windows.portfolio.start) / windows.portfolio.span);
     }
   });
@@ -159,6 +196,38 @@ export function PortfolioTravelGhosts({
     return () => controls.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playCount]);
+
+  // Runs the Portfolio → career flight on `usePagedSnap`'s own clock, timed
+  // to the paginated jump rather than its actual scroll distance. Takes over
+  // `portfolioProgress` for the duration (the scroll listener above steps
+  // aside via `careerFlightActive`) and hands it back once the flight lands,
+  // so a reader who then free-scrolls resumes from wherever they actually are.
+  const lastCareerPlayed = useRef(careerPlayCount);
+  useEffect(() => {
+    if (careerPlayCount === lastCareerPlayed.current) return;
+    lastCareerPlayed.current = careerPlayCount;
+    careerFlightActive.current = true;
+    portfolioProgress.set(TO_CAREER.start);
+    // Matches `usePagedSnap`'s own easing exactly, not the gentler curve the
+    // other ghosts use: this flight is standing in for the page's own scroll
+    // for the length of a full jump, not decorating a page that is already
+    // moving on its own schedule. A different, faster-starting curve here
+    // made the ghost visibly leap ahead of a background that was still
+    // sitting in `easeInOutCubic`'s own slow ease-in — the mismatch read as
+    // the page failing to start, not just two curves drifting apart.
+    const controls = animate(portfolioProgress, TO_CAREER.end, {
+      duration: CAREER_FLIGHT_MS / 1000,
+      ease: easeInOutCubic,
+    });
+    controls.then(() => {
+      careerFlightActive.current = false;
+    });
+    return () => {
+      controls.stop();
+      careerFlightActive.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [careerPlayCount]);
 
   if (!windows) return null;
 

@@ -138,6 +138,10 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   // scroll-scrubbed runway the paginated snap replaced — see `usePagedSnap`'s
   // `onPastLastStop` below and `PortfolioTravelGhosts`'s `playCount` prop.
   const [connectGhostPlay, setConnectGhostPlay] = useState(0);
+  // Bumped to play the Portfolio → career ghost on its own clock rather than
+  // leaving it to scroll-scrubbing — see `usePagedSnap`'s `onAdvance` below
+  // and `PortfolioTravelGhosts`'s `careerPlayCount` prop.
+  const [careerGhostPlay, setCareerGhostPlay] = useState(0);
   // Mirrors `connectOpen` for the Escape handler, which must not re-create
   // itself on every open/close.
   const connectOpenRef = useRef(connectOpen);
@@ -207,6 +211,10 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
    * of its pinned window. Same measurement as `snapPoints`, kept separate
    * since this hook needs a plain number array rather than `SnapPoint`s
    * carrying a section id.
+   *
+   * The order here is load-bearing: `PORTFOLIO_STOP_INDEX`/`CAREER_STOP_INDEX`
+   * below index into it by position to recognise the Portfolio→Career jump
+   * specifically, out of every jump this hook can fire.
    */
   const getPagedStops = useCallback((): number[] => {
     const stops: number[] = [];
@@ -235,10 +243,19 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   // this rather than jumping, and `PortfolioTravelGhosts` opens the modal once
   // the flight lands.
   const playConnectGhost = useCallback(() => setConnectGhostPlay((n) => n + 1), []);
+  // Indices into `getPagedStops`'s return array — see the comment there.
+  const PORTFOLIO_STOP_INDEX = 3;
+  const CAREER_STOP_INDEX = 4;
+  const onPagedAdvance = useCallback((from: number, to: number) => {
+    if (from === PORTFOLIO_STOP_INDEX && to === CAREER_STOP_INDEX) {
+      setCareerGhostPlay((n) => n + 1);
+    }
+  }, []);
   usePagedSnap(
     getPagedStops,
     view === null && !connectOpen && portfolioCategory === null,
     playConnectGhost,
+    onPagedAdvance,
   );
 
   // Whether scroll currently sits at the mosaic's settled stop — the sidebar's
@@ -352,7 +369,11 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
         <>
           <CardTravelGhost />
           <AboutTravelGhosts />
-          <PortfolioTravelGhosts onOpenConnect={openConnect} playCount={connectGhostPlay} />
+          <PortfolioTravelGhosts
+            onOpenConnect={openConnect}
+            playCount={connectGhostPlay}
+            careerPlayCount={careerGhostPlay}
+          />
         </>
       )}
 

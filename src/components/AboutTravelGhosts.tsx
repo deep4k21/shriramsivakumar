@@ -13,6 +13,14 @@ import { GhostSkin, readSkin, type Skin } from './GhostSkin';
 const ARC_STRENGTH = 0.5;
 
 /**
+ * How far outside `[range.start, range.end]` the geometry is still tracked
+ * live, as a fraction of the range's own span. Matches the opacity fade's own
+ * pull-in (`+0.04`/`-0.06` below) with room to spare, so the ghost is always
+ * fully transparent well before its geometry goes stale.
+ */
+const GEOMETRY_MARGIN = 0.15;
+
+/**
  * The handoff: it starts while the intro panel is still on screen and ends once
  * the about tiles have settled. Measured in intro-window units, that overlap
  * sits just past 1.0 — the intro has unpinned but its panel is still sliding
@@ -50,6 +58,17 @@ export function HandoffGhost({
   stickySelector?: string;
 }) {
   const geometry = useTransform(progress, (p) => {
+    // Outside the range (plus a margin), the ghost is fully transparent via
+    // `opacity` below regardless of what this returns — so skip the DOM reads
+    // below entirely rather than paying for two `getBoundingClientRect` calls,
+    // a `querySelector`, and two `getComputedStyle` reads (one parsing a
+    // matrix) on every scroll frame for the whole time this section is
+    // mounted, not just its own ~20%-of-progress handoff window. With several
+    // of these ghosts alive across the page at once, that constant off-screen
+    // cost was a measurable share of the page's overall scroll jank.
+    const margin = (range.end - range.start) * GEOMETRY_MARGIN;
+    if (p < range.start - margin || p > range.end + margin) return null;
+
     const t = Math.min(1, Math.max(0, (p - range.start) / (range.end - range.start)));
     const fromEl = document.querySelectorAll(fromSelector)[fromIndex];
     const toEl = document.querySelectorAll(toSelector)[toIndex];

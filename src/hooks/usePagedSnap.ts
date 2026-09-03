@@ -42,6 +42,16 @@ export function usePagedSnap(
    * happens next itself.
    */
   onPastLastStop?: () => void,
+  /**
+   * Fired with the stop indices a jump is about to travel between, right
+   * before it starts. For a scroll-linked effect tied to one specific
+   * boundary (a ghost that used to scrub across the scroll distance between
+   * two stops, say), this is what that effect can trigger off instead — the
+   * jump's jump covers the whole gap in one animated `scrollTo` sequence, so
+   * a narrow scroll-distance window designed for free-scroll often only
+   * occupies a sliver of the jump's actual duration.
+   */
+  onAdvance?: (fromIndex: number, toIndex: number) => void,
 ) {
   const jumping = useRef(false);
   const touchStartY = useRef<number | null>(null);
@@ -120,6 +130,7 @@ export function usePagedSnap(
         return false;
       }
       if (next < 0) return false;
+      onAdvance?.(bestI, next);
       jumpTo(stops[next]);
       return true;
     };
@@ -208,5 +219,5 @@ export function usePagedSnap(
       window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [getStops, enabled, onPastLastStop]);
+  }, [getStops, enabled, onPastLastStop, onAdvance]);
 }

@@ -49,7 +49,8 @@ function renderSlot(row: ProcessRow) {
               : { height: row.slotMaxHeight ?? '160px', minHeight: row.slotMaxHeight ?? '160px' }
       }
     >
-      <PrototypePiP prototype={row.prototype} />
+      {/* Keyed on the embed URL — see the note on the project-level prototype below. */}
+      <PrototypePiP key={row.prototype.embedUrl} prototype={row.prototype} />
     </div>
   ) : (
     <div
@@ -446,7 +447,16 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 maxWidth: '100%',
               }}
             >
-              <PrototypePiP prototype={project.prototype} />
+              {/*
+                Keyed on the embed URL so switching projects in the tab strip
+                remounts a fresh iframe instead of just updating `src` on the
+                same one. Some embed players (Google Slides, PowerPoint
+                Online, certain Figma configs) don't reliably tear down and
+                reload their own internal state on a bare `src` change, and
+                the previous project's deck was staying visible underneath
+                the new one loading — or not loading at all.
+              */}
+              <PrototypePiP key={project.prototype.embedUrl} prototype={project.prototype} />
             </div>
           )}
 
