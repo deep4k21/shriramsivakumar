@@ -670,6 +670,7 @@ export const CATEGORIES: Category[] = [
     projects: [
       {
         name: 'This website',
+        thumbnail: '/images/Brand Identity/Portfolio Website/thumbnail.png',
         software: ['Claude Design', 'Claude Code', 'Figma'],
         problem:
           "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template — the wrong first impression from someone selling design judgement.",
@@ -1695,6 +1696,13 @@ export const ROLES: Role[] = [
       ],
     ],
   },
+];
+
+/** One certificate per `PhotoFrame` in Career's right-hand column. */
+export const CERTIFICATES: string[] = [
+  '/images/Certificates/1.jpg',
+  '/images/Certificates/2.jpg',
+  '/images/Certificates/3.jpg',
 ];
 
 export interface NavItem {

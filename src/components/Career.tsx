@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { ROLES } from '../data/content';
+import { CERTIFICATES, ROLES } from '../data/content';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD_GLASS } from '../styles/card';
 import { CardGlow } from './CardGlow';
+import { PhotoFrame } from './PhotoFrame';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
@@ -42,7 +43,26 @@ export function Career() {
   // wheel and touch input from reaching past Career's own settled stop.
   return (
     <section ref={ref} id="career" className="relative h-[110vh] border-t border-white/6">
-      <div className="sticky top-0 flex h-screen flex-col justify-center gap-[clamp(20px,3.5vh,36px)] overflow-hidden px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav">
+      {/*
+        5:1 — the career copy keeps the width it always had, and the
+        certificates take the column beside it rather than crowding under it.
+        `items-stretch` (the flex default) is what lets the photo column match
+        the left column's own content height instead of the row's tallest
+        child forcing both to it, which is moot with either at five parts to
+        the other's one.
+      */}
+      <div className="sticky top-0 flex h-screen gap-gutter overflow-hidden px-gutter py-[clamp(20px,4vh,56px)] pl-gutter-nav">
+      {/*
+        No `overflow-hidden` here — the outer sticky row already clips at the
+        section boundary. A second clip on this column combined with
+        `justify-center` was cutting real content silently: on a shorter
+        screen, a role whose copy runs to six bullets (Freshworks) grew
+        taller than the column's own box, and centring an oversized child
+        inside a clipped one eats equally off the top and bottom rather than
+        overflowing visibly — the eyebrow label and the last bullet were
+        gone with no visual sign anything had been cut.
+      */}
+      <div className="flex flex-5 flex-col justify-center gap-[clamp(20px,3.5vh,36px)]">
       <motion.div className="font-body text-[11px] tracking-[0.18em] text-teal" style={exit}>
         CAREER JOURNEY
       </motion.div>
@@ -150,11 +170,16 @@ export function Career() {
             was selected — 393px is that tallest role, so the shorter ones now
             pad out to it instead.
 
-            A floor rather than a fixed height: a role whose copy wraps to an
-            extra line on a narrow viewport can still grow past it, which is
-            the right failure — text stays readable rather than being clipped.
+            Also capped, unlike a plain min-height: on a short viewport the
+            column above it (eyebrow, academic card, tab strip) already claims
+            real space, and a role's full copy — Freshworks runs to six
+            bullets plus a progression row — can be taller than what's left.
+            The cap turns that into an internal scroll on this one card
+            (`overflow-y-auto` below, on the content it caps) instead of the
+            card silently outgrowing the sticky row's own `overflow-hidden`
+            and taking the eyebrow or the last bullet with it off-screen.
           */
-          className={`relative flex min-h-[393px] flex-col overflow-hidden ${CARD_GLASS} ${
+          className={`relative flex min-h-98.25 max-h-[52vh] flex-col overflow-hidden ${CARD_GLASS} ${
             companyIdx === 0 ? 'rounded-tl-none' : ''
           }`}
         >
@@ -163,7 +188,7 @@ export function Career() {
         <AnimatePresence mode="wait">
           <motion.div
             key={role.name}
-            className="flex flex-col gap-5.5 px-9 py-8.5"
+            className="flex flex-col gap-5.5 overflow-y-auto px-9 py-8.5"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
@@ -207,6 +232,50 @@ export function Career() {
           </motion.div>
         </AnimatePresence>
         </div>
+      </motion.div>
+      </div>
+
+      {/*
+        The certificates — one `PhotoFrame` each, stood up rather than
+        cycled through: three separate stills, not three slides of one set.
+        No caption, no counter, no picker — see the `caption` note on
+        `PhotoFrame` for why leaving it unset drops all three at once.
+
+        `PhotoFrame` sizes itself off its parent's height (it derives its own
+        width from the frame's aspect ratio) — given a fixed height rather
+        than an equal `flex-1` share of the column, so the width that follows
+        can run wider than the slim column itself. That is deliberate: these
+        read as photos taped to a wall, not as panels obeying a grid, so a
+        frame overlapping its neighbour or spilling past the column's own
+        edge is the intended look, not an overflow bug.
+
+        Alternating tilt and a horizontal nudge per frame, rather than the
+        same angle straight down the column — a wall of taped-up prints, not
+        a filmstrip. The nudges sum to roughly zero so the group still reads
+        centred in its column rather than drifting to one side.
+
+        Negative margin between frames rather than a gap: three full-size
+        frames at a plain gap could add up to more than the column's own
+        `h-screen` height and run off the top and bottom edges. The overlap
+        is deliberate, matching the same "photos on a wall" logic as the
+        horizontal nudges above — two prints overlapping reads as a pile, not
+        a mistake — sized to hold real presence while still guaranteeing all
+        three fit a short screen with room to spare.
+      */}
+      <motion.div className="flex flex-1 flex-col justify-center" style={exit}>
+        {CERTIFICATES.map((src, i) => {
+          const tilt = [-3.4, 2.8, -2.2][i % 3];
+          const shift = ['-22%', '18%', '-14%'][i % 3];
+          return (
+            <div
+              key={src}
+              className={`z-1 h-[clamp(200px,30vh,320px)] flex-none ${i > 0 ? '-mt-[clamp(10px,3vh,32px)]' : ''}`}
+              style={{ transform: `translateX(${shift})` }}
+            >
+              <PhotoFrame image={src} index={1} total={1} tilt={tilt} />
+            </div>
+          );
+        })}
       </motion.div>
       </div>
     </section>

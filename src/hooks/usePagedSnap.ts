@@ -10,6 +10,13 @@ const JUMP_MS = 3000;
 const COOLDOWN_MS = 150;
 /** How far past the first/last stop the zone still claims input, so a gesture that begins right at the boundary isn't fumbled to the browser's native scroll. */
 const ZONE_MARGIN = 4;
+/**
+ * After a gesture runs a nested scrollable (a role panel's own overflow, say)
+ * out of room, this hook still won't advance the page for this long — long
+ * enough that the same continuous scroll motion which hit the edge doesn't
+ * also carry straight through into a page jump on its very next tick.
+ */
+const EDGE_HANDOFF_MS = 350;
 
 /** Slow ease-in-out, matching `useSmoothScrollTo`'s. */
 function easeInOutCubic(t: number) {
@@ -55,6 +62,8 @@ export function usePagedSnap(
 ) {
   const jumping = useRef(false);
   const touchStartY = useRef<number | null>(null);
+  /** Set while a gesture is still working through a nested scrollable's own room. */
+  const edgeHandoffUntil = useRef(0);
   const cooldownUntil = useRef(0);
 
   useEffect(() => {
@@ -143,11 +152,69 @@ export function usePagedSnap(
       return y > stops[0] - ZONE_MARGIN && y < stops[stops.length - 1] + ZONE_MARGIN;
     };
 
+    /**
+     * Where `target` sits relative to a nested scrollable ancestor (a role
+     * panel's own overflow, say), for the gesture's direction `dir`:
+     *
+     *   'room'      — inside one, and it can still scroll that way itself.
+     *                 The gesture belongs to its native scroll, not the page.
+     *   'exhausted' — inside one, but it has already run out of room that
+     *                 way. The panel is where the gesture started, but this
+     *                 particular tick has nowhere left to take it.
+     *   'none'      — no scrollable ancestor at all; ordinary page territory.
+     *
+     * Without this distinction, this hook's `window`-level listener either
+     * claims every tick over a scrollable panel (the panel becomes
+     * unreachable by wheel) or, once fixed to defer to it, immediately
+     * carries the same continuous scroll motion straight through into a page
+     * jump the instant the panel bottoms out — 'exhausted' is what lets the
+     * caller tell that handoff apart from a plain gesture over open page.
+     */
+    const scrollableChildStatus = (target: EventTarget | null, dir: 1 | -1): 'room' | 'exhausted' | 'none' => {
+      let el = target instanceof Element ? target : null;
+      while (el && el !== document.body) {
+        const style = getComputedStyle(el);
+        const scrollable =
+          (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
+        if (scrollable) {
+          const atTop = el.scrollTop <= 0;
+          const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+          if ((dir === -1 && !atTop) || (dir === 1 && !atBottom)) return 'room';
+          return 'exhausted';
+        }
+        el = el.parentElement;
+      }
+      return 'none';
+    };
+
     const onWheel = (e: WheelEvent) => {
       // Outside the zone and not mid-jump — leave the browser's own scroll
       // alone (e.g. scrolling Hero further up, away from Intro).
       if (!inZone() && !jumping.current) return;
       if (jumping.current) {
+        e.preventDefault();
+        return;
+      }
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const scrollable = scrollableChildStatus(e.target, dir);
+      // Hovering a nested scrollable that still has room to move that way —
+      // let its own native scroll have the gesture instead of jumping the
+      // page. Checked before the small-delta swallow below it too, or a
+      // gentle trackpad tick over the panel would be eaten with nowhere to go.
+      if (scrollable === 'room') return;
+      if (scrollable === 'exhausted') {
+        // The tick that runs the panel out of room does not also carry
+        // through into a page jump — hold the handoff for a beat so the
+        // reader's continuing scroll motion doesn't fire it by accident.
+        // Prevented here too, not just held off from `advance`: sticky
+        // positioning doesn't stop the underlying document from scrolling
+        // on its own, so an un-prevented tick would nudge the page a little
+        // even though nothing here claimed it as a jump.
+        edgeHandoffUntil.current = performance.now() + EDGE_HANDOFF_MS;
+        e.preventDefault();
+        return;
+      }
+      if (performance.now() < edgeHandoffUntil.current) {
         e.preventDefault();
         return;
       }
@@ -159,7 +226,7 @@ export function usePagedSnap(
       // it to go — otherwise it falls through to the browser's native scroll,
       // which is what lets the reader keep scrolling past either edge of the
       // zone instead of getting stuck against it.
-      if (advance(e.deltaY > 0 ? 1 : -1)) e.preventDefault();
+      if (advance(dir)) e.preventDefault();
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -178,11 +245,33 @@ export function usePagedSnap(
       }
       const y = e.touches[0]?.clientY ?? touchStartY.current;
       const dy = touchStartY.current - y;
+      const dir = dy > 0 ? 1 : -1;
+      // Same nested-scroll deference as `onWheel`, and the same edge-handoff
+      // pause once the panel runs out of room in this direction.
+      const scrollable = scrollableChildStatus(e.target, dir);
+      if (scrollable === 'room') {
+        touchStartY.current = null;
+        return;
+      }
+      if (scrollable === 'exhausted') {
+        // Prevented for the same reason as `onWheel`'s equivalent branch —
+        // without it, native touch scrolling still nudges the page even
+        // though nothing here claimed the gesture as a jump.
+        edgeHandoffUntil.current = performance.now() + EDGE_HANDOFF_MS;
+        touchStartY.current = null;
+        e.preventDefault();
+        return;
+      }
+      if (performance.now() < edgeHandoffUntil.current) {
+        touchStartY.current = null;
+        e.preventDefault();
+        return;
+      }
       if (Math.abs(dy) < TOUCH_THRESHOLD) {
         e.preventDefault();
         return;
       }
-      if (advance(dy > 0 ? 1 : -1)) {
+      if (advance(dir)) {
         e.preventDefault();
         touchStartY.current = y;
       } else {

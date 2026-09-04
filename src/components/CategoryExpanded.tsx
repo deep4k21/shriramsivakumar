@@ -338,7 +338,16 @@ export function CategoryExpanded({
                     holds it at every viewport.
                   */}
                   <div
-                    className="grid w-full place-items-center"
+                    // `relative` + an absolutely positioned image, not a grid
+                    // with a `size-full` child: as a grid item the image's own
+                    // intrinsic aspect ratio (1920×1080 for this thumbnail)
+                    // was winning over the box's declared `aspect-ratio` —
+                    // the box grew to match the image's proportions instead
+                    // of holding 934:340, and dragged the row's other tiles
+                    // taller with it. Absolute positioning takes the image
+                    // out of flow entirely, so only the box's own
+                    // `aspect-ratio` can ever set its height.
+                    className="relative grid w-full place-items-center overflow-hidden"
                     style={{ backgroundColor: 'rgba(255,255,255,.03)', aspectRatio: '934 / 340' }}
                   >
                     {p.thumbnail ? (
@@ -346,7 +355,7 @@ export function CategoryExpanded({
                         src={p.thumbnail}
                         alt=""
                         aria-hidden="true"
-                        className="size-full object-cover"
+                        className="absolute inset-0 size-full object-cover object-center"
                       />
                     ) : (
                       <span

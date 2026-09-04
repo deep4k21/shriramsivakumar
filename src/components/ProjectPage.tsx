@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import type { ProcessRow, Category } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
@@ -105,6 +105,10 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
     previous one's setting.
   */
   const [bannerDark, setBannerDark] = useState(false);
+  // Which FAQ item is expanded, if any. Reset alongside the banner: a new
+  // project starts with its first question open, not whatever the previous
+  // project's reader happened to leave expanded.
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   // Switching projects (tab strip or "Next project") starts the new one from
@@ -113,6 +117,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
     setBannerDark(false);
+    setOpenFaqIdx(0);
   }, [pIdx]);
 
   const handleNext = () => setProjectIdx((i) => (i + 1) % category.projects.length);
@@ -237,7 +242,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 src={bannerDark && project.thumbnailDark ? project.thumbnailDark : project.thumbnail}
                 alt=""
                 aria-hidden="true"
-                className="size-full object-cover"
+                className="absolute inset-0 size-full object-cover object-center"
               />
             ) : (
               <span className="font-body text-[11px] tracking-[0.14em] text-grey">
@@ -464,19 +469,57 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}
 
           {/*
-            Optional, on the same terms as the metrics row above. Styled like
-            a `textOnly` process row — same label treatment, same hairline
-            divider — stacked one pair per question rather than gridded two
-            wide, since an answer runs longer than a process row's aside.
+            Optional, on the same terms as the metrics row above. An
+            accordion rather than the stacked list every question used to
+            render as: four full answers open at once read as a wall of text
+            competing with the case study around it, where one open question
+            at a time reads as something to work through.
+
+            Full width (no `max-w` on the answer, unlike the stacked version)
+            — collapsed to one open question, the row has the space to spare
+            that the old side-by-side layout didn't.
           */}
           {project.faq && (
             <div className="flex flex-col">
-              {project.faq.map((item) => (
-                <div key={item.q} className="flex flex-col gap-2 border-t border-white/7 py-5 first:border-t-0">
-                  <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{item.q}</div>
-                  <p className="m-0 max-w-180 font-body text-[15px]/[1.7] text-grey">{item.a}</p>
-                </div>
-              ))}
+              {project.faq.map((item, i) => {
+                const open = openFaqIdx === i;
+                return (
+                  <div key={item.q} className="border-t border-white/7 first:border-t-0">
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaqIdx(open ? null : i)}
+                      aria-expanded={open}
+                      className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left"
+                    >
+                      <span className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">
+                        {item.q}
+                      </span>
+                      <motion.span
+                        aria-hidden="true"
+                        className="flex-none text-orange"
+                        animate={{ rotate: open ? 45 : 0 }}
+                        transition={{ duration: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
+                      >
+                        +
+                      </motion.span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {open && (
+                        <motion.div
+                          key="content"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.24, ease: [0.2, 0.7, 0.2, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <p className="m-0 pb-5 font-body text-[15px]/[1.7] text-grey">{item.a}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </div>
           )}
 

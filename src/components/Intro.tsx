@@ -86,9 +86,6 @@ export function Intro() {
   const progressWidth = useTransform(progress, [0, 1], ['0%', '100%']);
   const progressOpacity = useTransform(progress, [0.8, 1], [1, 0], { clamp: true });
 
-  const prevSlide = () => setSlideIdx((i) => (i + INTRO_SLIDES.length - 1) % INTRO_SLIDES.length);
-  const nextSlide = () => setSlideIdx((i) => (i + 1) % INTRO_SLIDES.length);
-
   return (
     <>
       <section ref={ref} id="intro" className="relative h-[300vh] border-t border-white/6">
@@ -257,8 +254,7 @@ export function Intro() {
                     video={slide.video}
                     index={i + 1}
                     total={INTRO_SLIDES.length}
-                    onPrev={i === slideIdx ? prevSlide : undefined}
-                    onNext={i === slideIdx ? nextSlide : undefined}
+                    onSelect={i === slideIdx ? setSlideIdx : undefined}
                   />
                 </motion.div>
               ))}

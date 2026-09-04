@@ -44,9 +44,21 @@ const BAR_INSET = { left: '24%', right: '19%' };
  */
 export const FRAME_TILT_DEG = 2.6;
 
-const ARROW_BUTTON =
-  'grid size-9 flex-none cursor-pointer place-items-center rounded-md border border-white ' +
-  'bg-transparent text-white transition-colors hover:bg-white/15';
+/*
+  Sized to clear the frame's own lower-margin height at any panel size —
+  `LOWER_MARGIN.height` is 18.92% of the frame, so the box has to stay well
+  under that or it collides with the drawing above and below it.
+*/
+const SLIDE_BUTTON =
+  'grid size-[clamp(26px,5.6cqw,42px)] flex-none cursor-pointer place-items-center rounded-[6px] border ' +
+  'font-heading text-[clamp(13px,2.3cqw,18px)] font-semibold transition-colors';
+
+/*
+  No border or fill of its own — just the chevron, so the arrows read as a
+  gesture rather than another boxed control competing with the numbers next
+  to them. The hit target is still the full square; only the paint is gone.
+*/
+const ARROW_BUTTON = 'grid size-[clamp(26px,5.6cqw,42px)] flex-none cursor-pointer place-items-center text-white/70 transition-colors hover:text-white';
 
 /**
  * The arrow mark, drawn rather than set as a `‹` glyph.
@@ -61,10 +73,10 @@ function Chevron({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="size-[15px]"
+      className="size-[72%]"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.4"
+      strokeWidth="2.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -87,10 +99,15 @@ export function PhotoFrame({
   total,
   image,
   video,
-  onPrev,
-  onNext,
+  onSelect,
+  tilt = FRAME_TILT_DEG,
 }: {
-  caption: string;
+  /**
+   * Shown with the counter on the frame's top bar. Omitted entirely — no
+   * label, no counter, no slide picker — for a single still image standing
+   * alone rather than one slide in a set (Career's certificate frames).
+   */
+  caption?: string;
   index: number;
   total: number;
   /** The photograph. Falls back to the frame's own empty opening when absent. */
@@ -102,10 +119,19 @@ export function PhotoFrame({
    * starting.
    */
   video?: string;
-  /** Step to the previous slide. Arrows are hidden when omitted. */
-  onPrev?: () => void;
-  /** Step to the next slide. */
-  onNext?: () => void;
+  /**
+   * Jump straight to slide `i` (0-based). The numbered picker is hidden
+   * entirely when omitted, the same as the arrows it replaced.
+   */
+  onSelect?: (i: number) => void;
+  /**
+   * The hang angle in degrees, sign and all — negative tilts left, positive
+   * tilts right. Defaults to the Intro carousel's fixed angle, since that is
+   * also what `CardTravelGhost` matches on the hero→intro handoff; a wall of
+   * several frames (Career's certificates) overrides it per frame instead, so
+   * they don't all lean the same way.
+   */
+  tilt?: number;
 }) {
   return (
     /*
@@ -117,8 +143,11 @@ export function PhotoFrame({
       tape is what holds it, so that is what it should pivot on.
     */
     <div
-      className="relative aspect-[438.5/442.4] h-full max-h-full w-auto max-w-full"
-      style={{ transform: `rotate(${FRAME_TILT_DEG}deg)`, transformOrigin: 'top center' }}
+      // `container-type:size` makes this the reference box for the `cqw`
+      // units the slide-picker boxes below are sized in, so they scale with
+      // the frame itself rather than the viewport.
+      className="relative aspect-[438.5/442.4] h-full max-h-full w-auto max-w-full @container-size"
+      style={{ transform: `rotate(${tilt}deg)`, transformOrigin: 'top center' }}
     >
       {/*
         The photo sits under the drawing, so the frame's paper edge and the
@@ -162,37 +191,80 @@ export function PhotoFrame({
       />
 
       {/*
-        Label left, counter right, along the frame's top bar beside the window
-        dots. Light type: the drawing is dark card, not the white paper a
-        polaroid usually has — dark ink on it disappears entirely.
-      */}
-      <div
-        className="absolute flex items-center justify-between gap-3"
-        style={{
-          left: BAR_INSET.left,
-          right: BAR_INSET.right,
-          top: TOP_BAR.top,
-          height: TOP_BAR.height,
-        }}
-      >
-        <span className="font-heading text-[clamp(9px,1.05vw,13px)] font-semibold tracking-[0.16em] text-teal uppercase">
-          {caption}
-        </span>
-        <span className="font-heading text-[clamp(7px,0.75vw,9.5px)] font-medium tracking-[0.14em] text-[#89919F]">
-          {index} / {total}
-        </span>
-      </div>
+        Label left, counter right, along the frame's top bar. Light type: the
+        drawing is dark card, not the white paper a polaroid usually has —
+        dark ink on it disappears entirely.
 
-      {/* The arrows ride the frame's own lower margin rather than floating below it. */}
-      {onPrev && onNext && (
+        Omitted with `caption` — a lone still (Career's certificates) has no
+        set to count through, so the bar would show only a stray "1 / 1".
+      */}
+      {caption && (
         <div
-          className="absolute inset-x-0 flex items-center justify-center gap-2.5"
-          style={{ top: LOWER_MARGIN.top, height: LOWER_MARGIN.height }}
+          className="absolute flex items-center justify-between gap-3"
+          style={{
+            left: BAR_INSET.left,
+            right: BAR_INSET.right,
+            top: TOP_BAR.top,
+            height: TOP_BAR.height,
+          }}
         >
-          <button type="button" onClick={onPrev} aria-label="Previous slide" className={ARROW_BUTTON}>
+          <span className="font-heading text-[clamp(9px,1.05vw,13px)] font-semibold tracking-[0.16em] text-teal uppercase">
+            {caption}
+          </span>
+          <span className="font-heading text-[clamp(7px,0.75vw,9.5px)] font-medium tracking-[0.14em] text-[#89919F]">
+            {index} / {total}
+          </span>
+        </div>
+      )}
+
+      {/*
+        Prev arrow, one numbered box per slide, next arrow — all one row,
+        centred in the frame's lower margin, the white strip a polaroid
+        would carry.
+
+        Left/right inset matches `BAR_INSET`, the same clearance the counter
+        keeps from the tape overhanging the top-right corner — the frame's
+        tilt lifts that corner exactly the same way, so a smaller inset here
+        let the row run past the drawing's own edge.
+      */}
+      {onSelect && (
+        <div
+          className="absolute flex items-center justify-center gap-[1.6cqw]"
+          style={{ left: BAR_INSET.left, right: BAR_INSET.right, top: LOWER_MARGIN.top, height: LOWER_MARGIN.height }}
+        >
+          <button
+            type="button"
+            onClick={() => onSelect((index - 2 + total) % total)}
+            aria-label="Previous slide"
+            className={ARROW_BUTTON}
+          >
             <Chevron dir="left" />
           </button>
-          <button type="button" onClick={onNext} aria-label="Next slide" className={ARROW_BUTTON}>
+
+          {Array.from({ length: total }, (_, i) => {
+            const on = i === index - 1;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onSelect(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={on || undefined}
+                className={`${SLIDE_BUTTON} ${
+                  on ? 'border-white bg-white text-bg' : 'border-white/50 text-white/70 hover:border-white'
+                }`}
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            onClick={() => onSelect(index % total)}
+            aria-label="Next slide"
+            className={ARROW_BUTTON}
+          >
             <Chevron dir="right" />
           </button>
         </div>
