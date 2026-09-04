@@ -40,7 +40,6 @@ export interface SiteConfig {
   showGrid: boolean;
   gridRadius: number;
   flipOnHover: boolean;
-  availableForWork: boolean;
   /** Which backdrop image to use — see `BACKDROPS`. */
   backdrop: BackdropName;
 }
@@ -49,7 +48,6 @@ const DEFAULT_CONFIG: SiteConfig = {
   showGrid: true,
   gridRadius: 140,
   flipOnHover: false,
-  availableForWork: true,
   backdrop: 'two',
 };
 
@@ -360,7 +358,7 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
     }, [closeConnect]),
   );
 
-  const statusLabel = config.availableForWork ? 'Available for work' : 'Currently abroad';
+  const statusLabel = 'Available for work';
 
   return (
     <div className="block min-h-screen">

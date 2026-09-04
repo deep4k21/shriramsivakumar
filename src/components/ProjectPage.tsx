@@ -463,6 +463,23 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           {/* Optional — omitted entirely (no row, no reserved spacing) for projects without metrics. */}
           {project.metrics && <ProjectMetricsRow label={project.metrics.label} metrics={project.metrics.stats} />}
 
+          {/*
+            Optional, on the same terms as the metrics row above. Styled like
+            a `textOnly` process row — same label treatment, same hairline
+            divider — stacked one pair per question rather than gridded two
+            wide, since an answer runs longer than a process row's aside.
+          */}
+          {project.faq && (
+            <div className="flex flex-col">
+              {project.faq.map((item) => (
+                <div key={item.q} className="flex flex-col gap-2 border-t border-white/7 py-5 first:border-t-0">
+                  <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{item.q}</div>
+                  <p className="m-0 max-w-180 font-body text-[15px]/[1.7] text-grey">{item.a}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Optional on the same terms as the metrics row above. */}
           {project.endNote && (
             <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">

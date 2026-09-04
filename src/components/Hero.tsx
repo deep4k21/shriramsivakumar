@@ -81,7 +81,7 @@ const HERO_DESIGN: HeroCardContent = {
 const HERO_TRAVEL: HeroCardContent = {
   accent: '#47C89A',
   quote: ['“Mid-flight,', ' mid-thought”'],
-  status: ['"Currently', ' abroad"'],
+  status: ['"Currently', ' in Chennai"'],
   // Companions to the given "Window seat" line are placeholders.
   traits: [
     { lines: ['"Window seat"', 'to worldview'], accentChars: 13 },
@@ -541,7 +541,7 @@ function HeroCardFace({
         against the face, so the group sits on the pill's centre by
         construction. Placed absolutely, each was pinned to its own hand-tuned
         percentage, and since the two sides' strings differ in length
-        ("Available for work" against "Currently abroad") the text and tick
+        ("Available for work" against "Currently in Chennai") the text and tick
         drifted independently of the pill and of each other.
       */}
       <motion.div

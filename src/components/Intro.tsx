@@ -254,6 +254,7 @@ export function Intro() {
                   <PhotoFrame
                     caption={slide.caption}
                     image={slide.image}
+                    video={slide.video}
                     index={i + 1}
                     total={INTRO_SLIDES.length}
                     onPrev={i === slideIdx ? prevSlide : undefined}

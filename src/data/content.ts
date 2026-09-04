@@ -169,6 +169,12 @@ export interface ProjectMetric {
   label: string;
 }
 
+/** One question-and-answer pair in a project's optional FAQ section. */
+export interface ProjectFaqItem {
+  q: string;
+  a: string;
+}
+
 export interface Project {
   /** Shown on the category tile and the tab strip — kept short/generic ("A podcast identity"). */
   name: string;
@@ -232,6 +238,15 @@ export interface Project {
    * renders nothing and reserves no space.
    */
   metrics?: { label: string; stats: ProjectMetric[] };
+  /**
+   * An optional FAQ section, sitting after the process rows (and after
+   * `metrics`, where a project has both) and before the end note. Rendered
+   * the same way a `textOnly` process row is — a label-style question over a
+   * body-copy answer, stacked and divided by the same hairline the process
+   * rows use — but as its own block, since it isn't one of `processRows`
+   * itself. Omitted entirely for a project without one.
+   */
+  faq?: ProjectFaqItem[];
 }
 
 export interface Category {
@@ -268,7 +283,12 @@ export interface Category {
   projects: Project[];
 }
 
-/** The process rows shared by every project that hasn't been given its own. */
+/*
+  The process rows shared by every project that hasn't been given its own.
+  Only referenced by the commented-out "Client onboarding flow" project below
+  — commented out alongside it rather than deleted, since re-enabling that
+  project needs this back too.
+
 const DEFAULT_PROCESS_ROWS: ProcessRow[] = [
   {
     label: 'DISCOVERY',
@@ -286,6 +306,7 @@ const DEFAULT_PROCESS_ROWS: ProcessRow[] = [
     slot: 'COMPONENTS',
   },
 ];
+*/
 
 /** Wraps a flat hex list into chips with the standard border. */
 function chipsFrom(colors: string[]): ColorChip[] {
@@ -648,15 +669,55 @@ export const CATEGORIES: Category[] = [
     ],
     projects: [
       {
-        name: 'A SaaS rebrand',
-        software: ['Illustrator', 'Figma', 'InDesign'],
-        problem: 'A parent brand and its products had drifted apart visually, so nothing read as one company.',
+        name: 'This website',
+        software: ['Claude Design', 'Claude Code', 'Figma'],
+        problem:
+          "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template — the wrong first impression from someone selling design judgement.",
         solution:
-          'A shape and colour vocabulary shared across the parent and its sub-brands, documented as usable rules.',
-        chips: chipsFrom(['#FF9A5C', '#101010', '#47C89A', '#FFFFFF']),
-        typeface: 'Sora',
-        processRows: DEFAULT_PROCESS_ROWS,
-        endNote: 'Guidelines written for the people applying them, not for the deck.',
+          'Rebuilt from a blank slate, with a real brand system underneath it and an architecture where nothing ever opens off-page.',
+        // Same chip-row + typeface-label format as Freshstart, per instruction.
+        chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#16181D', '#FFFFFF']),
+        typeface: 'Sora + Roboto',
+        processRows: [
+          {
+            label: 'CHALKBOARD',
+            text: 'The concept and the surface are the same idea. Everything here sits on a slate with the grid still faintly showing and the illustrations drawn rather than rendered. Nothing carried over from the old site.',
+            slot: 'THE SURFACE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/1.png', ratio: 2.2006 }],
+          },
+          {
+            label: 'SYSTEM',
+            text: "Colour and type are one rule here, not two — the colour decides the typeface. Teal is always Roboto, orange and green are always Sora, so a single headline carries two voices. Orange is design, green is travel, teal sits between them. You've been reading it since the first line of this page.",
+            slot: 'THE RULE IN USE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/2.png', ratio: 1.9141 }],
+          },
+          {
+            label: 'WORKFLOW',
+            text: 'I direct, Claude builds, my developer ships it in Claude Code. Three-way, one decision-maker.',
+            slot: 'THE STACK',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/3.png', ratio: 4.2611 }],
+          },
+        ],
+        faq: [
+          {
+            q: 'So did you design this, or did Claude?',
+            a: 'Every decision is mine — the type rule, the colour roles, the never-leave-the-page architecture, what each project says and why. Claude built what I specified and pushed back when the spec was wrong. My developer took it from there in Claude Code.',
+          },
+          {
+            q: 'Where did the AI actually fall short?',
+            a: "It understood structure quickly and got the scaffolding right. What it couldn't hold onto was judgement — the brand rules would drift unless I restated them, projects that didn't fit the template needed me to decide what bent and what held, and things like how a box behaves when you click it had to be specified rather than assumed. It builds well. It doesn't know what's correct.",
+          },
+          {
+            q: 'What was hardest to get right?',
+            a: 'Restraint. Generating ten versions of anything takes seconds now. Deciding which one is right and killing the other nine is still the entire job, and it got harder, not easier.',
+          },
+          {
+            q: 'Would you work this way on a client project?',
+            a: "I already do. The gain isn't speed of thinking — that takes as long as it ever did. It's that a client sees something interactive in a day instead of a flat comp in a week.",
+          },
+        ],
+        endNote:
+          'The riskiest page here is this one. Every other project asks you to trust the work. This one is the work.',
       },
       // 2nd project: previously "Sub-brand architecture" — swapped with it so
       // this sits 2nd and that sits 4th, per instruction.
@@ -1768,20 +1829,30 @@ export const INTRO_TILES: IntroTile[] = [
 export interface IntroSlide {
   caption: string;
   image: string;
+  /**
+   * A looping clip shown in place of `image` for this slide. `image` still
+   * doubles as the clip's poster — the frame it shows before playback starts
+   * and under `prefers-reduced-motion`, where the clip never plays at all.
+   */
+  video?: string;
 }
 
 /*
-  Real travel photographs. Picked for aspect ratio, not scene content: the
-  frame is `PhotoFrame`'s near-square 438.5/442.4 with `object-cover`, so a
-  photo near 1.33:1 crops a bit off the sides and stays legible, while a
-  panorama (up to 3:1 in this pool) would lose most of its width. Captions are
-  unchanged from the placeholder set and do not describe these specific shots.
+  The real photo-frame set, replacing the placeholder travel shots above.
+  `PhotoFrame` crops every slide the same way — near-square, `object-cover` —
+  so none of these needed cropping or aspect-ratio prep beyond the usual
+  resize-for-web pass.
 */
+// Captions are the files' own names (the leading sort index dropped), not
+// written separately — the frame's label reads exactly what the asset is called.
 export const INTRO_SLIDES: IntroSlide[] = [
-  { caption: 'At the desk', image: '/images/homegrid/Travel/travel01_lakeshore_snow.jpg' },
-  { caption: 'On the road', image: '/images/homegrid/Travel/travel03_landscape.jpg' },
-  { caption: 'Studio setup', image: '/images/homegrid/Travel/travel06_landscape.jpg' },
-  { caption: 'Speaking', image: '/images/homegrid/Travel/travel07_landscape.jpg' },
-  { caption: 'Sketchbook', image: '/images/homegrid/Travel/travel08_landscape.jpg' },
-  { caption: 'Window seat', image: '/images/homegrid/Travel/travel09_landscape.jpg' },
+  { caption: 'Anime me', image: '/images/Photo Frame/1 Anime me.png' },
+  { caption: 'CTRL ALT CAT', image: '/images/Photo Frame/2 CTRL ALT CAT.jpg' },
+  { caption: 'Golden Hour', image: '/images/Photo Frame/3 Golden Hour.jpg' },
+  { caption: 'Life of a designer', image: '/images/Photo Frame/4 Life of a designer.jpg' },
+  {
+    caption: 'Window seat',
+    image: '/images/Photo Frame/5 Window seat poster.jpg',
+    video: '/images/Photo Frame/5 Window seat.mp4',
+  },
 ];

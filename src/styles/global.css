@@ -62,6 +62,67 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ---------------------------------------------------------------------
+ * The hand-drawn cursors — `images/Mouse/Without fill`: the white chalk
+ * outline, its line weighted up with a stroke in its own colour. The drawn
+ * hairline is too fine to hold at cursor size, where it breaks up into
+ * something faint and grey rather than reading as chalk — and the smaller
+ * the cursor, the heavier that stroke has to be to keep the same weight.
+ *
+ * Served as PNG rather than the SVG itself: an SVG cursor needs intrinsic
+ * width/height to render in Chrome (these carry a viewBox alone), and Safari
+ * does not take SVG cursors at all. Rendered at 4x and declared at 1x, so
+ * the line stays crisp on a retina display.
+ *
+ * The trailing keyword in each rule is the mandatory fallback — a `cursor`
+ * declaration without one is invalid, and the whole rule is dropped.
+ * ------------------------------------------------------------------- */
+body,
+/*
+ * Applied to the subtree, not `body` alone. `cursor` does inherit, but any
+ * element setting its own — including Tailwind's `cursor-pointer` — would
+ * otherwise leave its children on the browser's default arrow.
+ */
+body * {
+  /* Hotspot 0 0: the arrow's tip is the artwork's top-left corner. */
+  cursor: url('/images/Mouse/cursors/mouse-pointer.png') 0 0, default;
+}
+
+/*
+ * Anything clickable takes the pointing hand — matching the `cursor-pointer`
+ * the components already carry, plus the native interactive elements that
+ * get it from the UA stylesheet.
+ */
+a,
+button,
+[role='button'],
+summary,
+label,
+.cursor-pointer,
+a *,
+button *,
+[role='button'] *,
+.cursor-pointer * {
+  /* The index fingertip, likewise at the artwork's top-left corner. */
+  cursor: url('/images/Mouse/cursors/mouse-hand.png') 0 0, pointer;
+}
+
+/*
+ * Text entry keeps the I-beam: the caret is what says the field takes
+ * typing, where an arrow or hand reads as "not editable".
+ */
+input,
+textarea,
+[contenteditable] {
+  cursor: text;
+}
+
+/* A disabled control isn't clickable, so it shouldn't claim to be. */
+button:disabled,
+button:disabled * {
+  cursor: not-allowed;
+}
+
 a {
   color: var(--color-teal);
   text-decoration: none;

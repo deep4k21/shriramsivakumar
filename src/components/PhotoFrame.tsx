@@ -86,6 +86,7 @@ export function PhotoFrame({
   index,
   total,
   image,
+  video,
   onPrev,
   onNext,
 }: {
@@ -94,6 +95,13 @@ export function PhotoFrame({
   total: number;
   /** The photograph. Falls back to the frame's own empty opening when absent. */
   image?: string;
+  /**
+   * A looping clip shown in the opening instead of `image`. `image` still
+   * renders underneath as the clip's poster, exactly as a plain photo slide
+   * would, so there is never a gap between the frame appearing and the video
+   * starting.
+   */
+  video?: string;
   /** Step to the previous slide. Arrows are hidden when omitted. */
   onPrev?: () => void;
   /** Step to the next slide. */
@@ -116,14 +124,34 @@ export function PhotoFrame({
         The photo sits under the drawing, so the frame's paper edge and the
         tape at the corners overlap it the way they would in life.
       */}
-      {image && (
-        <img
-          src={image}
-          alt=""
+      {video ? (
+        // Looped, muted and controls-free — a moving photo, not a video
+        // anyone is meant to scrub. `image` doubles as the poster, so the
+        // opening shows the same frame a plain photo slide would until
+        // playback starts.
+        <video
+          key={video}
+          src={video}
+          poster={image}
+          autoPlay
+          muted
+          loop
+          playsInline
+          controls={false}
           aria-hidden="true"
           className="absolute object-cover select-none"
           style={PHOTO}
         />
+      ) : (
+        image && (
+          <img
+            src={image}
+            alt=""
+            aria-hidden="true"
+            className="absolute object-cover select-none"
+            style={PHOTO}
+          />
+        )
       )}
 
       <img

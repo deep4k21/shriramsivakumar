@@ -64,7 +64,10 @@ const CELLS: Array<{ cell: [number, number]; file: string; bg?: string }> = [
   { cell: [0, 1], file: 'card04_pale_blue.gif', bg: '#E6DDF4' },
   { cell: [1, 1], file: 'card15_project_agresar.png' },
   { cell: [3, 1], file: 'card02_experience_nxt.png' },
-  { cell: [4, 1], file: 'card11_food_illustration.png' },
+  // Same reasoning as card04/card17 above — a wide illustration on a light
+  // textured ground, cropped hard on the sides by a square tile. Contained
+  // instead, with white filling the margin `object-contain` leaves.
+  { cell: [4, 1], file: 'card11_food_illustration.png', bg: '#FFFFFF' },
 
   // Third row, flanking the card.
   { cell: [0, 2], file: 'card19_mobily_dashboard.png' },
