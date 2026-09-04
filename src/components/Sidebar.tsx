@@ -147,9 +147,16 @@ export function Sidebar({
                 aren't visible at all) anywhere else in its window. Collapsing
                 the height rather than unmounting keeps the open and close
                 symmetrical.
+
+                An open category keeps the list up regardless of where scroll
+                sits. Opening one from here scrolls to a slightly different
+                offset than the settled stop the list is gated on, so gating
+                on scroll alone made the list vanish at the very moment the
+                reader used it — and took away the means to switch to another
+                category without closing this one first.
               */}
               <AnimatePresence initial={false}>
-                {isPortfolio && showPortfolioSubmenu && (
+                {isPortfolio && (showPortfolioSubmenu || activeCategory !== null) && (
                   <motion.div
                     /*
                       Indented so the nested list reads as belonging to

@@ -140,6 +140,10 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   // leaving it to scroll-scrubbing — see `usePagedSnap`'s `onAdvance` below
   // and `PortfolioTravelGhosts`'s `careerPlayCount` prop.
   const [careerGhostPlay, setCareerGhostPlay] = useState(0);
+  // Bumped on the same jump in reverse (Career → Portfolio), so Portfolio can
+  // hold its collapsed mark hidden until the returning ghost has landed on it
+  // rather than drawing it while the outline is still on its way.
+  const [careerReturnPlay, setCareerReturnPlay] = useState(0);
   // Mirrors `connectOpen` for the Escape handler, which must not re-create
   // itself on every open/close.
   const connectOpenRef = useRef(connectOpen);
@@ -247,6 +251,15 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const onPagedAdvance = useCallback((from: number, to: number) => {
     if (from === PORTFOLIO_STOP_INDEX && to === CAREER_STOP_INDEX) {
       setCareerGhostPlay((n) => n + 1);
+    }
+    /*
+      The same jump in reverse. There is no ghost animation to launch here —
+      scrolling back scrubs `TO_CAREER` backwards on its own — but Portfolio
+      still needs to know, so the mark it is about to restore stays hidden
+      until the returning outline has actually landed on it.
+    */
+    if (from === CAREER_STOP_INDEX && to === PORTFOLIO_STOP_INDEX) {
+      setCareerReturnPlay((n) => n + 1);
     }
   }, []);
   usePagedSnap(
@@ -395,6 +408,8 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
           overlayOpen={view !== null}
           openIdx={portfolioCategory}
           setOpenIdx={setPortfolioCategory}
+          careerPlayCount={careerGhostPlay}
+          careerReturnCount={careerReturnPlay}
         />
         <Career />
       </main>

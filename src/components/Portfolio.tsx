@@ -5,7 +5,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CATEGORIES } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -27,6 +27,28 @@ interface PortfolioProps {
    * level at a time, so the expanded category ignores it while that is up.
    */
   overlayOpen: boolean;
+  /**
+   * Bumped by `usePagedSnap` when the paginated jump to Career starts — the
+   * same signal that plays the travelling ghost in `PortfolioTravelGhosts`.
+   *
+   * The stage's own exit rides scroll progress, which during that jump only
+   * reaches its fade window in the last few hundred milliseconds. That left
+   * the collapsed mark sitting on screen underneath the ghost for almost the
+   * whole flight, so the outline appeared to leave a duplicate of itself
+   * behind. Fading on this instead puts the mark on the same clock as the
+   * ghost that is carrying it away.
+   */
+  careerPlayCount: number;
+  /**
+   * Bumped on the reverse jump, Career back to Portfolio.
+   *
+   * The mark's own observer restores it as soon as the stage re-enters the
+   * viewport, which happens well before the returning ghost arrives —
+   * measured, the card was fully opaque a good half-second before the
+   * outline landed, so the ghost flew toward a card that was already there.
+   * This holds it hidden until that return has finished.
+   */
+  careerReturnCount: number;
 }
 
 const EASE = cubicBezier(0.33, 1, 0.68, 1);
@@ -490,13 +512,82 @@ function CategoryCard({
   );
 }
 
-export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: PortfolioProps) {
+export function Portfolio({
+  onOpenProject,
+  overlayOpen,
+  openIdx,
+  setOpenIdx,
+  careerPlayCount,
+  careerReturnCount,
+}: PortfolioProps) {
   const { ref, progress } = useSectionScroll<HTMLElement>();
 
   // Clears the mosaic before the ghost leaves the collapsed mark for career at
   // progress 1.02 (TO_CAREER in PortfolioTravelGhosts). The mark itself is the
   // ghost's source, so it keeps its own choreography and is exempt.
-  const exit = useExitStyle(progress, { start: 0.94, end: 1 });
+  const scrollExit = useExitStyle(progress, { start: 0.94, end: 1 });
+
+  /*
+    Clears the stage on the paginated jump's clock rather than on scroll.
+
+    Every other way the panel leaves is driven by where the reader is: the
+    scroll exit above, and `useEnteredView`'s observer, which keeps the panel
+    at full opacity until the stage physically leaves the top of the
+    viewport. A paginated jump to Career defeats both — it animates the page
+    over a fixed 3s while the travelling ghost flies on a matching clock, and
+    measured, the stage only cleared that observer band ~2.5s in. The mark
+    therefore sat on screen underneath its own departing outline for most of
+    the flight, reading as a duplicate left behind.
+
+    This is the one exit that runs on the flight itself, so the mark hands
+    off to the ghost at the moment the ghost actually leaves.
+  */
+  const [inCareerFlight, setInCareerFlight] = useState(false);
+  const lastCareerPlayed = useRef(careerPlayCount);
+  useEffect(() => {
+    if (careerPlayCount === lastCareerPlayed.current) return;
+    lastCareerPlayed.current = careerPlayCount;
+    setInCareerFlight(true);
+    /*
+      Released once the jump has landed, rather than left latched: scrolling
+      back up from Career has to bring the stage back, and the observer that
+      normally owns that can only re-show what this is no longer hiding.
+      `usePagedSnap`'s jump is 3s and the ghost matches it, so this clears
+      just after both.
+    */
+    const timer = setTimeout(() => setInCareerFlight(false), 3200);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [careerPlayCount]);
+
+  /*
+    The same hold for the return trip.
+
+    Coming back, the ghost scrubs `TO_CAREER` in reverse and lands on the
+    mark — but `useEnteredView` restores the mark the moment the stage
+    re-enters the viewport, which is roughly half a second before the outline
+    gets there. The result is a card sitting fully drawn while its own ghost
+    is still flying toward it.
+
+    Held for slightly less than the 3s jump: the ghost lands a little before
+    the scroll settles, and the mark should be back the instant it does, not
+    after a further gap.
+  */
+  const [inCareerReturn, setInCareerReturn] = useState(false);
+  const lastCareerReturned = useRef(careerReturnCount);
+  useEffect(() => {
+    if (careerReturnCount === lastCareerReturned.current) return;
+    lastCareerReturned.current = careerReturnCount;
+    setInCareerReturn(true);
+    const timer = setTimeout(() => setInCareerReturn(false), 1800);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [careerReturnCount]);
+
+  /** Either leg of the Portfolio↔Career jump, where the ghost owns the mark. */
+  const ghostOwnsMark = inCareerFlight || inCareerReturn;
+
+  const exit = scrollExit;
 
   // Which tile is expanded over the stage. Owned by App rather than here: the
   // sidebar's category list opens these too, so both need the same state.
@@ -737,15 +828,32 @@ export function Portfolio({ onOpenProject, overlayOpen, openIdx, setOpenIdx }: P
               backgroundColor: panelFill,
             }}
             initial={{ opacity: 0, y: 40 }}
+            /*
+              `ghostOwnsMark` hides the mark for the same reason `openIdx`
+              does — something else is now representing it on screen. There
+              it is the expanding category panel; here it is the ghost
+              outline travelling between this box and Career, in either
+              direction: leaving from it on the way out, landing back on it
+              on the way in.
+            */
             animate={
-              entered && openIdx === null ? { opacity: 1, y: 0 } : { opacity: 0, y: openIdx === null ? 40 : 0 }
+              entered && openIdx === null && !ghostOwnsMark
+                ? { opacity: 1, y: 0 }
+                : { opacity: 0, y: openIdx === null && !ghostOwnsMark ? 40 : 0 }
             }
             // A category expanding over the stage shares this panel's space,
             // and its own background is translucent (part of the card glass
             // style), so the mark stays faintly visible underneath through the
             // whole morph unless it is hidden here — the fade is quick since
             // it just needs to clear before the expanding panel arrives.
-            transition={{ duration: openIdx === null ? 0.7 : 0.15, ease: EASE }}
+            //
+            // The flight's fade is quicker still: the ghost is already moving
+            // off the mark, so anything slower reads as the outline dragging a
+            // copy of the card along behind it.
+            transition={{
+              duration: ghostOwnsMark ? 0.3 : openIdx === null ? 0.7 : 0.15,
+              ease: EASE,
+            }}
           >
             {/*
               The hover light lives on this card rather than the mosaic tiles:
