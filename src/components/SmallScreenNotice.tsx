@@ -29,30 +29,71 @@ const RESUME_HREF = CONNECT_LINKS.find((l) => l.label === 'Resume')?.href ?? '#'
 export function SmallScreenNotice() {
   return (
     /*
-      One centred column with a single spacing rhythm, rather than a stack of
-      equal gaps: the name and role belong together, the notice and its
-      explanation belong together, and the actions are their own group. The
-      gaps below are set per-group so those relationships read, instead of
-      four blocks floating at equal distance from each other.
-    */
-    <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-14 text-center">
-      {/*
-        The status of this screen, stated first and on its own.
+      The status pill rides at the top of the screen; the rest is one centred
+      column beneath it.
 
-        A pill rather than a sentence inside the paragraph below: it is the
-        one line here that is about the site's own progress rather than about
-        the work, and burying it mid-paragraph left the reader to find it. In
-        the site's green, which is the register it already uses for a state
-        rather than a statement.
+      Separating them is the point: the pill is a standing note about this
+      screen, not a line in the message, so it sits apart from the stack
+      rather than becoming its first item. Within the stack the spacing is
+      per-group — name and role together, the notice and its explanation
+      together, the actions together — so the relationships read instead of
+      four blocks floating at equal distance.
+    */
+    <main className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-14 text-center">
+      {/*
+        Pinned to the top of the viewport rather than sitting in the flow, so
+        it stays a banner about the screen instead of reading as the headline
+        of the content below it.
+
+        Glass rather than a solid green fill, matching the cards across the
+        rest of the site: a green-tinted gradient over the chalkboard with a
+        lit rim, so the pill sits on the surface instead of punching a flat
+        block through it.
+
+        The tint also settles the contrast question a solid fill created —
+        orange on this ground measures 5.8:1 at the gradient's lightest
+        point, where white on a flat accent fill was 2.10:1 and would have
+        been hard work at this size.
       */}
       <motion.div
-        className="mb-7 inline-flex items-center gap-2 rounded-full border border-green/30 bg-green/10 px-3.5 py-1.5"
+        className="absolute inset-x-0 top-[clamp(16px,4vh,32px)] mx-auto inline-flex w-fit items-center gap-2.5 rounded-full border border-orange/25 bg-[linear-gradient(158deg,rgba(255,154,92,.20),rgba(18,19,24,.42)_55%,rgba(255,154,92,.14))] px-4 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.05)]"
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: EASE_OUT }}
       >
-        <span className="size-1.5 flex-none rounded-full bg-green" aria-hidden="true" />
-        <span className="font-body text-[clamp(11px,3.2vw,12.5px)] font-semibold tracking-[0.04em] text-green">
+        {/*
+          A spinner rather than a static dot: this says work is underway, not
+          that something is simply "on". Drawn as an SVG ring with a gap and
+          spun by motion, so it honours `reducedMotion` from `MotionConfig`
+          like everything else here — a CSS `animate-spin` would keep turning
+          for a reader who has asked the OS for stillness.
+        */}
+        <motion.svg
+          viewBox="0 0 24 24"
+          className="size-[clamp(12px,3.4vw,14px)] flex-none text-orange"
+          fill="none"
+          aria-hidden="true"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+        >
+          {/* The full ring, dimmed — the track the bright arc travels around. */}
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" opacity={0.3} />
+          {/*
+            A quarter of the circumference (2πr ≈ 56.5, so ~14) drawn bright,
+            the rest left as a gap. That single visible arc is what makes the
+            rotation legible.
+          */}
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="14 43"
+          />
+        </motion.svg>
+        <span className="font-body text-[clamp(11px,3.2vw,12.5px)] font-semibold tracking-[0.04em] text-orange">
           The mobile version is still being drawn
         </span>
       </motion.div>
@@ -99,7 +140,7 @@ export function SmallScreenNotice() {
         transition={{ duration: 0.5, delay: 0.12, ease: EASE_OUT }}
       >
         <div className="font-heading text-[clamp(19px,5.4vw,23px)]/[1.3] font-semibold tracking-[-0.01em] text-white">
-          Best viewed on <span className="text-orange">desktop</span>
+          Best viewed on <span className="text-green">desktop</span>
         </div>
         {/*
           `max-w` in characters rather than pixels, so the measure stays
