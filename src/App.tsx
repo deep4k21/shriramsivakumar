@@ -12,6 +12,8 @@ import { Portfolio } from './components/Portfolio';
 import { Career } from './components/Career';
 import { ProjectPage } from './components/ProjectPage';
 import { ConnectModal } from './components/ConnectModal';
+import { SmallScreenNotice } from './components/SmallScreenNotice';
+import { useIsSmallScreen } from './hooks/useIsSmallScreen';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useNavVisible } from './hooks/useNavVisible';
 import { usePointerGlow } from './hooks/usePointerGlow';
@@ -113,7 +115,7 @@ const SECTION_SETTLED: Record<string, number> = {
  */
 const PORTFOLIO_CARD_READABLE = 0.19;
 
-function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
+function DesktopApp({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const { active } = useActiveSection();
   const navOn = useNavVisible();
   usePointerGlow(config.gridRadius);
@@ -434,6 +436,25 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
       </AnimatePresence>
     </div>
   );
+}
+
+/**
+ * Picks between the desktop site and the small-screen notice.
+ *
+ * A wrapper rather than an early return inside `DesktopApp`: that component
+ * opens with a long run of hooks — scroll progress, paged snap, observers —
+ * and hooks cannot be skipped conditionally. Branching a level up also means
+ * none of that machinery mounts at all on a phone, so no scroll listeners or
+ * `IntersectionObserver`s are set up for a layout that isn't being shown.
+ */
+function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
+  const isSmall = useIsSmallScreen();
+
+  // `null` until the media query has been read — see `useIsSmallScreen`.
+  // Rendering nothing for that first frame avoids showing the desktop site
+  // and then swapping it out on exactly the devices that can't use it.
+  if (isSmall === null) return null;
+  return isSmall ? <SmallScreenNotice /> : <DesktopApp config={config} />;
 }
 
 export default App;
