@@ -1725,11 +1725,23 @@ export interface ConnectLink {
   href: string;
 }
 
+/**
+ * The resume PDF, served from `public/`.
+ *
+ * Percent-encoded: the filename carries spaces, and an unencoded space in an
+ * `href` is not a valid URL — browsers mostly cope, but a bare space breaks
+ * the `download` attribute's filename in some of them.
+ */
+export const RESUME_HREF = '/Shriram%20Sivakumar%20Resume.pdf';
+
+/** What the saved file is called, rather than the URL's own basename. */
+export const RESUME_FILENAME = 'Shriram Sivakumar Resume.pdf';
+
 export const CONNECT_LINKS: ConnectLink[] = [
   { label: 'Email', value: 'shriramsiva18726@gmail.com', href: 'mailto:shriramsiva18726@gmail.com' },
   { label: 'LinkedIn', value: '/in/shriramsiva', href: 'https://www.linkedin.com/in/shriramsiva/' },
   { label: 'Dribbble', value: '/shriramsiva', href: 'https://dribbble.com/shriramsiva' },
-  { label: 'Resume', value: 'PDF', href: '#' },
+  { label: 'Resume', value: 'PDF', href: RESUME_HREF },
 ];
 
 export interface ToolIcon {
@@ -1754,7 +1766,7 @@ export const AI_TOOLS: ToolIcon[] = [
   { name: 'ChatGPT', icon: '/images/aiworkflow/image 20.png' },
   { name: 'Claude', icon: '/images/aiworkflow/image 21.png' },
   { name: 'Midjourney', icon: '/images/aiworkflow/image 24.png' },
-  { name: 'Figma AI', icon: '/images/aiworkflow/image 25.png' },
+  { name: 'Lovable', icon: '/images/aiworkflow/image 25.png' },
   { name: 'Stitch', icon: '/images/aiworkflow/image 26.png' },
   // TODO: no icon supplied yet — placeholder path, will 404 until one lands.
   { name: 'Figma Make', icon: '/images/aiworkflow/figmamake.svg' },
@@ -1800,36 +1812,68 @@ export const INTRO_QUOTE_WORDS: QuoteWord[] = [
   { text: 'design', colorClass: 'text-orange', doodle: '/images/doodles/design.svg', doodleEm: 2.1 },
 ];
 
+/**
+ * A run of tile copy. `accent` runs are set bold in teal, the rest grey.
+ *
+ * The copy is held as a list of runs rather than a string plus one bold
+ * phrase because the highlights don't fall in one contiguous place — a tile
+ * picks out several phrases scattered through the sentence, and the
+ * punctuation between them is sometimes highlighted with the phrase it
+ * follows and sometimes not.
+ */
+export interface IntroTileRun {
+  text: string;
+  accent?: boolean;
+}
+
 export interface IntroTile {
   label: string;
   /** Path to the tile's icon, drawn as an image. */
   icon: string;
-  body: string;
-  bold: string;
-  boldPosition: 'start' | 'end';
+  /** Rendered in order, concatenated with no separator — spacing is in the text. */
+  segments: IntroTileRun[];
 }
 
 export const INTRO_TILES: IntroTile[] = [
   {
     label: 'After Hours',
     icon: '/images/about/afterhours.svg',
-    body: 'Window seats, street signage, and the way a city writes itself down. So far across',
-    bold: '14 countries',
-    boldPosition: 'end',
+    // The commas after the first two phrases are inside the accent runs, as
+    // in the reference — the highlight carries its own punctuation there.
+    segments: [
+      { text: 'Window seats,', accent: true },
+      { text: ' ' },
+      { text: 'street signage,', accent: true },
+      { text: ' and the ' },
+      { text: 'stories', accent: true },
+      { text: ' tucked into ordinary streets. ' },
+      { text: '14 countries', accent: true },
+      { text: ' travelled so far, plus a standing gaming habit.' },
+    ],
   },
   {
     label: 'Currently Exploring',
     icon: '/images/about/currentlyexploring.svg',
-    bold: 'Motion systems',
-    boldPosition: 'start',
-    body: 'and speculative rebrands — how a mark behaves once it stops sitting still.',
+    segments: [
+      { text: 'AI tooling,', accent: true },
+      { text: ' ' },
+      { text: 'motion systems,', accent: true },
+      { text: ' and ' },
+      { text: 'speculative rebrands', accent: true },
+      { text: ' — mostly how each one changes the way a system gets built.' },
+    ],
   },
   {
     label: 'Open To',
     icon: '/images/about/opento.svg',
-    bold: 'Lead Visual design',
-    boldPosition: 'start',
-    body: 'roles where the system matters as much as the screen it ends up on.',
+    segments: [
+      { text: 'Lead', accent: true },
+      { text: ' and ' },
+      { text: 'Senior Visual design', accent: true },
+      { text: ' roles, and ' },
+      { text: 'UI/UX design', accent: true },
+      { text: ' roles.' },
+    ],
   },
 ];
 

@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
-import { CONNECT_LINKS } from '../data/content';
+import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 
@@ -145,9 +145,17 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
               // navigating the reader away from the site entirely — unlike
               // the rest of the site's in-page convention, which is about
               // content the site itself hosts, not third-party profiles. A
-              // placeholder (`#`) or `mailto:` link has nowhere else to go,
-              // so it's left as a plain same-tab link.
-              {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              // `mailto:` link has nowhere else to go, so it's left as a
+              // plain same-tab link.
+              //
+              // The resume saves rather than navigates: without `download` a
+              // same-tab PDF replaces the site in the tab, which loses the
+              // modal and the reader's place behind it.
+              {...(l.href.startsWith('http')
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : l.href === RESUME_HREF
+                  ? { download: RESUME_FILENAME }
+                  : {})}
               className="rounded-[9px] bg-surface px-3.5 py-2.25 font-body text-[13px] text-grey transition-colors duration-180 hover:text-teal"
             >
               {l.label} <span className="text-[#4a4a4a]">{l.value}</span>

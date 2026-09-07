@@ -1,13 +1,13 @@
 import { motion, useTransform } from 'motion/react';
 import { useState } from 'react';
-import { INTRO_SLIDES, INTRO_WORDS } from '../data/content';
+import { INTRO_SLIDES, INTRO_WORDS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { usePortfolioFit } from '../hooks/usePortfolioFit';
 import { useRevealStyle } from '../hooks/useRevealStyle';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { DownloadCircleIcon } from './Icons';
 import { PhotoFrame } from './PhotoFrame';
-import { ResumeFlight } from './ResumeFlight';
+import { FLIGHT_ARRIVAL_MS, FLIGHT_TOTAL_MS, ResumeFlight } from './ResumeFlight';
 
 /*
  * The reveal is compressed into the first half of the window so the section has
@@ -29,11 +29,14 @@ function RevealWord({
   progress,
   slot,
   className,
+  style: extraStyle,
   children,
 }: {
   progress: ReturnType<typeof useSectionScroll>['progress'];
   slot: number;
   className?: string;
+  /** Merged under the reveal's own animated values, for static properties. */
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
   const style = useRevealStyle(progress, {
@@ -45,7 +48,7 @@ function RevealWord({
   });
 
   return (
-    <motion.span className={className} style={style}>
+    <motion.span className={className} style={{ ...extraStyle, ...style }}>
       {children}
     </motion.span>
   );
@@ -118,7 +121,7 @@ export function Intro() {
               </RevealWord>
 
               <h1
-                className="relative m-0 flex max-w-[17ch] flex-wrap text-[clamp(32px,4.4vw,70px)] leading-[1.14] tracking-[-0.03em]"
+                className="relative m-0 flex flex-col items-start text-[clamp(30px,3.6vw,58px)] leading-[1.14] tracking-[-0.03em]"
                 style={{ columnGap: '0.26em', rowGap: '0.02em' }}
               >
                 {/*
@@ -136,20 +139,82 @@ export function Intro() {
                   className="pointer-events-none absolute top-[-1.4em] left-[2em] w-[4.8em] max-w-full"
                   style={doodleReveal}
                 />
-                {INTRO_WORDS.map((word, i) => (
-                  <RevealWord
-                    key={word.text}
-                    progress={progress}
-                    slot={i + 1}
-                    className={
-                      word.variant === 'teal'
-                        ? 'font-body font-normal text-teal'
-                        : 'font-heading font-bold text-white'
-                    }
-                  >
-                    {word.text}
-                  </RevealWord>
-                ))}
+                {/*
+                  Only the teal half runs as flowing words — the name has
+                  moved into the ruler below, so it is filtered out here
+                  rather than removed from `INTRO_WORDS`, which still drives
+                  the shared reveal timing for every slot.
+                */}
+                <span className="flex flex-nowrap whitespace-nowrap" style={{ columnGap: '0.26em' }}>
+                {INTRO_WORDS.map((word, i) =>
+                  word.variant === 'teal' ? (
+                    <RevealWord
+                      key={word.text}
+                      progress={progress}
+                      slot={i + 1}
+                      // "Layovers to Layouts," is Sora Regular — the contrast
+                      // against the drawn name below is face, not weight.
+                      className="font-heading font-normal text-teal"
+                    >
+                      {word.text}
+                    </RevealWord>
+                  ) : null,
+                )}
+                </span>
+
+              {/*
+                The name, written inside a drawn ruler.
+
+                The ruler is a background image rather than an inline `<svg>`
+                or an `<img>` with the text layered over it: the file is ~3MB
+                of hand-drawn path data, so inlining it would put all of that
+                in the document, and a positioned overlay would need the text
+                re-measured against the artwork at every breakpoint.
+
+                The box is sized by the name rather than the other way round,
+                so the ruler wraps the text instead of the text floating in a
+                fixed frame.
+
+                The artwork keeps its own 705:196 proportions — it is a drawn
+                object, and stretching it to whatever box the text makes both
+                distorts the ticks and slides the punch hole inward, which is
+                what put the last letter through the hole in an earlier pass.
+                So the name sets the width, the height follows the ratio, and
+                the text is positioned against fractions measured off the
+                artwork itself: the body runs from 52 to 188 of its 196 units,
+                and the punch hole sits at x 619-658 of 705.
+              */}
+              <RevealWord
+                progress={progress}
+                slot={INTRO_WORDS.length}
+                className="relative mt-[0.56em] inline-block text-[clamp(34px,5.208vw,100px)]"
+              >
+                {/*
+                  The name sets the size: at 121% of the text's width, the
+                  span between the ruler's left border and its punch hole is
+                  wide enough to hold the name with the hole still clear.
+                  `aspect-ratio` then fixes the height from the artwork's own
+                  705:196, so it scales without distortion.
+
+                  Anchored at `left-0` so the ruler's left edge lines up with
+                  the teal line above it; the name is nudged right instead, to
+                  clear the drawn border rather than sitting on it.
+                */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-0 -z-1 aspect-705/196 w-[121%] -translate-y-1/2 bg-contain bg-center bg-no-repeat"
+                  style={{ backgroundImage: "url('/images/Intro/NameScale.svg')" }}
+                />
+                {/*
+                  Nudged down against the frame's centre line: the artwork's
+                  open body is not vertically centred in its own box — the
+                  tick band pushes it down — so its middle sits at about 61%
+                  of the height rather than 50%.
+                */}
+                <span className="font-drawn relative block translate-x-[0.16em] translate-y-[0.06em] leading-none font-normal whitespace-nowrap text-white">
+                  I&rsquo;m Shriram
+                </span>
+              </RevealWord>
               </h1>
             </div>
 
@@ -158,7 +223,13 @@ export function Intro() {
               the paragraph keeps a readable measure rather than stretching to
               the column's full 1120px.
             */}
-            <motion.div className="flex max-w-[52ch] flex-col gap-2.5" style={bodyReveal}>
+            {/*
+              A little extra air above the body copy, on top of the column's
+              shared gap: the ruler's drawn border ends much closer to its
+              text than a type block's own line box would, so the default gap
+              reads tighter here than it does between the other groups.
+            */}
+            <motion.div className="mt-[clamp(6px,1.1vh,14px)] flex max-w-[52ch] flex-col gap-2.5" style={bodyReveal}>
               <p className="m-0 font-body text-[clamp(13.5px,1.2vw,18.5px)]/[1.7] font-bold">
                 <span className="text-orange">Designer by profession,</span>{' '}
                 <span className="text-green">traveler by instinct.</span>
@@ -173,13 +244,21 @@ export function Intro() {
 
             <motion.div style={bodyReveal}>
               <motion.a
-                href="#"
+                href={RESUME_HREF}
+                download={RESUME_FILENAME}
                 onClick={(e) => {
-                  // `href="#"` would otherwise jump the page to the top the
-                  // instant this fires, which shifts everything mid-measure
-                  // and sends the plane from the wrong spot. There's no real
-                  // resume file wired up yet, so this is a no-op destination
-                  // for now regardless.
+                  /*
+                    The browser's own navigation is cancelled and the download
+                    re-issued below when the plane lands, so the file arrives
+                    as the animation delivers it rather than a beat before it
+                    has left. Letting the default through instead would open
+                    the downloads shelf immediately and the flight would then
+                    be narrating something already finished.
+
+                    Cancelling also protects the measurement: the anchor still
+                    carries a real `href`, and following it mid-click shifts
+                    the layout the plane's launch point is read from.
+                  */
                   e.preventDefault();
 
                   // The plane launches from wherever the button actually is,
@@ -198,9 +277,30 @@ export function Intro() {
                     */
                     to: { x: window.innerWidth - 120, y: 0 },
                   });
+                  /*
+                    The save fires as the trail reaches the top edge — the
+                    plane is carrying the file, so it lands when the plane
+                    does. Driven from a hidden anchor rather than by letting
+                    the click through, since the click is long over by then.
+
+                    Immediate for a reader who has asked the OS for less
+                    motion: `MotionConfig reducedMotion="user"` suppresses the
+                    flight's animation, so the delay would be a wait with
+                    nothing on screen to account for it.
+                  */
+                  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                  window.setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = RESUME_HREF;
+                    a.download = RESUME_FILENAME;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  }, still ? 0 : FLIGHT_ARRIVAL_MS);
+
                   // Clears the path once the flight has finished, so the same
                   // click can trigger it again rather than leaving it "used up".
-                  window.setTimeout(() => setFlightPath(null), 2700);
+                  window.setTimeout(() => setFlightPath(null), FLIGHT_TOTAL_MS);
                 }}
                 className="inline-flex items-center gap-3.5 rounded-xl border border-teal bg-[#005961]/10 py-3 pr-4 pl-5 font-heading text-[clamp(14px,1.15vw,19px)] font-bold text-teal"
                 whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}

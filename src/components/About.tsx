@@ -152,15 +152,20 @@ function IntroTile({
         <img src={tile.icon} alt="" aria-hidden="true" className="size-4.5" />
         {tile.label}
       </div>
+      {/*
+        Runs are concatenated with no separator of their own — the spaces
+        live in the copy, so a highlight can sit tight against the comma
+        that follows it.
+      */}
       <div className="font-body text-sm/[1.55] text-grey">
-        {tile.boldPosition === 'start' ? (
-          <>
-            <span className="font-bold text-teal">{tile.bold}</span> {tile.body}
-          </>
-        ) : (
-          <>
-            {tile.body} <span className="font-bold text-teal">{tile.bold}</span>
-          </>
+        {tile.segments.map((run, j) =>
+          run.accent ? (
+            <span key={j} className="font-bold text-teal">
+              {run.text}
+            </span>
+          ) : (
+            <span key={j}>{run.text}</span>
+          ),
         )}
       </div>
     </motion.div>

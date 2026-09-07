@@ -58,6 +58,19 @@ const ERASE_S = 0.95;
 const HOLD_S = DRAW_S + SETTLE_S + ERASE_S;
 
 /**
+ * When the trail reaches the top of the screen, in milliseconds.
+ *
+ * Exported so a caller can start the download on arrival rather than on
+ * click: the plane is carrying the file, so the save should land when it
+ * gets there. Derived from `DRAW_S` rather than written out again at the
+ * call site, so retiming the draw moves the download with it.
+ */
+export const FLIGHT_ARRIVAL_MS = DRAW_S * 1000;
+
+/** How long the whole flight lasts, for callers clearing the path after it. */
+export const FLIGHT_TOTAL_MS = HOLD_S * 1000;
+
+/**
  * A dashed trail that travels from the resume button toward the browser's
  * downloads area on click.
  *

@@ -16,8 +16,20 @@
   --color-surface-alt: #0a0a0a;
   --color-grey: #a5aebb;
 
+  /*
+   * One family throughout. The two roles are kept as separate variables
+   * rather than collapsed into one: they still mean different things at the
+   * call site — headings, and running text — so a second face can be
+   * reintroduced later by changing this line alone.
+   */
   --font-heading: 'Sora', sans-serif;
-  --font-body: 'Roboto', system-ui, sans-serif;
+  --font-body: 'Sora', system-ui, sans-serif;
+  /*
+   * The drawn face, used only for the name inside the ruler. Kept to that
+   * one place on purpose: it is a display face with a single weight and no
+   * real small sizes, so it reads as a mark rather than as type.
+   */
+  --font-drawn: 'Fredericka the Great', cursive;
 
   --spacing-gutter: clamp(28px, 5vw, 72px);
   --spacing-gutter-nav: clamp(104px, 7vw, 132px);
@@ -63,16 +75,21 @@ body {
 }
 
 /* ---------------------------------------------------------------------
- * The hand-drawn cursors — `images/Mouse/Without fill`: the white chalk
- * outline, its line weighted up with a stroke in its own colour. The drawn
- * hairline is too fine to hold at cursor size, where it breaks up into
- * something faint and grey rather than reading as chalk — and the smaller
- * the cursor, the heavier that stroke has to be to keep the same weight.
+ * The hand-drawn cursors — `images/Mouse/With fill`: a dark chalk body with
+ * a white rim around it. The fill is what makes these hold at cursor size;
+ * the outline-only set they replaced thinned out to something faint and grey
+ * against a light background, where a filled shape keeps its weight on any
+ * ground the pointer crosses.
  *
  * Served as PNG rather than the SVG itself: an SVG cursor needs intrinsic
  * width/height to render in Chrome (these carry a viewBox alone), and Safari
- * does not take SVG cursors at all. Rendered at 4x and declared at 1x, so
- * the line stays crisp on a retina display.
+ * does not take SVG cursors at all. Rendered at 4x and downsampled, so the
+ * edges stay clean on a retina display.
+ *
+ * Note for whoever regenerates these: the source SVGs declare every fill in
+ * a <style> block and reference it by class. Most rasterisers handle that;
+ * PyMuPDF does not, and silently renders the whole shape black. Resolve the
+ * classes to inline fill attributes first.
  *
  * The trailing keyword in each rule is the mandatory fallback — a `cursor`
  * declaration without one is invalid, and the whole rule is dropped.
@@ -103,18 +120,31 @@ a *,
 button *,
 [role='button'] *,
 .cursor-pointer * {
-  /* The index fingertip, likewise at the artwork's top-left corner. */
-  cursor: url('/images/Mouse/cursors/mouse-hand.png') 0 0, pointer;
+  /*
+   * Hotspot on the index fingertip, which sits a couple of pixels in from
+   * the left edge rather than on the corner -- the hand is drawn upright,
+   * so `0 0` would put the click point in empty space beside the finger.
+   */
+  cursor: url('/images/Mouse/cursors/mouse-hand.png') 2 0, pointer;
 }
 
 /*
  * Text entry keeps the I-beam: the caret is what says the field takes
- * typing, where an arrow or hand reads as "not editable".
+ * typing, where an arrow or hand reads as "not editable". Drawn in the same
+ * chalk hand as the other two, from `Mouse Text.svg`.
+ *
+ * White alone rather than the filled body the arrow and hand carry — the
+ * only text entry on the site is the Connect modal's fields, which are
+ * `bg-surface` black, so the chalk line reads as drawn against them.
+ *
+ * Hotspot at the stem (8) and half its height (17), not `0 0` like the
+ * others: an I-beam points with its middle, and the caret has to land on
+ * the character the beam straddles rather than a corner of its box.
  */
 input,
 textarea,
 [contenteditable] {
-  cursor: text;
+  cursor: url('/images/Mouse/cursors/mouse-text.png') 8 17, text;
 }
 
 /* A disabled control isn't clickable, so it shouldn't claim to be. */

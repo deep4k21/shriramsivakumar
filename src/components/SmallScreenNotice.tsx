@@ -1,16 +1,8 @@
 import { motion } from 'motion/react';
-import { CONNECT_LINKS } from '../data/content';
+import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { DownloadCircleIcon } from './Icons';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
-
-/**
- * Read off `CONNECT_LINKS` rather than written here, so wiring up the real
- * file is a one-line change in `content.ts` that this picks up with the
- * Connect modal. Still the `'#'` placeholder today — no resume PDF exists in
- * the project yet, on this screen or the desktop one.
- */
-const RESUME_HREF = CONNECT_LINKS.find((l) => l.label === 'Resume')?.href ?? '#';
 
 /**
  * What a phone or narrow window gets instead of the desktop site.
@@ -164,12 +156,7 @@ export function SmallScreenNotice() {
       */}
       <motion.a
         href={RESUME_HREF}
-        {...(RESUME_HREF === '#'
-          ? // No file wired up yet, on this screen or the desktop one. Left
-            // inert rather than navigating to the top of the page, which is
-            // what a bare `#` would otherwise do.
-            { onClick: (e: React.MouseEvent) => e.preventDefault(), 'aria-disabled': true }
-          : { download: true })}
+        download={RESUME_FILENAME}
         className="mt-9 inline-flex items-center gap-3 rounded-xl border border-teal bg-[#005961]/10 py-3.5 pr-4.5 pl-5.5 font-heading text-[15px] font-bold text-teal"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
