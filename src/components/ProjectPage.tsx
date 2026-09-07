@@ -490,7 +490,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 block read as five more statements about the project instead
                 of as a set of questions.
               */}
-              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">FAQ</div>
+              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-teal">FAQ</div>
               <div data-faq-list className="flex flex-col">
               {project.faq.map((item, i) => {
                 const open = openFaqIdx === i;
