@@ -364,7 +364,7 @@ function CategoryCard({
         rather than the old grey type over a new background.
       */}
       <motion.div
-        className="relative font-heading text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em]"
+        className="relative font-accent text-[clamp(20px,2vw,34px)]/[1.15] font-semibold tracking-[-0.02em]"
         animate={{ color: '#FF9A5C' }}
         transition={{ duration: 0.18 }}
       >

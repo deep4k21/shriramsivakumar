@@ -187,31 +187,43 @@ export function Intro() {
               <RevealWord
                 progress={progress}
                 slot={INTRO_WORDS.length}
-                className="relative mt-[0.56em] inline-block text-[clamp(34px,5.208vw,100px)]"
+                className="relative mt-[0.62em] inline-block text-[clamp(31px,4.687vw,90px)]"
               >
                 {/*
-                  The name sets the size: at 121% of the text's width, the
-                  span between the ruler's left border and its punch hole is
-                  wide enough to hold the name with the hole still clear.
-                  `aspect-ratio` then fixes the height from the artwork's own
-                  705:196, so it scales without distortion.
+                  The ruler, and the name written inside it.
 
-                  Anchored at `left-0` so the ruler's left edge lines up with
-                  the teal line above it; the name is nudged right instead, to
-                  clear the drawn border rather than sitting on it.
+                  The invisible copy below is what gives this block its size:
+                  the artwork is 121% of that text's width, which is the span
+                  between the ruler's left border and its punch hole, and
+                  `aspect-ratio` fixes the height from the artwork's own
+                  705:196 so it scales without distortion. Anchored at
+                  `left-0`, so the ruler's left edge lines up with the teal
+                  line above it.
+
+                  The visible name is nested *inside* this layer rather than
+                  beside it, so its percentages resolve against the artwork's
+                  own box. That is what lets it be placed on the ruler's
+                  usable body: the tick band takes the top 52 of the 196
+                  units, putting the open area's middle at 61.2% of the
+                  height, and the punch hole cuts the usable width off at 619
+                  of 705, putting that middle at 43.9%. Measured against the
+                  wrapper instead, both numbers land short.
                 */}
                 <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute top-1/2 left-0 -z-1 aspect-705/196 w-[121%] -translate-y-1/2 bg-contain bg-center bg-no-repeat"
+                  className="pointer-events-none absolute top-1/2 left-0 aspect-705/196 w-[121%] -translate-y-1/2 bg-contain bg-center bg-no-repeat"
                   style={{ backgroundImage: "url('/images/Intro/NameScale.svg')" }}
-                />
+                >
+                  <span className="font-accent absolute top-[61.2%] left-[43.9%] block w-max -translate-x-1/2 -translate-y-1/2 leading-none font-bold whitespace-nowrap text-white">
+                    I&rsquo;m Shriram
+                  </span>
+                </span>
                 {/*
-                  Nudged down against the frame's centre line: the artwork's
-                  open body is not vertically centred in its own box — the
-                  tick band pushes it down — so its middle sits at about 61%
-                  of the height rather than 50%.
+                  The sizer. The name above is positioned, so it gives the
+                  block no height of its own — this restores it: same string,
+                  same face, invisible, so the heading reserves the right
+                  space and the copy below does not ride up.
                 */}
-                <span className="font-accent relative block translate-x-[0.16em] translate-y-[0.06em] leading-none font-bold whitespace-nowrap text-white">
+                <span aria-hidden="true" className="font-accent invisible block leading-none font-bold whitespace-nowrap">
                   I&rsquo;m Shriram
                 </span>
               </RevealWord>
