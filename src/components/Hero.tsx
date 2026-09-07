@@ -1,4 +1,4 @@
-import { animate, motion, useMotionValue, useTransform } from 'motion/react';
+import { AnimatePresence, animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useExitStyle } from '../hooks/useExitStyle';
 import { useHeroProgress } from '../hooks/useHeroProgress';
@@ -648,9 +648,17 @@ function HeroCardFace({
         The role text sits inside the pill rather than in its own positioned
         span, so it centres for any string — "Avid Traveller" is much shorter
         than the design's role and sat off to one side otherwise.
+
+        The design side takes a wider pill: "Visual & UI/UX Designer" is nearly
+        twice the travel side's "Avid Traveller", and at the shared width it
+        ran to the rounded ends with no breathing room. Both stay centred on
+        the same axis — the extra width is split either side, so the two faces
+        still line up as the card turns.
       */}
       <motion.div
-        className="absolute top-[83.74%] left-[35.62%] flex h-[7.63%] w-[36.72%] items-center justify-center rounded-[1.30cqw] bg-[#131218]"
+        className={`absolute top-[83.74%] flex h-[7.63%] items-center justify-center rounded-[1.30cqw] bg-[#131218] ${
+          back ? 'left-[35.62%] w-[36.72%]' : 'left-[30.98%] w-[46%]'
+        }`}
         style={{ transformOrigin: CARD_ORIGIN }}
         animate={{ scale: hovered ? CARD_HOVER_SCALE : 1 }}
         transition={HOVER_SPRING}
@@ -658,6 +666,89 @@ function HeroCardFace({
         <span className="font-body text-[2.86cqw]/[1] font-semibold text-teal">{content.role}</span>
       </motion.div>
     </div>
+  );
+}
+
+/**
+ * The scroll cue shown once the card has been turned.
+ *
+ * The mouse body is the drawn `Mouse down.svg`, but its wheel and chevrons are
+ * redrawn here as inline SVG rather than left in the artwork: the file is one
+ * flat set of ~200 paths with nothing to target, and the point of the cue is
+ * that those two parts move. The positions come from measuring the artwork —
+ * the wheel occupies y 18.7-30.9 of its 80.71-unit height and the chevrons
+ * 49.2-67.3 — so the drawn shell is masked over its own wheel and chevrons and
+ * the animated pair sit exactly where they were.
+ *
+ * The motion is the cue: the wheel travels down and fades, and the chevrons
+ * pulse after it, one then the other, so the eye is led downward. Both are
+ * motion-driven rather than CSS keyframes so `MotionConfig reducedMotion`
+ * stills them along with everything else.
+ */
+function ScrollCue() {
+  return (
+    <span className="relative block h-[clamp(38px,5.4vh,52px)] w-auto">
+      {/*
+        The drawn shell, with the artwork's own wheel and chevrons stripped
+        out — `Mouse down shell.svg` is `Mouse down.svg` minus those six
+        shapes. Masking them instead meant painting a flat rectangle over the
+        section's textured ground, which read as a patch behind the mouse.
+      */}
+      <img
+        src="/images/Mouse/Without fill/Mouse down shell.svg"
+        alt=""
+        aria-hidden="true"
+        className="block h-full w-auto select-none"
+      />
+      <svg
+        viewBox="0 0 46.57 80.71"
+        className="absolute inset-0 size-full"
+        fill="none"
+        aria-hidden="true"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        {/*
+          The wheel: down and out, then back to the top to start again. The
+          fade at each end keeps the return invisible, so it reads as one
+          continuous downward travel rather than a yo-yo.
+        */}
+        <motion.rect
+          x="21.6"
+          y="18.7"
+          width="3.4"
+          height="7"
+          rx="1.7"
+          fill="#ffffff"
+          // Moved with a transform, not by animating the `y` attribute: `y` on
+          // an SVG rect is geometry, and motion writes `style.y`, which does
+          // not touch it. `translateY` is a real transform besides.
+          animate={{ translateY: [0, 7, 7], opacity: [0, 1, 0] }}
+          transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut', times: [0, 0.62, 1] }}
+        />
+        {/*
+          The two chevrons, pulsing in sequence after the wheel — the second
+          delayed behind the first, so the pair reads as movement continuing
+          down the page rather than as two lights blinking together.
+        */}
+        {[0, 1].map((i) => (
+          <motion.path
+            key={i}
+            d={`M17.4 ${50.5 + i * 8.4} L23.3 ${56.4 + i * 8.4} L29.2 ${50.5 + i * 8.4}`}
+            stroke="#ffffff"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            animate={{ opacity: [0.25, 1, 0.25] }}
+            transition={{
+              duration: 1.9,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: 0.18 + i * 0.16,
+            }}
+          />
+        ))}
+      </svg>
+    </span>
   );
 }
 
@@ -690,6 +781,15 @@ export function Hero({ flipOnHover }: HeroProps) {
    * wobble hint keeps repeating until this flips, then never runs again.
    */
   const dismissed = useRef(false);
+  /**
+   * The same fact as `dismissed`, as state.
+   *
+   * The ref is what the wobble loop reads — it is captured once and must not
+   * retrigger the effect — but a ref change does not re-render, and the hint
+   * below has to actually swap when the card is first turned. So both are set
+   * together in `showTravel`.
+   */
+  const [turned, setTurned] = useState(false);
   /** True while the click-triggered flip owns `cardRotateY` — the wobble waits. */
   const flipping = useRef(false);
   useEffect(() => {
@@ -780,6 +880,7 @@ export function Hero({ flipOnHover }: HeroProps) {
     // job and stops for good, here rather than in the effect `turns` triggers
     // below: that effect also runs once on mount, before any real interaction.
     dismissed.current = true;
+    setTurned(true);
     setFlipped(dir);
     setTurns((t) => (dir ? t + 1 : t - 1));
   };
@@ -1031,12 +1132,44 @@ export function Hero({ flipOnHover }: HeroProps) {
 
         </div>
       </div>
-      <motion.span
-        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 -translate-x-1/2 font-heading text-[10.5px] font-medium tracking-[0.1em] text-[#A5AEBB]"
+      {/*
+        One slot, two hints: how to turn the card before it has been turned,
+        and how to leave the section afterwards. The second only makes sense
+        once the first has been acted on — a reader who has not yet flipped
+        the card is being told the wrong thing by a scroll cue.
+
+        `mode="wait"` so the outgoing caption clears before the cue arrives,
+        rather than the two crossfading through each other in the same spot.
+      */}
+      <motion.div
+        className="absolute bottom-[clamp(20px,4vh,44px)] left-1/2 z-1 flex -translate-x-1/2 justify-center"
         style={exit}
       >
-        {flipOnHover ? 'HOVER TO FLIP' : 'CLICK THE CARD TO FLIP'}
-      </motion.span>
+        <AnimatePresence mode="wait" initial={false}>
+          {turned ? (
+            <motion.span
+              key="scroll"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.32 }}
+            >
+              <ScrollCue />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="flip"
+              className="font-heading text-[10.5px] font-medium tracking-[0.1em] text-[#A5AEBB]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.32 }}
+            >
+              {flipOnHover ? 'HOVER TO FLIP' : 'CLICK THE CARD TO FLIP'}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

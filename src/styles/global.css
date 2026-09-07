@@ -25,11 +25,12 @@
   --font-heading: 'Sora', sans-serif;
   --font-body: 'Sora', system-ui, sans-serif;
   /*
-   * The drawn face, used only for the name inside the ruler. Kept to that
-   * one place on purpose: it is a display face with a single weight and no
-   * real small sizes, so it reads as a mark rather than as type.
+   * The serif accent. It carries the words the writing actually turns on —
+   * the name in the intro, the swapping verb in the about quote, the noun
+   * each portfolio statement lands on — so a serif against the Sora sets
+   * those apart as the emphasis rather than colour having to do all of it.
    */
-  --font-drawn: 'Fredericka the Great', cursive;
+  --font-accent: 'Lora', serif;
 
   --spacing-gutter: clamp(28px, 5vw, 72px);
   --spacing-gutter-nav: clamp(104px, 7vw, 132px);

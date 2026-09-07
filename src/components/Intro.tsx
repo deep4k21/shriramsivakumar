@@ -211,7 +211,7 @@ export function Intro() {
                   tick band pushes it down — so its middle sits at about 61%
                   of the height rather than 50%.
                 */}
-                <span className="font-drawn relative block translate-x-[0.16em] translate-y-[0.06em] leading-none font-normal whitespace-nowrap text-white">
+                <span className="font-accent relative block translate-x-[0.16em] translate-y-[0.06em] leading-none font-bold whitespace-nowrap text-white">
                   I&rsquo;m Shriram
                 </span>
               </RevealWord>

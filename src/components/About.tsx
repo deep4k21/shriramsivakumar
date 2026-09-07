@@ -65,7 +65,7 @@ function SplitFlapWord({ word, trailing }: { word: QuoteWord; trailing?: string 
   return (
     <span className="inline-flex items-center gap-[0.32em]" style={{ perspective: 600 }}>
       <motion.span
-        className={`inline-block font-heading font-bold ${shown.colorClass}`}
+        className={`inline-block font-accent font-bold ${shown.colorClass}`}
         style={{ transformStyle: 'preserve-3d', transformOrigin: 'center bottom' }}
         animate={{ rotateX: phase === 'out' ? -90 : 0 }}
         transition={{
@@ -242,7 +242,7 @@ export function About() {
           style={{ transform: `scale(${fit.toFixed(3)})`, transformOrigin: 'center left' }}
         >
           <motion.h2
-            className="m-0 font-heading text-[clamp(30px,4vw,52px)] font-bold tracking-[-0.02em] text-white"
+            className="m-0 font-heading text-[clamp(30px,4vw,52px)] font-semibold tracking-[-0.02em] text-white"
             style={{ ...quoteReveal, opacity: quoteExitOpacity }}
           >
             {/*

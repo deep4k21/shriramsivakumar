@@ -892,10 +892,10 @@ export function Portfolio({
                 PORTFOLIO
               </div>
 
-              <div className="absolute top-[17.5%] left-[6.6%] font-heading text-[6.4cqw]/[1.22] font-bold tracking-[-0.02em] text-white">
+              <div className="absolute top-[17.5%] left-[6.6%] font-heading text-[6.4cqw]/[1.22] font-normal tracking-[-0.02em] text-grey">
                 <span className="text-teal">Every Project</span> started
                 <br />
-                with <span className="text-green">Curiosity.</span>
+                with <span className="font-accent font-bold text-green">Curiosity.</span>
               </div>
 
               {/*
@@ -911,10 +911,10 @@ export function Portfolio({
                 className="pointer-events-none absolute top-[33%] left-[19%] h-[44%] w-auto select-none"
               />
 
-              <div className="absolute right-[6.6%] bottom-[6.4%] text-right font-heading text-[6.4cqw]/[1.22] font-bold tracking-[-0.02em] text-white">
+              <div className="absolute right-[6.6%] bottom-[6.4%] text-right font-heading text-[6.4cqw]/[1.22] font-normal tracking-[-0.02em] text-grey">
                 <span className="text-teal">Every solution</span>
                 <br />
-                was shaped by <span className="text-orange">Design.</span>
+                was shaped by <span className="font-accent font-bold text-orange">Design.</span>
               </div>
             </motion.div>
 

@@ -238,7 +238,7 @@ export function CategoryExpanded({
               {String(categoryIndex + 1).padStart(2, '0')} / 04 · CATEGORY
             </div>
             <div
-              className="font-heading text-[clamp(22px,2.2vw,32px)] font-semibold tracking-[-0.02em]"
+              className="font-accent text-[clamp(22px,2.2vw,32px)] font-bold tracking-[-0.02em]"
               style={{ color: TITLE }}
             >
               {category.title}
