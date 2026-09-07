@@ -670,51 +670,62 @@ export const CATEGORIES: Category[] = [
     projects: [
       {
         name: 'This website',
-        thumbnail: '/images/Brand Identity/Portfolio Website/thumbnail.webp',
+        thumbnail: '/images/Brand Identity/Portfolio Website/Thumbnail.webp',
         software: ['Claude Design', 'Claude Code', 'Figma'],
         problem:
-          "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template — the wrong first impression from someone selling design judgement.",
+          "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template.",
         solution:
-          'Rebuilt from a blank slate, with a real brand system underneath it and an architecture where nothing ever opens off-page.',
-        // Same chip-row + typeface-label format as Freshstart, per instruction.
-        chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#16181D', '#FFFFFF']),
-        typeface: 'Sora + Roboto',
+          'Rebuilt from a blank slate with a real brand system underneath, and an architecture where nothing ever opens off-page.',
+        chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora + Lora',
         processRows: [
           {
-            label: 'CHALKBOARD',
-            text: 'The concept and the surface are the same idea. Everything here sits on a slate with the grid still faintly showing and the illustrations drawn rather than rendered. Nothing carried over from the old site.',
-            slot: 'THE SURFACE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/1.webp', ratio: 2.2006 }],
+            label: 'COLOR THEORY',
+            text: 'Three colours, three jobs. Orange is design. Green is travel. Teal sits between them and carries every header on the site.\n\nThe split isn\u2019t decorative. Orange only appears where the work is, green only where the travelling is. Teal is what connects the two, which is why it\u2019s the colour you\u2019ve read the most of since you landed here.',
+            slot: 'THE PALETTE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Color.webp', ratio: 2.0879 }],
           },
           {
-            label: 'SYSTEM',
-            text: "Colour and type are one rule here, not two — the colour decides the typeface. Teal is always Roboto, orange and green are always Sora, so a single headline carries two voices. Orange is design, green is travel, teal sits between them. You've been reading it since the first line of this page.",
-            slot: 'THE RULE IN USE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/2.webp', ratio: 1.9141 }],
+            label: 'FONT THEORY',
+            text: 'Every headline here is two fonts. Sora sets it up, Lora lands it.\n\n\u201CLayovers to Layouts,\u201D then I\u2019m Shriram in serif. \u201CThe more I,\u201D then design in serif. The serif always takes the word the sentence was built for. Nothing else on the site uses it.\n\nI tried seven serifs before this. Crimson Pro was in for a while and got dropped for being too quiet on a dark background. Lora held its weight.',
+            slot: 'THE PAIR',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Font.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'DRAWING BOARD',
+            text: 'Back to the drawing board, taken literally. The site is a chalkboard. The grid still shows through, the illustrations are drawn rather than rendered, and nothing carried over from the old build.\n\nStarting from a blank slate meant deciding what a portfolio is for before deciding what it looks like. It\u2019s for someone who has four minutes and a hiring decision.',
+            slot: 'THE SURFACE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Drawing Board.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'NAVIGATION',
+            text: 'You never leave the page. Categories open in place, projects open on top of them, and the back button is never the way out.\n\nFour categories, five projects each, one modal pattern for all twenty. Tabs across the top move you between projects without closing anything. Close returns you exactly where you were.\n\nThe constraint was deliberate. Every tab you open is a chance to lose someone.',
+            slot: 'THE ARCHITECTURE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Navigation.webp', ratio: 2.0879 }],
           },
           {
             label: 'WORKFLOW',
-            text: 'I direct, Claude builds, my developer ships it in Claude Code. Three-way, one decision-maker.',
+            text: 'I direct, Claude builds, my developer ships it in Claude Code. Three parts, one decision-maker.\n\nI write the spec and the copy, Claude Design does the layout passes, and the file goes to my developer who builds it. When something came back wrong, I said what was wrong rather than accepting it.',
             slot: 'THE STACK',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/3.webp', ratio: 4.2611 }],
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Workflow.webp', ratio: 4.2611 }],
           },
         ],
         faq: [
           {
             q: 'So did you design this, or did Claude?',
-            a: 'Every decision is mine — the type rule, the colour roles, the never-leave-the-page architecture, what each project says and why. Claude built what I specified and pushed back when the spec was wrong. My developer took it from there in Claude Code.',
+            a: 'Every decision is mine. The type rule, the colour roles, the never-leave-the-page architecture, what each project says and why. Claude built what I specified and I pushed back when the spec was wrong.',
           },
           {
             q: 'Where did the AI actually fall short?',
-            a: "It understood structure quickly and got the scaffolding right. What it couldn't hold onto was judgement — the brand rules would drift unless I restated them, projects that didn't fit the template needed me to decide what bent and what held, and things like how a box behaves when you click it had to be specified rather than assumed. It builds well. It doesn't know what's correct.",
+            a: "Structure it could hold. Judgement it couldn't. It didn't know which design guidelines mattered here, when a case study should break the template instead of follow it, or how the project navigation should feel to use. That stayed with me.",
           },
           {
             q: 'What was hardest to get right?',
-            a: 'Restraint. Generating ten versions of anything takes seconds now. Deciding which one is right and killing the other nine is still the entire job, and it got harder, not easier.',
+            a: 'The typography. Seven serifs before Lora, and the first colour-to-font rule I wrote had to be scrapped entirely once headlines started carrying two voices.',
           },
           {
             q: 'Would you work this way on a client project?',
-            a: "I already do. The gain isn't speed of thinking — that takes as long as it ever did. It's that a client sees something interactive in a day instead of a flat comp in a week.",
+            a: "Yes, with the same split. AI moves faster than I can draw. It doesn't know what the client needs, and it never will.",
           },
         ],
         endNote:

@@ -1,0 +1,125 @@
+ original      webp   saved                 dims    rms  file
+--------------------------------------------------------------------------------------------------------------
+  33.40MB     440KB     99% 11232x13824 -> 3250x4000   5.88  public/images/Marketing Campaigns/Environmental graphics/DISTANCE.png
+  12.92MB     683KB     95% 10224x4093 -> 4000x1601   8.81  public/images/Marketing Campaigns/Illustration and iconography/SCALE.jpg
+   8.43MB     260KB     97% 4536x11339 -> 1600x4000   4.27  public/images/Marketing Campaigns/Environmental graphics/VOLUME.png
+   6.77MB     366KB     94% 6401x4801 -> 4000x3000   4.14  public/images/Marketing Campaigns/Social campaign systems/LIST.jpg
+   5.24MB     198KB     96%            2940x1536   2.38  public/images/Brand Identity/Portfolio Website/2.png
+   4.77MB     202KB     96%            2940x1336   2.35  public/images/Brand Identity/Portfolio Website/1.png
+   2.55MB     146KB     94%            1190x1684   4.06  public/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-01.png
+   2.39MB     134KB     94%            1190x1684   2.94  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-06.png
+   2.22MB     154KB     93%            1190x1684   2.92  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-01.png
+   1.91MB      42KB     98%             2676x628   1.80  public/images/Brand Identity/Portfolio Website/3.png
+   1.68MB      91KB     94%            1190x1684   3.23  public/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-04.png
+   1.81MB     333KB     81% 5184x10368 -> 2000x4000   6.10  public/images/Marketing Campaigns/Environmental graphics/ARRIVAL/standee.png
+   1.59MB     304KB     80% 6912x6912 -> 4000x4000   3.11  public/images/Marketing Campaigns/Environmental graphics/ARRIVAL/welcome-board.png
+   1.35MB     104KB     92%            1190x1684   4.25  public/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-02.png
+   1.29MB     100KB     92%            2486x1142   1.81  public/images/UIUX/GlobelA/ORIENTATION.png
+   1.35MB     196KB     85%            2485x1574   2.24  public/images/UIUX/Healthdesk/Persona.jpg
+   1.13MB      68KB     94%            1920x1080   1.94  public/images/Brand Identity/Portfolio Website/thumbnail.png
+    922KB      79KB     91%            2940x1464   1.70  public/images/UIUX/Prudent/Diagnosis.png
+    943KB     108KB     89%            1190x1684   3.29  public/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-03.png
+   1.01MB     191KB     81%            1190x1684   3.03  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-04.png
+    855KB     164KB     81%            1190x1684   2.92  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-02.png
+    652KB      50KB     92%            1080x1080   2.09  public/images/Marketing Campaigns/Social campaign systems/NARRATIVE/4.png
+   1.00MB     380KB     61%              820x466   6.53  public/images/homegrid/Design/card11_food_illustration.png
+    647KB      51KB     92%            1080x1080   2.02  public/images/Marketing Campaigns/Social campaign systems/NARRATIVE/2.png
+    949KB     364KB     62%            2048x1536   2.77  public/images/homegrid/Travel/travel07_landscape.jpg
+    620KB      61KB     90%            1080x1080   1.96  public/images/Marketing Campaigns/Social campaign systems/NARRATIVE/1.png
+    686KB     137KB     80%            1190x1684   2.32  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-05.png
+    755KB     223KB     71%            2304x1536   2.23  public/images/homegrid/Travel/travel06_landscape.jpg
+    623KB      95KB     85%            3334x2500   1.52  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-02.jpg
+    585KB      65KB     89%            1080x1080   2.27  public/images/Marketing Campaigns/Social campaign systems/NARRATIVE/3.png
+    553KB      40KB     93%            1080x1080   1.99  public/images/Marketing Campaigns/Social campaign systems/NARRATIVE/5.png
+    576KB      74KB     87%             1440x750   2.81  public/images/Marketing Campaigns/Social campaign systems/PLACE.jpg
+    583KB      95KB     84%            2486x1308   1.74  public/images/UIUX/Prudent/HIERARCHY.png
+    540KB      76KB     86%            3334x2501   1.33  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-06.jpg
+    519KB      62KB     88%            3334x2501   1.30  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-04.jpg
+    532KB      77KB     85%            3334x2500   1.52  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-01.jpg
+    495KB      55KB     89%            3334x2501   1.41  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-03.jpg
+    457KB      21KB     95%              820x465   2.41  public/images/homegrid/Design/card14_city_illustration.png
+    535KB     103KB     81% 4752x5184 -> 3667x4000   2.05  public/images/Marketing Campaigns/Environmental graphics/ARRIVAL/photo-frame.png
+    448KB      48KB     89%            3334x2501   0.95  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-05.jpg
+    471KB      72KB     85%             1667x617   2.94  public/images/UIUX/GlobelA/REASSURANCE.jpg
+    456KB      59KB     87%            3334x2501   1.06  public/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-07.jpg
+    408KB      44KB     89%              820x466   2.72  public/images/homegrid/Design/card12_phones_travel.png
+    388KB      30KB     92%              820x466   3.38  public/images/homegrid/Design/card13_six_reasons_freshworks.png
+    405KB      53KB     87%              595x842   4.00  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Cover.png
+    412KB      64KB     84%             1312x890   2.58  public/images/UIUX/PowerBI Dashboards/PORTFOLIO.png
+    365KB      25KB     93%              820x466   2.64  public/images/homegrid/Design/card07_iprovision.png
+    400KB      59KB     85%             1360x768   3.70  public/images/UIUX/PowerBI Dashboards/ENGAGEMENT.png
+    393KB      65KB     84%             1310x738   4.30  public/images/UIUX/PowerBI Dashboards/PERFORMANCE.png
+    364KB      43KB     88%              595x842   2.51  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Ebook TOC.png
+    381KB      69KB     82%              595x842   5.21  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 3.png
+    325KB      37KB     89%              820x465   2.74  public/images/homegrid/Design/card08_ufo_desert.png
+    416KB     140KB     66%            1190x1684   2.70  public/images/Marketing Campaigns/Brochures and reports/DENSITY/page-03.png
+    269KB      32KB     88%              910x752   2.04  public/images/Photo Frame/1 Anime me.png
+    251KB      19KB     93%              820x466   2.05  public/images/homegrid/Design/card20_man_thinking.png
+    289KB      57KB     80%             1318x682   2.57  public/images/Brand Identity/Uplift/REFERENCES.png
+    319KB      87KB     73%            3000x1570   1.65  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/5.png
+    293KB      89KB     70%            3000x1570   1.59  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/1.png
+    292KB      89KB     69%            3000x1570   1.88  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/6.png
+    294KB      94KB     68%            3000x1570   2.29  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/3.png
+    291KB      92KB     68%            3000x1570   1.87  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/4.png
+    257KB      60KB     77%             1330x808   3.48  public/images/UIUX/PowerBI Dashboards/COMPLIANCE.png
+    304KB     109KB     64%            1920x1080   4.76  public/images/Brand Identity/Orbitshift Podcast/SURFACE.png
+    275KB      86KB     69%            3000x1570   2.15  public/images/Marketing Campaigns/Social campaign systems/VERTICALS/2.png
+    189KB      16KB     91%              820x466   2.32  public/images/homegrid/Design/card06_phone_screens.png
+    179KB      10KB     95%              820x465   1.99  public/images/homegrid/Design/card01_portrait_man.png
+    191KB      24KB     88%              820x465   2.35  public/images/homegrid/Design/card09_recognizing_needs.png
+    185KB      26KB     86%              901x245   4.75  public/images/Brand Identity/Forge/HEAT.png
+    179KB      21KB     88%             1585x331   3.00  public/images/Brand Identity/Freshstart/TRANSLATION.jpg
+    296KB     154KB     48%            1200x1600   2.22  public/images/homegrid/Travel/travel08_landscape.jpg
+    376KB     243KB     36%            1400x1867   2.32  public/images/Photo Frame/2 CTRL ALT CAT.jpg
+    181KB      48KB     74%              595x842   3.70  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 5.png
+    157KB      29KB     81%              812x456   3.56  public/images/homegrid/Design/card19_mobily_dashboard.png
+    136KB      10KB     93%              820x465   1.76  public/images/homegrid/Design/card10_freshsprint_hackathon.png
+    137KB      14KB     90%              820x465   1.98  public/images/homegrid/Design/card02_experience_nxt.png
+    137KB      15KB     89%              970x331   2.91  public/images/Brand Identity/Freshstart/INVERSION.jpg
+    122KB      14KB     88%              842x595   2.66  public/images/Brand Identity/Uplift/EXTENSION.png
+    120KB      18KB     85%              820x466   2.27  public/images/homegrid/Design/card18_icons_grid.png
+    120KB      18KB     85%              820x466   2.27  public/images/homegrid/Design/card21_icons_grid.png
+    399KB     301KB     25%            1400x1867   2.47  public/images/Photo Frame/3 Golden Hour.jpg
+    223KB     125KB     44%            1600x1200   2.17  public/images/homegrid/Travel/travel03_landscape.jpg
+    123KB      40KB     68%              595x842   2.79  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 1.png
+     90KB      10KB     89%              290x290   2.99  public/favicon.png
+     90KB      10KB     89%              290x290   2.99  public/images/menuicons/avatar.png
+    288KB     210KB     27%            1600x1200   2.33  public/images/homegrid/Travel/travel09_landscape.jpg
+    125KB      50KB     60%              595x842   4.97  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 4.png
+     87KB      13KB     85%             1160x468   1.24  public/images/Brand Identity/Freshstart/ORIGIN.jpg
+    435KB     362KB     17%            1200x1600   2.77  public/images/homegrid/Travel/travel12_portrait.jpg
+    110KB      40KB     64%             1298x470   1.17  public/images/UIUX/Healthdesk/Wireframes.png
+    121KB      51KB     58%            1273x1117   1.46  public/images/Photo Frame/4 Life of a designer.jpg
+    247KB     180KB     27%            1600x1200   2.24  public/images/homegrid/Travel/travel01_lakeshore_snow.jpg
+     75KB       8KB     90%              820x466   1.39  public/images/homegrid/Design/card16_freshstart_logo.png
+     75KB       8KB     90%              820x466   1.39  public/images/homegrid/Design/card22_freshstart_logo.png
+    183KB     116KB     37%             900x1600   2.14  public/images/homegrid/Travel/travel21_portrait.jpg
+    451KB     384KB     15%             1900x962   3.01  public/images/homegrid/Travel/travel04_lanka_pano.jpg
+     77KB      10KB     87%             1062x166   2.40  public/images/Brand Identity/Uplift/CONSTRUCTION.jpg
+     77KB      11KB     86%              820x465   2.16  public/images/homegrid/Design/card05_orbit_shift_podcast.png
+    415KB     358KB     14%             900x1600   3.16  public/images/homegrid/Travel/travel18_portrait.jpg
+    149KB      92KB     38%             900x1600   2.08  public/images/homegrid/Travel/travel20_portrait.jpg
+    200KB     144KB     28%             900x1600   2.42  public/images/homegrid/Travel/travel19_portrait.jpg
+    133KB      78KB     42%             798x1200   2.32  public/images/Photo Frame/5 Window seat poster.jpg
+    322KB     267KB     17%             1600x900   2.96  public/images/homegrid/Travel/travel11_landscape.jpg
+    449KB     394KB     12%            1200x1600   2.82  public/images/homegrid/Travel/travel14_portrait.jpg
+    119KB      67KB     44%              595x842   3.42  public/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 2.png
+     59KB       9KB     85%              927x130   5.93  public/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.jpg
+    141KB      92KB     35%             900x1600   1.95  public/images/homegrid/Travel/travel15_portrait.jpg
+     54KB       5KB     91%              820x465   1.12  public/images/homegrid/Design/card03_forge_logo.png
+    370KB     321KB     13%             900x1600   3.10  public/images/homegrid/Travel/travel16_portrait.jpg
+    324KB     277KB     14%             1600x810   3.00  public/images/homegrid/Travel/travel13_pano.jpg
+    424KB     382KB     10%             900x1600   3.11  public/images/homegrid/Travel/travel17_portrait.jpg
+     56KB      14KB     76%             1545x986   0.01  public/images/career/logo-rd.png
+     44KB       6KB     85%              421x125   8.25  public/images/Brand Identity/Orbitshift Podcast/ESCAPE.jpg
+    332KB     295KB     11%             1600x900   2.90  public/images/homegrid/Travel/travel10_landscape.jpg
+    172KB     136KB     21%             1600x533   2.67  public/images/homegrid/Travel/travel05_sikkim_pano.jpg
+     97KB      63KB     35%            1920x1440   1.50  public/images/Certificates/2.jpg
+     44KB      13KB     71%              820x465   1.70  public/images/homegrid/Design/card15_project_agresar.png
+     71KB      42KB     41%            1920x1370   1.10  public/images/Certificates/1.jpg
+     70KB      41KB     41%            1920x1370   1.10  public/images/Certificates/3.jpg
+     44KB      22KB     50%             1190x217   1.25  public/images/Brand Identity/Forge/FUSION.png
+     22KB       8KB     66%            1024x1024   0.77  public/images/aiworkflow/cursor.png
+     58KB      52KB     11%             1152x528   2.16  public/images/homegrid/Travel/travel02_night_wide.jpg
+--------------------------------------------------------------------------------------------------------------
+ 125.53MB   14.11MB     89%   121 files, 7 also resized

@@ -324,9 +324,9 @@ export function CategoryExpanded({
                   key={p.name}
                   type="button"
                   onClick={() => onOpenProject(pi)}
-                  className={`flex cursor-pointer flex-col overflow-hidden p-0 text-left ${CARD_GLASS}`}
-                  // Only the lift on hover: the accent border it used to take
-                  // would override the glass card's own rim.
+                  className={`flex cursor-pointer flex-col overflow-hidden p-0 text-left ${CARD_GLASS} border transition-colors duration-150 hover:border-teal/60 focus-visible:border-teal/60 focus-visible:outline-none`}
+                  // The lift is motion's; the stroke is CSS, so it reaches
+                  // keyboard focus as well as hover.
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -348,7 +348,7 @@ export function CategoryExpanded({
                     // out of flow entirely, so only the box's own
                     // `aspect-ratio` can ever set its height.
                     className="relative grid w-full place-items-center overflow-hidden"
-                    style={{ backgroundColor: 'rgba(255,255,255,.03)', aspectRatio: '934 / 340' }}
+                    style={{ backgroundColor: '#212327', aspectRatio: '934 / 340' }}
                   >
                     {p.thumbnail ? (
                       <img

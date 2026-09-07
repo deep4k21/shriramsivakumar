@@ -164,7 +164,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         gives the sheet an edge and a direction, where pure transparency would
         read as a missing background.
       */
-      className="flex max-h-full w-[min(1280px,100%)] flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,43,50,.90),rgba(16,17,21,.85)_42%,rgba(28,30,36,.87))] shadow-[0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
+      className="flex max-h-full w-[min(1500px,100%)] flex-col overflow-hidden rounded-[18px] border border-teal/40 bg-[linear-gradient(158deg,rgba(40,43,50,.90),rgba(16,17,21,.85)_42%,rgba(28,30,36,.87))] shadow-[0_0_40px_rgba(0,184,201,.12),0_40px_120px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.16),inset_0_0_0_1px_rgba(255,255,255,.07)] backdrop-blur-lg backdrop-saturate-150"
     >
       {/* The scroll container, so the sticky header stays put while the body moves. */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
@@ -223,7 +223,10 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   className="cursor-pointer rounded-[7px] border px-3.5 py-2 font-body text-xs"
                   animate={{
                     backgroundColor: on ? 'rgba(255,154,92,.12)' : 'rgba(255,255,255,0)',
-                    borderColor: on ? 'rgba(255,154,92,.4)' : 'rgba(255,255,255,.1)',
+                    // The active tab is marked twice over: a stronger fill and
+                    // this stroke, so it still reads as selected for anyone who
+                    // cannot separate the orange from the grey.
+                    borderColor: on ? 'rgba(255,154,92,.5)' : 'rgba(255,255,255,.1)',
                     color: on ? '#FF9A5C' : '#A5AEBB',
                   }}
                   transition={{ duration: 0.18 }}
@@ -480,18 +483,43 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             that the old side-by-side layout didn't.
           */}
           {project.faq && (
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-3">
+              {/*
+                Titled like the other section labels rather than left as a
+                bare list: with the questions in orange and no heading, the
+                block read as five more statements about the project instead
+                of as a set of questions.
+              */}
+              <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">FAQ</div>
+              <div data-faq-list className="flex flex-col">
               {project.faq.map((item, i) => {
                 const open = openFaqIdx === i;
                 return (
                   <div key={item.q} className="border-t border-white/7 first:border-t-0">
                     <button
                       type="button"
+                      data-faq-row={i}
                       onClick={() => setOpenFaqIdx(open ? null : i)}
+                      onKeyDown={(e) => {
+                        const last = (project.faq?.length ?? 1) - 1;
+                        let next: number | null = null;
+                        if (e.key === 'ArrowDown') next = i === last ? 0 : i + 1;
+                        else if (e.key === 'ArrowUp') next = i === 0 ? last : i - 1;
+                        else if (e.key === 'Home') next = 0;
+                        else if (e.key === 'End') next = last;
+                        if (next === null) return;
+                        // The list wraps, so a reader holding Down never dead-ends
+                        // on the last row and has to reverse.
+                        e.preventDefault();
+                        e.currentTarget
+                          .closest('[data-faq-list]')
+                          ?.querySelector<HTMLButtonElement>(`[data-faq-row="${next}"]`)
+                          ?.focus();
+                      }}
                       aria-expanded={open}
                       className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left"
                     >
-                      <span className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">
+                      <span className="font-heading text-xs font-semibold tracking-[-0.005em] text-orange">
                         {item.q}
                       </span>
                       <motion.span
@@ -520,6 +548,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   </div>
                 );
               })}
+              </div>
             </div>
           )}
 
