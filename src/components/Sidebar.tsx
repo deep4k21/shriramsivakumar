@@ -79,7 +79,7 @@ export function Sidebar({
         className="flex cursor-pointer items-center gap-3 border-b border-white/6 px-1 pt-1 pb-2.5"
       >
         <span className="size-7 flex-none overflow-hidden rounded-full border border-white/12">
-          <img src="/images/menuicons/avatar.png" alt="" className="size-full object-cover" />
+          <img src="/images/menuicons/avatar.webp" alt="" className="size-full object-cover" />
         </span>
         <RailLabel show={hover} className="font-heading text-[12.5px] font-semibold text-white">
           Shriram Sivakumar

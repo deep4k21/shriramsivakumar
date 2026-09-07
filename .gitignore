@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# The pre-WebP source images, kept locally in case a higher-resolution
+# original is ever needed again. Ignored rather than committed: the site
+# serves the .webp conversions and these are ~125MB of duplicate bytes.
+#
+# They are still in git history — `git log --all -- public/images/...` finds
+# the commit that last held one, and `git checkout <commit> -- <path>`
+# restores it — so ignoring them here loses nothing permanently.
+legacy-images

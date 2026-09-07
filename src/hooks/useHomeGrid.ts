@@ -49,11 +49,11 @@ export const CELL_H = '20%';
  */
 const CELLS: Array<{ cell: [number, number]; file: string; bg?: string }> = [
   // Top row, left to right.
-  { cell: [0, 0], file: 'card01_portrait_man.png' },
-  { cell: [1, 0], file: 'card06_phone_screens.png' },
-  { cell: [2, 0], file: 'card13_six_reasons_freshworks.png' },
-  { cell: [3, 0], file: 'card18_icons_grid.png' },
-  { cell: [4, 0], file: 'card08_ufo_desert.png' },
+  { cell: [0, 0], file: 'card01_portrait_man.webp' },
+  { cell: [1, 0], file: 'card06_phone_screens.webp' },
+  { cell: [2, 0], file: 'card13_six_reasons_freshworks.webp' },
+  { cell: [3, 0], file: 'card18_icons_grid.webp' },
+  { cell: [4, 0], file: 'card08_ufo_desert.webp' },
 
   // Second row — the card blocks the middle from here down.
   // `bg`: the phone mockup this gif animates sits tall and centred in a wide
@@ -62,34 +62,34 @@ const CELLS: Array<{ cell: [number, number]; file: string; bg?: string }> = [
   // margin `object-contain` leaves — sampled off its background — rather than
   // whatever's behind the tile showing through as a mismatched letterbox.
   { cell: [0, 1], file: 'card04_pale_blue.gif', bg: '#E6DDF4' },
-  { cell: [1, 1], file: 'card15_project_agresar.png' },
-  { cell: [3, 1], file: 'card02_experience_nxt.png' },
+  { cell: [1, 1], file: 'card15_project_agresar.webp' },
+  { cell: [3, 1], file: 'card02_experience_nxt.webp' },
   // Same reasoning as card04/card17 above — a wide illustration on a light
   // textured ground, cropped hard on the sides by a square tile. Contained
   // instead, with white filling the margin `object-contain` leaves.
-  { cell: [4, 1], file: 'card11_food_illustration.png', bg: '#FFFFFF' },
+  { cell: [4, 1], file: 'card11_food_illustration.webp', bg: '#FFFFFF' },
 
   // Third row, flanking the card.
-  { cell: [0, 2], file: 'card19_mobily_dashboard.png' },
-  { cell: [1, 2], file: 'card03_forge_logo.png' },
-  { cell: [3, 2], file: 'card16_freshstart_logo.png' },
-  { cell: [4, 2], file: 'card09_recognizing_needs.png' },
+  { cell: [0, 2], file: 'card19_mobily_dashboard.webp' },
+  { cell: [1, 2], file: 'card03_forge_logo.webp' },
+  { cell: [3, 2], file: 'card16_freshstart_logo.webp' },
+  { cell: [4, 2], file: 'card09_recognizing_needs.webp' },
 
   // Fourth row.
-  { cell: [0, 3], file: 'card14_city_illustration.png' },
-  { cell: [1, 3], file: 'card21_icons_grid.png' },
-  { cell: [3, 3], file: 'card07_iprovision.png' },
+  { cell: [0, 3], file: 'card14_city_illustration.webp' },
+  { cell: [1, 3], file: 'card21_icons_grid.webp' },
+  { cell: [3, 3], file: 'card07_iprovision.webp' },
   // Same reasoning as card04 above — the illustration's head and desk sit
   // close to the top and bottom edges of its own canvas, so a crop clips one
   // or the other in most tile shapes.
   { cell: [4, 3], file: 'card17_lavender_blank.gif', bg: '#FFFFFF' },
 
   // Bottom row — card10 sits dead centre, as specified.
-  { cell: [0, 4], file: 'card12_phones_travel.png' },
-  { cell: [1, 4], file: 'card05_orbit_shift_podcast.png' },
-  { cell: [2, 4], file: 'card10_freshsprint_hackathon.png' },
-  { cell: [3, 4], file: 'card20_man_thinking.png' },
-  { cell: [4, 4], file: 'card22_freshstart_logo.png' },
+  { cell: [0, 4], file: 'card12_phones_travel.webp' },
+  { cell: [1, 4], file: 'card05_orbit_shift_podcast.webp' },
+  { cell: [2, 4], file: 'card10_freshsprint_hackathon.webp' },
+  { cell: [3, 4], file: 'card20_man_thinking.webp' },
+  { cell: [4, 4], file: 'card22_freshstart_logo.webp' },
 ];
 
 /**
@@ -111,29 +111,29 @@ const CELLS: Array<{ cell: [number, number]; file: string; bg?: string }> = [
  * rows away) so the panos land apart instead.
  */
 const TRAVEL_FILES: string[] = [
-  'travel01_lakeshore_snow.jpg',
-  'travel02_night_wide.jpg',
-  'travel03_landscape.jpg',
-  'travel04_lanka_pano.jpg',
-  'travel19_portrait.jpg',
-  'travel06_landscape.jpg',
-  'travel07_landscape.jpg',
-  'travel08_landscape.jpg',
-  'travel09_landscape.jpg',
-  'travel10_landscape.jpg',
-  'travel11_landscape.jpg',
-  'travel12_portrait.jpg',
-  'travel13_pano.jpg',
-  'travel14_portrait.jpg',
-  'travel15_portrait.jpg',
-  'travel16_portrait.jpg',
-  'travel17_portrait.jpg',
-  'travel18_portrait.jpg',
-  'travel05_sikkim_pano.jpg',
-  'travel20_portrait.jpg',
-  'travel21_portrait.jpg',
+  'travel01_lakeshore_snow.webp',
+  'travel02_night_wide.webp',
+  'travel03_landscape.webp',
+  'travel04_lanka_pano.webp',
+  'travel19_portrait.webp',
+  'travel06_landscape.webp',
+  'travel07_landscape.webp',
+  'travel08_landscape.webp',
+  'travel09_landscape.webp',
+  'travel10_landscape.webp',
+  'travel11_landscape.webp',
+  'travel12_portrait.webp',
+  'travel13_pano.webp',
+  'travel14_portrait.webp',
+  'travel15_portrait.webp',
+  'travel16_portrait.webp',
+  'travel17_portrait.webp',
+  'travel18_portrait.webp',
+  'travel05_sikkim_pano.webp',
+  'travel20_portrait.webp',
+  'travel21_portrait.webp',
   // Repeats travel01 — 21 photos for 22 cells.
-  'travel01_lakeshore_snow.jpg',
+  'travel01_lakeshore_snow.webp',
 ];
 
 /** Wait between one column starting its flip and the next, in seconds. */

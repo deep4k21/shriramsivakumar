@@ -332,7 +332,7 @@ const PLACEHOLDER_POOL = [
   'card12_phones_travel', 'card13_six_reasons_freshworks', 'card14_city_illustration',
   'card15_project_agresar', 'card16_freshstart_logo', 'card17_lavender_blank', 'card18_icons_grid',
   'card19_mobily_dashboard', 'card20_man_thinking',
-].map((name) => `/images/homegrid/${name}.png`);
+].map((name) => `/images/homegrid/${name}.webp`);
 
 export const PLACEHOLDER_RATIO = 820 / 465;
 
@@ -411,7 +411,7 @@ export const CATEGORIES: Category[] = [
             slot: 'PERSONA',
             // 2485 × 1574 — the sheet's own ratio, so it is contained rather
             // than cropped to a 16:9 slot it does not fit.
-            assetSet: [{ src: '/images/UIUX/Healthdesk/Persona.jpg', ratio: 1.579 }],
+            assetSet: [{ src: '/images/UIUX/Healthdesk/Persona.webp', ratio: 1.579 }],
           },
           {
             label: 'TRIAGE',
@@ -424,7 +424,7 @@ export const CATEGORIES: Category[] = [
               keeps all three widths in the frame. The lightbox is where the
               wireframes become legible.
             */
-            assetSet: [{ src: '/images/UIUX/Healthdesk/Wireframes.png', ratio: 2.762 }],
+            assetSet: [{ src: '/images/UIUX/Healthdesk/Wireframes.webp', ratio: 2.762 }],
           },
           {
             label: 'INTERFACE',
@@ -475,14 +475,14 @@ export const CATEGORIES: Category[] = [
             slot: 'BEFORE / AUDIT',
             // 2940 × 1464 — wider than 16:9, so contained rather than cropped
             // to a ratio it doesn't fit.
-            assetSet: [{ src: '/images/UIUX/Prudent/Diagnosis.png', ratio: 2.0082 }],
+            assetSet: [{ src: '/images/UIUX/Prudent/Diagnosis.webp', ratio: 2.0082 }],
           },
           {
             label: 'HIERARCHY',
             text: "I rebuilt it as a sequence: how it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section — wholesale, correspondent, retail — because a feature grid speaks to none of them.",
             slot: 'STRUCTURE / SECTION FLOW',
             // 2486 × 1308.
-            assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.png', ratio: 1.9006 }],
+            assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.webp', ratio: 1.9006 }],
           },
           {
             label: 'PRESENCE',
@@ -533,7 +533,7 @@ export const CATEGORIES: Category[] = [
             // two-column slot, so the image was squeezed narrower than the box
             // and came out shorter too, leaving a gap of empty background above
             // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/COMPLIANCE.png', ratio: 1.646 }],
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/COMPLIANCE.webp', ratio: 1.646 }],
           },
           {
             label: 'ENGAGEMENT',
@@ -544,7 +544,7 @@ export const CATEGORIES: Category[] = [
             // two-column slot, so the image was squeezed narrower than the box
             // and came out shorter too, leaving a gap of empty background above
             // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/ENGAGEMENT.png', ratio: 1.7708 }],
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/ENGAGEMENT.webp', ratio: 1.7708 }],
           },
           {
             label: 'PERFORMANCE',
@@ -555,7 +555,7 @@ export const CATEGORIES: Category[] = [
             // two-column slot, so the image was squeezed narrower than the box
             // and came out shorter too, leaving a gap of empty background above
             // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PERFORMANCE.png', ratio: 1.7751 }],
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PERFORMANCE.webp', ratio: 1.7751 }],
           },
           {
             label: 'PORTFOLIO',
@@ -566,7 +566,7 @@ export const CATEGORIES: Category[] = [
             // two-column slot, so the image was squeezed narrower than the box
             // and came out shorter too, leaving a gap of empty background above
             // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PORTFOLIO.png', ratio: 1.4742 }],
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PORTFOLIO.webp', ratio: 1.4742 }],
           },
         ],
         endNote:
@@ -596,7 +596,7 @@ export const CATEGORIES: Category[] = [
             text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion — RCMP, FBI, apostille, fingerprinting — each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
             slot: 'SERVICE SELECTION',
             // 2486 × 1142.
-            assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.png', ratio: 2.1769 }],
+            assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.webp', ratio: 2.1769 }],
           },
           {
             // The prototype sits here rather than on the final row: the locked
@@ -625,7 +625,7 @@ export const CATEGORIES: Category[] = [
             text: 'This is a category where people are anxious about getting it wrong. So: a with-and-without comparison making the alternative concrete, country-specific guides for the two audiences actually moving to Spain, trust numbers, and an FAQ that answers the question the accordion already started.',
             slot: 'TRUST + FAQ',
             // 1667 × 617.
-            assetSet: [{ src: '/images/UIUX/GlobelA/REASSURANCE.jpg', ratio: 2.7018 }],
+            assetSet: [{ src: '/images/UIUX/GlobelA/REASSURANCE.webp', ratio: 2.7018 }],
           },
         ],
         endNote:
@@ -670,7 +670,7 @@ export const CATEGORIES: Category[] = [
     projects: [
       {
         name: 'This website',
-        thumbnail: '/images/Brand Identity/Portfolio Website/thumbnail.png',
+        thumbnail: '/images/Brand Identity/Portfolio Website/thumbnail.webp',
         software: ['Claude Design', 'Claude Code', 'Figma'],
         problem:
           "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template — the wrong first impression from someone selling design judgement.",
@@ -684,19 +684,19 @@ export const CATEGORIES: Category[] = [
             label: 'CHALKBOARD',
             text: 'The concept and the surface are the same idea. Everything here sits on a slate with the grid still faintly showing and the illustrations drawn rather than rendered. Nothing carried over from the old site.',
             slot: 'THE SURFACE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/1.png', ratio: 2.2006 }],
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/1.webp', ratio: 2.2006 }],
           },
           {
             label: 'SYSTEM',
             text: "Colour and type are one rule here, not two — the colour decides the typeface. Teal is always Roboto, orange and green are always Sora, so a single headline carries two voices. Orange is design, green is travel, teal sits between them. You've been reading it since the first line of this page.",
             slot: 'THE RULE IN USE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/2.png', ratio: 1.9141 }],
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/2.webp', ratio: 1.9141 }],
           },
           {
             label: 'WORKFLOW',
             text: 'I direct, Claude builds, my developer ships it in Claude Code. Three-way, one decision-maker.',
             slot: 'THE STACK',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/3.png', ratio: 4.2611 }],
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/3.webp', ratio: 4.2611 }],
           },
         ],
         faq: [
@@ -742,14 +742,14 @@ export const CATEGORIES: Category[] = [
             label: 'ORIGIN',
             text: 'Started from the parent brand’s existing community icon — three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.',
             slot: 'SOURCE ICON',
-            assetSet: [{ src: '/images/Brand Identity/Freshstart/ORIGIN.jpg', ratio: 2.4786 }],
+            assetSet: [{ src: '/images/Brand Identity/Freshstart/ORIGIN.webp', ratio: 2.4786 }],
           },
           {
             label: 'TRANSLATION',
             text: 'Morphed that icon toward the parent brand’s signature drop shape, so the sub-mark would sit inside the existing visual family rather than beside it.',
             slot: 'SHAPE STUDIES',
             assetSet: [
-              { src: '/images/Brand Identity/Freshstart/TRANSLATION.jpg', ratio: 4.7885, white: true, padded: true },
+              { src: '/images/Brand Identity/Freshstart/TRANSLATION.webp', ratio: 4.7885, white: true, padded: true },
             ],
           },
           {
@@ -757,7 +757,7 @@ export const CATEGORIES: Category[] = [
             text: 'Inverting the colour direction turned the drop’s negative space into a rocket silhouette. Partnership and startup became the same shape.',
             slot: 'FINAL MARK',
             assetSet: [
-              { src: '/images/Brand Identity/Freshstart/INVERSION.jpg', ratio: 2.9305, white: true, padded: true },
+              { src: '/images/Brand Identity/Freshstart/INVERSION.webp', ratio: 2.9305, white: true, padded: true },
             ],
           },
         ],
@@ -787,7 +787,7 @@ export const CATEGORIES: Category[] = [
             slot: 'CONCEPT',
             assetSet: [
               {
-                src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.jpg',
+                src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.webp',
                 ratio: 7.1308,
                 white: true,
                 padded: true,
@@ -799,7 +799,7 @@ export const CATEGORIES: Category[] = [
             text: 'The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably; breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.',
             slot: 'MARK CONSTRUCTION',
             assetSet: [
-              { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.jpg', ratio: 3.368, white: true, padded: true },
+              { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.webp', ratio: 3.368, white: true, padded: true },
             ],
           },
           {
@@ -809,7 +809,7 @@ export const CATEGORIES: Category[] = [
             // the hero is shown.
             text: 'The system extended into a site that opens in deep space and resolves into daylight as you scroll, with guest portraits duotoned into the palette, then out again across episode artwork, launch banners and social posts.',
             slot: 'WEBSITE + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/SURFACE.png', ratio: 1.7778 }],
+            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/SURFACE.webp', ratio: 1.7778 }],
           },
         ],
         metrics: {
@@ -846,21 +846,21 @@ export const CATEGORIES: Category[] = [
             label: 'REFERENCES',
             text: "Four starting points, all pointing the same way: the parent brand's arrow, the physical act of being lifted, a torch held above a city, and the rising axis of a growth chart.",
             slot: 'MOODBOARD',
-            assetSet: [{ src: '/images/Brand Identity/Uplift/REFERENCES.png', ratio: 1.9326 }],
+            assetSet: [{ src: '/images/Brand Identity/Uplift/REFERENCES.webp', ratio: 1.9326 }],
           },
           {
             label: 'CONSTRUCTION',
             text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
             slot: 'LETTERFORM STUDIES',
             assetSet: [
-              { src: '/images/Brand Identity/Uplift/CONSTRUCTION.jpg', ratio: 6.3976, white: true, padded: true },
+              { src: '/images/Brand Identity/Uplift/CONSTRUCTION.webp', ratio: 6.3976, white: true, padded: true },
             ],
           },
           {
             label: 'EXTENSION',
             text: "The arrow scales out of the logo and into the environment — repeated as a backdrop pattern over a mapped world, so the mark's single gesture becomes the brand's ambient texture.",
             slot: 'BACKDROP + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Uplift/EXTENSION.png', ratio: 1.4151 }],
+            assetSet: [{ src: '/images/Brand Identity/Uplift/EXTENSION.webp', ratio: 1.4151 }],
           },
         ],
         endNote:
@@ -890,13 +890,13 @@ export const CATEGORIES: Category[] = [
             label: 'FUSION',
             text: 'An anvil profile and a capital F share the same structure: flat top, stepped shoulder, vertical base. Overlaying them produced a single mark that holds both readings.',
             slot: 'ANVIL / F STUDIES',
-            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.png', ratio: 5.4839, light: true, padded: true }],
+            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.webp', ratio: 5.4839, light: true, padded: true }],
           },
           {
             label: 'HEAT',
             text: 'The wordmark stays graphite; only the leading edge of the F ignites. Orange reads as the moment of striking rather than as decoration.',
             slot: 'FINAL MARK + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Forge/HEAT.png', ratio: 3.6776 }],
+            assetSet: [{ src: '/images/Brand Identity/Forge/HEAT.webp', ratio: 3.6776 }],
           },
         ],
         endNote:
@@ -953,10 +953,10 @@ export const CATEGORIES: Category[] = [
             document: {
               title: '4-page logistics brochure',
               pages: [
-                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-01.png',
-                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-02.png',
-                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-03.png',
-                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-04.png',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-01.webp',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-02.webp',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-03.webp',
+                '/images/Marketing Campaigns/Brochures and reports/COMPRESSION/page-04.webp',
               ],
             },
           },
@@ -969,13 +969,13 @@ export const CATEGORIES: Category[] = [
             document: {
               title: 'Beauty industry growth guide',
               pages: [
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Cover.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Ebook TOC.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 1.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 2.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 3.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 4.png',
-                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 5.png',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Cover.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Ebook TOC.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 1.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 2.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 3.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 4.webp',
+                '/images/Marketing Campaigns/Brochures and reports/EDITORIAL/Content Page 5.webp',
               ],
             },
           },
@@ -988,12 +988,12 @@ export const CATEGORIES: Category[] = [
             document: {
               title: 'Financial services AI flyer',
               pages: [
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-01.png',
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-02.png',
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-03.png',
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-04.png',
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-05.png',
-                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-06.png',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-01.webp',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-02.webp',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-03.webp',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-04.webp',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-05.webp',
+                '/images/Marketing Campaigns/Brochures and reports/DENSITY/page-06.webp',
               ],
             },
           },
@@ -1025,7 +1025,7 @@ export const CATEGORIES: Category[] = [
               title: 'Vertical banner set',
               pages: Array.from(
                 { length: 6 },
-                (_, i) => `/images/Marketing Campaigns/Social campaign systems/VERTICALS/${i + 1}.png`,
+                (_, i) => `/images/Marketing Campaigns/Social campaign systems/VERTICALS/${i + 1}.webp`,
               ),
             },
           },
@@ -1039,7 +1039,7 @@ export const CATEGORIES: Category[] = [
             // below a much-shorter image. Unset, `AssetSet` sizes to the asset
             // itself instead, capped at its own default rather than stretched.
             assetSet: [
-              { src: '/images/Marketing Campaigns/Social campaign systems/LIST.jpg', ratio: 1.3333 },
+              { src: '/images/Marketing Campaigns/Social campaign systems/LIST.webp', ratio: 1.3333 },
             ],
           },
           {
@@ -1065,7 +1065,7 @@ export const CATEGORIES: Category[] = [
               title: 'Narrative carousel',
               pages: Array.from(
                 { length: 5 },
-                (_, i) => `/images/Marketing Campaigns/Social campaign systems/NARRATIVE/${i + 1}.png`,
+                (_, i) => `/images/Marketing Campaigns/Social campaign systems/NARRATIVE/${i + 1}.webp`,
               ),
             },
           },
@@ -1094,7 +1094,7 @@ export const CATEGORIES: Category[] = [
             // asset stretched to the other rows' fixed height leaves empty
             // space around it, so this sizes to the asset itself instead.
             assetSet: [
-              { src: '/images/Marketing Campaigns/Social campaign systems/PLACE.jpg', ratio: 1.92 },
+              { src: '/images/Marketing Campaigns/Social campaign systems/PLACE.webp', ratio: 1.92 },
             ],
           },
         ],
@@ -1127,7 +1127,7 @@ export const CATEGORIES: Category[] = [
             */
             assetSet: [
               {
-                src: '/images/Marketing Campaigns/Illustration and iconography/SCALE.jpg',
+                src: '/images/Marketing Campaigns/Illustration and iconography/SCALE.webp',
                 caption: 'Cafeteria mural',
                 ratio: 10224 / 4093,
               },
@@ -1145,7 +1145,7 @@ export const CATEGORIES: Category[] = [
               pages: Array.from(
                 { length: 7 },
                 (_, i) =>
-                  `/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-0${i + 1}.jpg`,
+                  `/images/Marketing Campaigns/Illustration and iconography/SERIES/Copy of Illus-0${i + 1}.webp`,
               ),
             },
           },
@@ -1218,7 +1218,7 @@ export const CATEGORIES: Category[] = [
             // to the artwork's own 5616 × 6912 ratio instead.
             assetSet: [
               {
-                src: '/images/Marketing Campaigns/Environmental graphics/DISTANCE.png',
+                src: '/images/Marketing Campaigns/Environmental graphics/DISTANCE.webp',
                 caption: 'Roll-up banner',
                 ratio: 5616 / 6912,
               },
@@ -1232,7 +1232,7 @@ export const CATEGORIES: Category[] = [
             // artwork's own 2267.7 × 5669.3 ratio.
             assetSet: [
               {
-                src: '/images/Marketing Campaigns/Environmental graphics/VOLUME.png',
+                src: '/images/Marketing Campaigns/Environmental graphics/VOLUME.webp',
                 caption: 'Booth panel',
                 ratio: 2267.7 / 5669.3,
               },
@@ -1260,17 +1260,17 @@ export const CATEGORIES: Category[] = [
             */
             assetSet: [
               {
-                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/standee.png',
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/standee.webp',
                 caption: 'Standee',
                 ratio: 2592 / 5184,
               },
               {
-                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/welcome-board.png',
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/welcome-board.webp',
                 caption: 'Welcome board',
                 ratio: 1,
               },
               {
-                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/photo-frame.png',
+                src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/photo-frame.webp',
                 caption: 'Photo frame',
                 ratio: 2376 / 2592,
               },
@@ -1618,7 +1618,7 @@ export const ROLES: Role[] = [
   {
     name: 'RR Donnelley',
     font: 'sora',
-    logo: '/images/career/logo-rd.png',
+    logo: '/images/career/logo-rd.webp',
     title: 'Graphic Designer',
     period: 'August 2017 - October 2018',
     bullets: [
@@ -1700,9 +1700,9 @@ export const ROLES: Role[] = [
 
 /** One certificate per `PhotoFrame` in Career's right-hand column. */
 export const CERTIFICATES: string[] = [
-  '/images/Certificates/1.jpg',
-  '/images/Certificates/2.jpg',
-  '/images/Certificates/3.jpg',
+  '/images/Certificates/1.webp',
+  '/images/Certificates/2.webp',
+  '/images/Certificates/3.webp',
 ];
 
 export interface NavItem {
@@ -1771,7 +1771,7 @@ export const AI_TOOLS: ToolIcon[] = [
   // TODO: no icon supplied yet — placeholder path, will 404 until one lands.
   { name: 'Figma Make', icon: '/images/aiworkflow/figmamake.svg' },
   { name: 'Higgsfield', icon: '/images/aiworkflow/higgsfield.png' },
-  { name: 'Cursor', icon: '/images/aiworkflow/cursor.png' },
+  { name: 'Cursor', icon: '/images/aiworkflow/cursor.webp' },
 ];
 
 export const HERO_STATS = [
@@ -1898,13 +1898,13 @@ export interface IntroSlide {
 // Captions are the files' own names (the leading sort index dropped), not
 // written separately — the frame's label reads exactly what the asset is called.
 export const INTRO_SLIDES: IntroSlide[] = [
-  { caption: 'Anime me', image: '/images/Photo Frame/1 Anime me.png' },
-  { caption: 'CTRL ALT CAT', image: '/images/Photo Frame/2 CTRL ALT CAT.jpg' },
-  { caption: 'Golden Hour', image: '/images/Photo Frame/3 Golden Hour.jpg' },
-  { caption: 'Life of a designer', image: '/images/Photo Frame/4 Life of a designer.jpg' },
+  { caption: 'Anime me', image: '/images/Photo Frame/1 Anime me.webp' },
+  { caption: 'CTRL ALT CAT', image: '/images/Photo Frame/2 CTRL ALT CAT.webp' },
+  { caption: 'Golden Hour', image: '/images/Photo Frame/3 Golden Hour.webp' },
+  { caption: 'Life of a designer', image: '/images/Photo Frame/4 Life of a designer.webp' },
   {
     caption: 'Window seat',
-    image: '/images/Photo Frame/5 Window seat poster.jpg',
+    image: '/images/Photo Frame/5 Window seat poster.webp',
     video: '/images/Photo Frame/5 Window seat.mp4',
   },
 ];
