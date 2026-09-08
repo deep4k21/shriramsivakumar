@@ -157,7 +157,7 @@ function IntroTile({
         live in the copy, so a highlight can sit tight against the comma
         that follows it.
       */}
-      <div className="font-body text-sm/[1.55] text-grey">
+      <div className="font-body text-[15px]/[1.6] text-grey">
         {tile.segments.map((run, j) =>
           run.accent ? (
             <span key={j} className="font-bold text-teal">
@@ -250,7 +250,7 @@ export function About() {
               with the doodle sitting after the whole quoted phrase rather than
               between the word and its own punctuation.
             */}
-            &ldquo;The more I <SplitFlapWord word={quoteWord} trailing="&rdquo;" />
+            The more I <SplitFlapWord word={quoteWord} />
           </motion.h2>
 
           {/*

@@ -136,7 +136,7 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
           </div>
         </form>
 
-        <div className="flex flex-wrap gap-2 border-t border-white/15 pt-4.5">
+        <div className="grid grid-cols-2 gap-2 border-t border-white/15 pt-4.5">
           {CONNECT_LINKS.map((l) => (
             <a
               key={l.label}
@@ -156,9 +156,9 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
                 : l.href === RESUME_HREF
                   ? { download: RESUME_FILENAME }
                   : {})}
-              className="rounded-[9px] bg-surface px-3.5 py-2.25 font-body text-[13px] text-grey transition-colors duration-180 hover:text-teal"
+              className={`flex items-center justify-between gap-3 rounded-[9px] bg-surface px-3.5 py-2.5 font-body text-[13px] text-white! transition-colors duration-180 hover:text-teal! ${l.label === 'Email' ? 'col-span-2' : ''}`}
             >
-              {l.label} <span className="text-[#4a4a4a]">{l.value}</span>
+              {l.label} <span className="truncate text-grey">{l.value}</span>
             </a>
           ))}
         </div>

@@ -62,12 +62,12 @@ const FLIP_EASE = [0.7, 0, 0.2, 1] as const;
 
 const HERO_DESIGN: HeroCardContent = {
   accent: '#FF9A5C',
-  quote: ['“Mid-iteration', ' on a new layout”'],
-  status: ['"Available', ' for work"'],
+  quote: ['Mid-iteration', ' on a new layout'],
+  status: ['Available', ' for work'],
   traits: [
-    { lines: ['"Curious"', 'by default'], accentChars: 9 },
-    { lines: ['"Wireframe"', 'to workflow'], accentChars: 11 },
-    { lines: ['"figma-native"', 'obviously'], accentChars: 14 },
+    { lines: ['Still', 'asking why'], accentChars: 5 },
+    { lines: ['Wireframe', 'to workflow'], accentChars: 9 },
+    { lines: ['Lives', 'in Figma'], accentChars: 5 },
   ],
   stats: [
     { icon: '/images/hero/projects-delivered.svg', value: '500+', label: ['Projects', 'delivered'] },
@@ -80,13 +80,13 @@ const HERO_DESIGN: HeroCardContent = {
 
 const HERO_TRAVEL: HeroCardContent = {
   accent: '#47C89A',
-  quote: ['“Mid-flight,', ' mid-thought”'],
-  status: ['"Currently', ' in Chennai"'],
+  quote: ['Mid-flight,', ' mid-thought'],
+  status: ['Currently', ' in Chennai'],
   // Companions to the given "Window seat" line are placeholders.
   traits: [
-    { lines: ['"Window seat"', 'to worldview'], accentChars: 13 },
-    { lines: ['"Passport"', 'always packed'], accentChars: 10 },
-    { lines: ['"One-way"', 'by instinct'], accentChars: 9 },
+    { lines: ['Window seat', 'to worldview'], accentChars: 11 },
+    { lines: ['Passport', 'always packed'], accentChars: 8 },
+    { lines: ['One-way', 'by instinct'], accentChars: 7 },
   ],
   // The travel side cycles too, so the block behaves the same on both faces.
   // These two companions are placeholders — only the countries figure was given.
@@ -485,7 +485,7 @@ function HeroCardFace({
         slight lift off the centreline.
       */}
       <motion.div
-        className="absolute top-[11.52%] left-0 flex h-[14.80%] w-[50.45%] items-center gap-[1.32cqw] rounded-[2.60cqw] bg-[#15161A] pl-[3.10cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        className="absolute top-[11.52%] -left-[5.2%] flex h-[14.80%] w-[55.8%] items-center gap-[1.32cqw] rounded-[2.60cqw] bg-[#15161A] pr-[3.10cqw] pl-[3.10cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         // Above the portrait's `z-10` while hovered, so a growing badge lifts
         // over its neighbours rather than sliding under them.
         style={{ zIndex: hovered ? 20 : undefined }}
@@ -545,7 +545,7 @@ function HeroCardFace({
         drifted independently of the pill and of each other.
       */}
       <motion.div
-        className="absolute top-[23.35%] left-[59.93%] flex h-[8.58%] w-[40.07%] items-center justify-center gap-[1.6cqw] rounded-full bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        className="absolute top-[23.35%] left-[63%] flex h-[8.58%] w-[40.07%] items-center justify-center gap-[1.6cqw] rounded-full bg-[#15161A] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         style={{ zIndex: hovered ? 20 : undefined }}
         // Slides up and right — away from the card's centre — matching the
         // quote pill's outward pop on the opposite corner.
@@ -618,7 +618,7 @@ function HeroCardFace({
         // Narrowed from 28.45% to sit closer to the copy. Kept fixed rather than
         // sized to content: the text types in a character at a time, so a
         // content-width pill grew and shrank on every keystroke.
-        className="absolute top-[50.94%] left-[70.32%] box-border flex h-[14.90%] w-[24%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
+        className="absolute top-[50.94%] left-[71.5%] box-border flex h-[14.90%] w-[26.84%] items-center rounded-[2.60cqw] bg-[#15161A] px-[2.2cqw] shadow-[0_14px_34px_rgba(0,0,0,.5)]"
         style={{ zIndex: hovered ? 20 : undefined }}
         // Slides right — away from the card's centre — since this pill sits on
         // the card's right side.

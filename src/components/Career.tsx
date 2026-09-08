@@ -2,15 +2,20 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { CERTIFICATES, ROLES } from '../data/content';
 import { useExitStyle } from '../hooks/useExitStyle';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useSectionScroll } from '../hooks/useSectionScroll';
 import { CARD_GLASS } from '../styles/card';
 import { CardGlow } from './CardGlow';
+import { Overlay } from './Overlay';
 import { PhotoFrame } from './PhotoFrame';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
 export function Career() {
   const [companyIdx, setCompanyIdx] = useState(0);
+  /** The certificate shown full-size, if any — they are unreadable in the frames. */
+  const [openCert, setOpenCert] = useState<string | null>(null);
+  useEscapeKey(() => setOpenCert(null));
   const role = ROLES[companyIdx];
 
   // Now that career pins, it has a scroll window of its own — the exit rides
@@ -267,17 +272,49 @@ export function Career() {
           const tilt = [-3.4, 2.8, -2.2][i % 3];
           const shift = ['-22%', '18%', '-14%'][i % 3];
           return (
-            <div
+            <button
               key={src}
-              className={`z-1 h-[clamp(200px,30vh,320px)] flex-none ${i > 0 ? '-mt-[clamp(10px,3vh,32px)]' : ''}`}
+              type="button"
+              onClick={() => setOpenCert(src)}
+              aria-label="View certificate full size"
+              className={`z-1 h-[clamp(200px,30vh,320px)] flex-none cursor-pointer border-0 bg-transparent p-0 ${i > 0 ? '-mt-[clamp(10px,3vh,32px)]' : ''}`}
               style={{ transform: `translateX(${shift})` }}
             >
               <PhotoFrame image={src} index={1} total={1} tilt={tilt} />
-            </div>
+            </button>
           );
         })}
       </motion.div>
       </div>
+
+      {/*
+        The certificate at full size. Same Overlay as the project modals and
+        the AssetSet lightbox, so it closes on the scrim, the X or Esc the way
+        every other overlay on the site does.
+      */}
+      <AnimatePresence>
+        {openCert && (
+          <Overlay
+            z="z-50"
+            onClose={() => setOpenCert(null)}
+            className="relative max-w-[min(1100px,92vw)]"
+          >
+            <img
+              src={openCert}
+              alt="Certificate"
+              className="block max-h-[86vh] w-auto max-w-full rounded-[14px] border border-white/9 object-contain"
+            />
+            <button
+              type="button"
+              onClick={() => setOpenCert(null)}
+              aria-label="Close"
+              className="absolute top-3 right-3 size-9 cursor-pointer rounded-[9px] border-0 bg-black/70 font-body text-base text-white transition-colors duration-180 hover:bg-black/90"
+            >
+              &#10005;
+            </button>
+          </Overlay>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

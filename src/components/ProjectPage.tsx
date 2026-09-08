@@ -73,7 +73,7 @@ function renderSlot(row: ProcessRow) {
 /** A `pairWithNext` column's own label, text and slot, stacked vertically. */
 function PairColumn({ row }: { row: ProcessRow }) {
   return (
-    <div className="flex flex-col gap-20">
+    <div className="flex h-full flex-col justify-between gap-20">
       <div className="flex flex-col gap-2">
         <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
         <p className="m-0 font-body text-[15px]/[1.7] text-grey">{row.text}</p>
@@ -239,7 +239,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         </div>
 
         <div className="flex flex-col gap-6.5 p-8">
-          <div className="relative grid h-[340px] w-full place-items-center overflow-hidden rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
+          <div className="relative grid aspect-[915/338] w-full place-items-center overflow-hidden rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
             {project.thumbnail ? (
               <img
                 src={bannerDark && project.thumbnailDark ? project.thumbnailDark : project.thumbnail}
@@ -350,7 +350,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               return (
                 <div
                   key={row.label}
-                  className="grid items-start gap-8 divide-x divide-white/7 border-t border-white/7 py-5"
+                  className="grid items-stretch gap-8 divide-x divide-white/7 border-t border-white/7 py-5"
                   style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
                 >
                   <PairColumn row={row} />

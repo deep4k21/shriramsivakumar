@@ -247,10 +247,10 @@ export function Intro() {
                 <span className="text-green">traveler by instinct.</span>
               </p>
               <p className="m-0 font-body text-[clamp(13.5px,1.2vw,18.5px)]/[1.7] text-grey text-pretty">
-                Over <span className="font-bold text-white">9 years</span> designing SaaS products, UI/UX
-                experiences, and scalable visual systems shaped by{' '}
-                <span className="font-bold text-white">global perspective, curiosity,</span> and{' '}
-                <span className="font-bold text-white">bold thinking.</span>
+                <span className="font-bold text-white">Nine years</span> designing SaaS products,
+                interfaces, and the brand systems that hold them together. I&rsquo;ve worked with teams in{' '}
+                <span className="font-bold text-white">India, Europe, the Middle East, Japan and ANZ</span>,
+                which is where most of what I know actually came from.
               </p>
             </motion.div>
 

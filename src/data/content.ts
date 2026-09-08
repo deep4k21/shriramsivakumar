@@ -377,25 +377,25 @@ export const CATEGORIES: Category[] = [
     linkLabel: 'UI/UX Design',
     tags: 'Enterprise · SaaS · Product',
     collection: 'Enterprise Dashboards · Websites · Design Systems · Product Experiences',
-    body: 'Designing intuitive digital experiences that transform complex workflows into scalable products and seamless user journeys.',
+    body: 'Complex workflows turned into products people can actually use. Mostly enterprise, mostly SaaS.',
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
     art: '/images/portfolio/UI-UX.svg',
     artScale: 0.39,
     stats: [
       { value: '20+', label: 'PRODUCTS' },
-      { value: '6', label: 'YEARS' },
+      { value: '6', label: 'YEARS IN UI/UX' },
       { value: '5', label: 'INDUSTRIES' },
       { value: '10+', label: 'GLOBAL MARKETS' },
     ],
     projects: [
       {
-        name: 'A healthcare dashboard',
+        name: 'Healthcare dashboard',
         thumbnail: '/images/UIUX/Healthdesk/thumbnail.svg',
         software: ['Figma', 'Illustrator'],
         problem:
-          'A self-directed exploration: clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.',
-        solution: "A dashboard ranked by urgency instead of organised by category — the day's shape readable in one glance.",
+          "A self-directed exploration. Clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.",
+        solution: "A dashboard ranked by urgency instead of organised by category. The day's shape readable in one glance.",
         chips: [
           { color: '#16697A', border: 'rgba(255,255,255,0.15)' },
           { color: '#489FB5', border: 'rgba(255,255,255,0.15)' },
@@ -407,7 +407,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'PREMISE',
-            text: 'I set myself a standard healthcare dashboard brief — patient list, scheduling, records, messaging, analytics — and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.',
+            text: "I set myself a standard healthcare dashboard brief. Patient list, scheduling, records, messaging, analytics, and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.",
             slot: 'PERSONA',
             // 2485 × 1574 — the sheet's own ratio, so it is contained rather
             // than cropped to a 16:9 slot it does not fit.
@@ -415,7 +415,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'TRIAGE',
-            text: "The physician I wrote for doesn't need more capability, she needs less noise. So alerts and messages each split into critical and routine, four counters set the day's shape, and analytics — the flashiest thing in the brief — got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
+            text: "The physician I wrote for doesn't need more capability, she needs less noise. Alerts and messages each split into critical and routine. Four counters set the day's shape. Analytics, the flashiest thing in the brief, got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
             slot: 'WIREFRAMES — DESKTOP / TABLET / MOBILE',
             /*
               1298 × 470 — the three screen sizes end to end, so roughly 2.8:1.
@@ -428,7 +428,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'INTERFACE',
-            text: 'Blues carry the calm; a single amber is withheld for what genuinely needs attention. The mark argues the same thing — an H and D whose negative space forms a cross. Simple on the surface, structured underneath.',
+            text: "Blue for everything routine, amber only for what needs attention. Using it once is what makes it work. The mark follows the same logic, an H and a D whose negative space forms a cross.",
             slot: 'MOCKUPS',
             stacked: true,
             // The artboard's own ratio, measured off the painted region of the
@@ -455,9 +455,9 @@ export const CATEGORIES: Category[] = [
         thumbnail: '/images/UIUX/Prudent/thumbnail.svg',
         software: ['Figma'],
         problem:
-          "A self-directed redesign exercise. An enterprise lending platform had three distinct products and a page that didn't make clear what any of them did — everything competed for the same level of attention, so nothing held it.",
+          "A client redesign. An enterprise lending platform had three distinct products and a page that didn't make clear what any of them did. Everything competed for the same level of attention, so nothing held it.",
         solution:
-          'A rebuilt hierarchy that explains the products in sequence, and photography of actual people in a category that usually shows none.',
+          "A rebuilt hierarchy that explains the products in sequence, and photography of actual people in a category that usually shows none.",
         // TODO: replace with the real palette from Figma.
         chips: [
           { color: '#0B2A4A', border: 'rgba(255,255,255,0.15)' },
@@ -471,7 +471,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'DIAGNOSIS',
-            text: "The original page had the components but not the order. Products sat in a flat block with no way to tell them apart, proof and capability were interleaved, and a first-time visitor couldn't answer what the thing does before being asked to book a demo.",
+            text: "The original page had the components but not the order. Products sat in a flat block with no way to tell them apart. Proof and capability were interleaved. A first-time visitor couldn't answer what the thing does before being asked to book a demo.",
             slot: 'BEFORE / AUDIT',
             // 2940 × 1464 — wider than 16:9, so contained rather than cropped
             // to a ratio it doesn't fit.
@@ -479,14 +479,14 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'HIERARCHY',
-            text: "I rebuilt it as a sequence: how it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section — wholesale, correspondent, retail — because a feature grid speaks to none of them.",
+            text: "I rebuilt it as a sequence. How it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section, wholesale, correspondent and retail, because a feature grid speaks to none of them.",
             slot: 'STRUCTURE / SECTION FLOW',
             // 2486 × 1308.
             assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.webp', ratio: 1.9006 }],
           },
           {
             label: 'PRESENCE',
-            text: "Enterprise fintech runs on abstraction — gradients, icons, empty dashboards. This uses cut-out photography of people sitting on and standing beside the product, at full scale. The interface screenshots carry the explanation, which frees the imagery to do the thing abstraction can't: make it look like software people actually use.",
+            text: "Enterprise fintech runs on abstraction. Gradients, icons, empty dashboards. This uses cut-out photography of people sitting on and standing beside the product, at full scale. The interface screenshots carry the explanation, which frees the imagery to do the thing abstraction can't. Make it look like software people actually use.",
             slot: 'MOCKUPS',
             stacked: true,
             // The artboard measures 1.774 — 16:9 within a rounding error — so
@@ -507,17 +507,17 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          'Nothing on the original page was wrong. It was all there, in the wrong order — and that turns out to be the harder problem to see.',
+          "Nothing on the original page was wrong. It was all there, in the wrong order, and that turns out to be the harder problem to see. The engagement ended before the rebuild shipped. The order stayed.",
       },
       {
-        name: 'PowerBI Dashboards',
+        name: 'PowerBI demos',
         thumbnail: '/images/UIUX/PowerBI Dashboards/thumbnail.svg',
         software: ['Figma', 'Power BI'],
         // A collection rather than a single case study, so the two-column row is
         // relabelled: there is no one problem/solution pair across four builds.
         problemLabel: 'CONTEXT',
         problem:
-          'A set of Power BI dashboards built in-house across compliance, client management, commercial performance and multi-market reporting — four different audiences, four different questions.',
+          "A set of Power BI dashboards built in-house across compliance, client management, commercial performance and multi-market reporting. Four different audiences, four different questions.",
         solutionLabel: 'THROUGHLINE',
         solution:
           'Every one had the same underlying job: make a dense data screen answer its main question before anyone starts reading.',
@@ -526,7 +526,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'COMPLIANCE',
-            text: 'Five exception counters and three charts kept fighting for the top of the screen. Nothing won until the filters moved out into their own panel — once narrowing a query stopped costing the overview, the counters could stay loud and the charts could stay quiet.',
+            text: "Five exception counters and three charts kept fighting for the top of the screen. Nothing won until the filters moved out into their own panel. Once narrowing a query stopped costing the overview, the counters could stay loud and the charts could stay quiet.",
             slot: 'VENDOR COMPLIANCE',
             // No fixed height: `slotHeight: '460px'` demanded up to 817px of
             // width for these 1.47–1.78:1 screenshots inside a ~455px
@@ -537,7 +537,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'ENGAGEMENT',
-            text: 'Account teams open this between calls, so it had about four seconds to work. RAG status and pursuit numbers went up top and everything else went below. The illustration was the argument I had with myself — a screen this commercial reads cold without it.',
+            text: "Account teams open this between calls, so it had about four seconds to work. RAG status and pursuit numbers went up top and everything else went below. The illustration was the argument I had with myself. A screen this commercial reads cold without it.",
             slot: 'CLIENT 360',
             // No fixed height: `slotHeight: '460px'` demanded up to 817px of
             // width for these 1.47–1.78:1 screenshots inside a ~455px
@@ -570,14 +570,14 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          "Every one of these had to survive contact with the tool. Power BI decides a lot for you — the design work is in what's left.",
+          "Every one of these had to survive contact with the tool. Power BI decides a lot for you. The design work is in what's left.",
       },
       {
         name: 'GlobeIA',
         thumbnail: '/images/UIUX/GlobelA/thumbnail.svg',
         software: ['Figma'],
         problem:
-          "People arriving here don't know which check they need — the answer depends on which country is asking, not what they want. And the client wanted the booking form locked on screen at all times, since it's the only conversion that matters.",
+          "People arriving here don't know which check they need. The answer depends on which country is asking, not what they want. And the client wanted the booking form locked on screen at all times, since it's the only conversion that matters.",
         solution:
           'A page that answers "which service is mine" before it asks for anything, with the booking panel permanently in view so the answer and the action are never more than a glance apart.',
         // TODO: replace with the real palette from Figma.
@@ -593,7 +593,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'ORIENTATION',
-            text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion — RCMP, FBI, apostille, fingerprinting — each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
+            text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion, RCMP, FBI, apostille, fingerprinting, each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
             slot: 'SERVICE SELECTION',
             // 2486 × 1142.
             assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.webp', ratio: 2.1769 }],
@@ -603,7 +603,7 @@ export const CATEGORIES: Category[] = [
             // nav and booking panel are what it demonstrates, so the reader can
             // try the scroll behaviour straight after reading about it.
             label: 'CONSTRAINT',
-            text: "The locked booking panel was the client's requirement, and it takes roughly a third of the viewport permanently. Everything else had to work in a narrower column — shorter measure, tighter cards, no full-width sections. The nav locks with it, so the page scrolls underneath a frame that never moves.",
+            text: "The locked booking panel was the client's requirement, and it takes roughly a third of the viewport permanently. Everything else had to work in a narrower column. Shorter measure, tighter cards, no full-width sections. The nav locks with it, so the page scrolls underneath a frame that never moves.",
             slot: 'MOCKUPS',
             stacked: true,
             // 1.778 measured off the rendered artboard — 16:9, so the standard
@@ -629,7 +629,7 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem.",
+          "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem. It went live and has since been adapted into their own brand.",
       },
       /*
       ...['Client onboarding flow'].map(
@@ -658,7 +658,7 @@ export const CATEGORIES: Category[] = [
     short: 'Brand Identity',
     tags: 'Identity · Strategy · Guidelines',
     collection: 'Brand exploration on · Freshstart · Forge · HealthDesk · Project Agresor',
-    body: 'Building memorable brands through thoughtful identities and scalable visual systems.',
+    body: 'Identities and the systems that keep them consistent once other people start using them.',
     lead: 'Identities and visual systems built to',
     leadBold: 'hold together at scale.',
     stats: [
@@ -739,7 +739,7 @@ export const CATEGORIES: Category[] = [
         thumbnailDark: '/images/Brand Identity/Freshstart/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
-          'A startup partnership programme lived inside a larger SaaS brand with no mark of its own — nothing signalled that it belonged to the family, or that it stood for something distinct within it.',
+          "A startup partnership programme lived inside a larger SaaS brand with no mark of its own. Nothing signalled that it belonged to the family, or that it stood for something distinct within it.",
         solution:
           'One shape that reads two ways: hands joined in partnership, and a rocket for the startups being backed.',
         chips: [
@@ -751,7 +751,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'ORIGIN',
-            text: 'Started from the parent brand’s existing community icon — three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.',
+            text: "Started from the parent brand's existing community icon, three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.",
             slot: 'SOURCE ICON',
             assetSet: [{ src: '/images/Brand Identity/Freshstart/ORIGIN.webp', ratio: 2.4786 }],
           },
@@ -773,12 +773,12 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          'The rocket wasn’t the plan. It appeared once the colour inverted — and two ideas resolved into one shape.',
+          "The rocket wasn't the plan. It appeared once the colour inverted, and two ideas resolved into one shape.",
       },
       // 3rd project — previously "Identity guidelines", replaced with the
       // podcast identity per instruction (2026-08-25).
       {
-        name: 'A podcast identity',
+        name: 'Orbitshift Podcast',
         thumbnail: '/images/Brand Identity/Orbitshift Podcast/thumbnail-light.svg',
         thumbnailDark: '/images/Brand Identity/Orbitshift Podcast/thumbnail-dark.svg',
         title: 'Orbitshift Podcast',
@@ -794,7 +794,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'TRAJECTORY',
-            text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up — and the same thing an hour with someone further along is meant to trigger.",
+            text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up, and the same thing an hour with someone further along is meant to trigger.",
             slot: 'CONCEPT',
             assetSet: [
               {
@@ -807,7 +807,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'ESCAPE',
-            text: 'The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably; breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.',
+            text: "The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably. Breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.",
             slot: 'MARK CONSTRUCTION',
             assetSet: [
               { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.webp', ratio: 3.368, white: true, padded: true },
@@ -832,7 +832,7 @@ export const CATEGORIES: Category[] = [
           ],
         },
         endNote:
-          'The rocket sits outside the ring, not inside it. That was the whole argument — the point was never to orbit well.',
+          "The rocket sits outside the ring, not inside it. That was the whole argument. The point was never to orbit well.",
       },
       // 4th project — previously "Sub-brand architecture" (itself previously
       // 2nd, swapped with "A sub logo system" above).
@@ -842,7 +842,7 @@ export const CATEGORIES: Category[] = [
         thumbnailDark: '/images/Brand Identity/Uplift/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
-          "A global marketing technology brand needed an identity for its New York chapter — something with its own energy that still read as family, not a separate company.",
+          "A global marketing technology brand needed an identity for its New York chapter. Something with its own energy that still read as family, not a separate company.",
         solution:
           "A wordmark engineered from the parent brand's own arrow, so the event, the city and the company all live inside the same letterforms.",
         chips: [
@@ -875,7 +875,7 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          'Four ideas share one wordmark — an arrow, a lift, a torch, an axis. None of them announce themselves. You find them one at a time.',
+          "Four ideas share one wordmark. An arrow, a lift, a torch, an axis. None of them announce themselves. You find them one at a time.",
       },
       {
         name: 'Forge',
@@ -883,7 +883,7 @@ export const CATEGORIES: Category[] = [
         thumbnailDark: '/images/Brand Identity/Forge/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
         problem:
-          'An accelerator programme for early-stage founders needed a mark of its own — one that described what the programme does to a company, not just who runs it.',
+          "An accelerator programme for early-stage founders needed a mark of its own. One that described what the programme does to a company, not just who runs it.",
         solution: 'An anvil and the letter F share a silhouette. Overlaid, they make one mark: the surface things get made on.',
         chips: [
           { color: '#FF9900', border: 'rgba(255,255,255,0.15)' },
@@ -893,7 +893,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'PREMISE',
-            text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge — a fair description of what an accelerator does to an early company.",
+            text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge. A fair description of what an accelerator does to an early company.",
             slot: 'NAME + CONCEPT',
             assetSet: [{ src: '/images/Brand Identity/Forge/PREMISE.png', ratio: 1.892, light: true, padded: true }],
           },
@@ -911,7 +911,7 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          "An anvil doesn't make anything by itself. It's the surface something else gets made on — which is the more honest description of what a programme like this actually does.",
+          "An anvil doesn't make anything by itself. It's the surface something else gets made on, which is the more honest description of what a programme like this actually does.",
       },
     ],
   },
@@ -924,7 +924,7 @@ export const CATEGORIES: Category[] = [
     short: 'Campaigns',
     tags: 'Creative · Growth · Performance',
     collection: 'Product Launches · Event Branding · Social Campaigns · Landing Pages',
-    body: 'Campaigns that combine storytelling, strategy, events, illustrations and measurable business impact.',
+    body: 'Launches, events, and the collateral around them. Judged on whether they worked, not whether they looked good.',
     lead: 'Storytelling and strategy measured on',
     leadBold: 'business impact.',
     stats: [
@@ -949,7 +949,7 @@ export const CATEGORIES: Category[] = [
         software: ['InDesign', 'Illustrator', 'PowerPoint'],
         problemLabel: 'RANGE',
         problem:
-          'Three documents from four to thirty pages — a logistics brochure, a beauty industry guide and a financial services flyer.',
+          "Three documents from four to thirty pages. A logistics brochure, a beauty industry guide and a financial services flyer.",
         solutionLabel: 'CONSTANT',
         solution:
           'Every one had the same job: decide what the reader sees first, then protect that decision for the rest of the document.',
@@ -957,7 +957,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'ORIENTATION',
-            text: "Built to be glanced at in a meeting, not read afterward. Everything that didn't survive the cut became a number — shipments per day, carrier network, freight spend — so the proof sits on one page and the rest can stay quiet.",
+            text: "Built to be glanced at in a meeting, not read afterward. Everything that didn't survive the cut became a number. Shipments per day, carrier network, freight spend. So the proof sits on one page and the rest can stay quiet.",
             slot: '4-PAGE LOGISTICS BROCHURE',
             slotHeight: '480px',
             wideSlot: true,
@@ -992,7 +992,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'DENSITY',
-            text: 'A genuinely long list of technical use cases with no natural hierarchy. Splitting them into labelled bands — predictive, LLM, anomaly, clustering — gave the reader four places to stop instead of one continuous run of bullets.',
+            text: "A genuinely long list of technical use cases with no natural hierarchy. Splitting them into labelled bands, predictive, LLM, anomaly, clustering, gave the reader four places to stop instead of one continuous run of bullets.",
             slot: 'FINANCIAL SERVICES AI FLYER',
             slotHeight: '480px',
             wideSlot: true,
@@ -1018,7 +1018,7 @@ export const CATEGORIES: Category[] = [
         software: ['Illustrator', 'Figma', 'Photoshop'],
         problemLabel: 'FORMATS',
         problem:
-          'Six vertical banners, two carousels, an interactive display ad and an event campaign — five canvases, five jobs, five audiences.',
+          "Six vertical banners, two carousels, an interactive display ad and an event campaign. Five canvases, five jobs, five audiences.",
         solutionLabel: 'SYSTEM',
         solution:
           'Each one built as a template first and a design second, so it could be extended without me in the room.',
@@ -1026,7 +1026,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'VERTICALS',
-            text: 'Six industries, one layout. The template fixes everything structural — logo position, headline pattern, bullet list, phone frame — and lets colour and illustration carry the whole difference. Healthcare pink, e-commerce green, food delivery amber. Someone could add a seventh vertical without asking me anything.',
+            text: "Six industries, one layout. The template fixes everything structural, logo position, headline pattern, bullet list, phone frame, and lets colour and illustration carry the whole difference. Healthcare pink, e-commerce green, food delivery amber. Someone could add a seventh vertical without asking me anything.",
             slot: 'VERTICAL BANNER SET',
             // 3000 × 1570 — a single landscape banner, so the frame sizes to
             // its own ratio instead of stretching to the other rows' fixed
@@ -1060,7 +1060,7 @@ export const CATEGORIES: Category[] = [
               none can.
             */
             label: 'NARRATIVE',
-            text: "A five-card carousel that only works in order: agents are overwhelmed, here's the mechanism, here's the speed, here's the result, here's the ask. The isometric illustration runs continuously across all five cards so the swipe feels like panning across one scene rather than turning pages, and only the final card carries a button — everything before it is earning the right to ask.",
+            text: "A five-card carousel that only works in order. Agents are overwhelmed, here's the mechanism, here's the speed, here's the result, here's the ask. The isometric illustration runs continuously across all five cards so the swipe feels like panning across one scene rather than turning pages, and only the final card carries a button. Everything before it is earning the right to ask.",
             slot: 'NARRATIVE CAROUSEL',
             // Square cards (1080×1080): sizing to their own ratio instead of
             // the fixed slot height is what gives the pager room to breathe
@@ -1099,7 +1099,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'PLACE',
-            text: "An event campaign set at a stadium in Barcelona. The headline plays on the club's own motto, and the illustration puts the venue inside its real skyline rather than a generic sports frame — this only lands if it feels local to the people who are actually going.",
+            text: "An event campaign set at a stadium in Barcelona. The headline plays on the club's own motto, and the illustration puts the venue inside its real skyline rather than a generic sports frame. This only lands if it feels local to the people who are actually going.",
             slot: 'EVENT CAMPAIGN',
             // 1440 × 750. No `slotHeight`, same as LIST above: a landscape
             // asset stretched to the other rows' fixed height leaves empty
@@ -1126,7 +1126,7 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'SCALE',
-            text: "Twelve feet wide, read from across the room and from a foot away. Density solves both — the lettering holds the centre at distance, and the doodle field only pays off when you're standing next to it with a plate in your hand. Nothing precious about it, because it's a cafeteria.",
+            text: "Twelve feet wide, read from across the room and from a foot away. Density solves both. The lettering holds the centre at distance, and the doodle field only pays off when you're standing next to it with a plate in your hand. Nothing precious about it, because it's a cafeteria.",
             slot: 'CAFETERIA MURAL',
             /*
               10224 × 4093, roughly 2.5:1. No `slotHeight`: a single wide
@@ -1162,7 +1162,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'MOTION',
-            text: 'Drawn for movement rather than for a still. Every element separated onto its own layer from the outset, which changes how you draw — no shared outlines, no overlapping strokes, every object discrete enough to move independently.',
+            text: "Drawn for movement rather than for a still. Every element separated onto its own layer from the outset, which changes how you draw. No shared outlines, no overlapping strokes, every object discrete enough to move independently.",
             slot: 'MOTION STUDY',
             // 800 × 600 — 4:3, so the frame sizes to the clip's own ratio
             // instead of the fixed slot height.
@@ -1201,7 +1201,7 @@ export const CATEGORIES: Category[] = [
           },
         ],
         endNote:
-          'A wall and a 24-pixel icon share exactly one requirement: both have to read instantly. Everything else about how you draw them is different.',
+          "The mural took a week. The seventh illustration took twenty minutes. Same hand, different problem.",
       },
       {
         name: 'Environmental graphics',
@@ -1224,9 +1224,12 @@ export const CATEGORIES: Category[] = [
             // rows — both are tall, narrow standing pieces, so side by side
             // reads as a comparison.
             pairWithNext: true,
-            // No `slotHeight`: a single portrait banner stretched to the other
-            // rows' fixed height leaves empty space beside it, so this sizes
-            // to the artwork's own 5616 × 6912 ratio instead.
+            // A fixed slot, unlike most rows here. Without one AssetSet sizes
+            // each figure by width share and lets the ratio decide the height,
+            // which for a portrait banner came out taller than the row itself
+            // and printed the artwork over the copy below it. The slot caps
+            // the height and derives the width from it instead.
+            slotHeight: '460px',
             assetSet: [
               {
                 src: '/images/Marketing Campaigns/Environmental graphics/DISTANCE.webp',
@@ -1239,8 +1242,9 @@ export const CATEGORIES: Category[] = [
             label: 'VOLUME',
             text: 'Exhibition floors are loud, and everyone on them runs the same playbook: bright, white, big claims. Going dark was the whole decision. A deep green field with one glowing figure holds its own in that room, and the stats orbit it rather than compete — the figure catches the eye, the numbers arrive second.',
             slot: 'BOOTH PANEL',
-            // No `slotHeight`, same reason as DISTANCE — sized to the
-            // artwork's own 2267.7 × 5669.3 ratio.
+            // Capped for the same reason as DISTANCE — this one is narrower
+            // still (0.40:1), so it overflowed furthest.
+            slotHeight: '460px',
             assetSet: [
               {
                 src: '/images/Marketing Campaigns/Environmental graphics/VOLUME.webp',
@@ -1269,6 +1273,7 @@ export const CATEGORIES: Category[] = [
               which is what keeps the standee narrower than the boards rather
               than all three sharing the row equally.
             */
+            slotHeight: '460px',
             assetSet: [
               {
                 src: '/images/Marketing Campaigns/Environmental graphics/ARRIVAL/standee.webp',
@@ -1302,7 +1307,7 @@ export const CATEGORIES: Category[] = [
     short: 'Presentations',
     tags: 'Pitch · Product · Strategy',
     collection: 'Pitch Decks · Product Launches · Sales Enablement · Corporate Profiles',
-    body: 'Decks built to be presented, not read — where the argument is the design.',
+    body: 'Decks built to be presented rather than read.',
     lead: 'Decks built to be presented, not read —',
     leadBold: 'the argument is the design.',
     stats: [
@@ -1326,9 +1331,9 @@ export const CATEGORIES: Category[] = [
         thumbnail: '/images/Presentation/A self-presentation deck/thumbnail.svg',
         software: ['Figma'],
         problem:
-          'A deck about myself, built for a company I wanted to work at. The hardest brief there is — no client to hide behind, and the design gets judged as hard as anything I put inside it.',
+          "A deck about myself, built for a company I wanted to work at. The hardest brief there is. No client to hide behind, and the design gets judged as hard as anything I put inside it.",
         solution:
-          "Structured as an argument rather than a portfolio: who I am, what I've shipped, what I'd do there. Built in Figma so the deck itself was a design artefact, not a PowerPoint.",
+          "Structured as an argument rather than a portfolio. Who I am, what I've shipped, what I'd do there. Built in Figma so the deck itself was a design artefact, not a PowerPoint.",
         processRows: [
           {
             label: 'AUDIENCE',
@@ -1337,12 +1342,12 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'EVIDENCE',
-            text: 'Talk is cheap in a deck about yourself, so the middle section is nothing but work and numbers. Dark cover, light body, dark close — the tonal shift does the sectioning, so I never spent a slide on a divider when I only had ten.',
+            text: "Talk is cheap in a deck about yourself, so the middle section is nothing but work and numbers. Dark cover, light body, dark close. The tonal shift does the sectioning, so I never spent a slide on a divider when I only had ten.",
             textOnly: true,
           },
           {
             label: 'CLOSE',
-            text: "The last slide returns to the cover's dark treatment and introduces nothing new. It exists purely to signal that the presenting is over and the conversation starts — which is the moment the whole deck was built to reach.",
+            text: "The last slide returns to the cover's dark treatment and introduces nothing new. It exists purely to signal that the presenting is over and the conversation starts, which is the moment the whole deck was built to reach.",
             textOnly: true,
           },
         ],
@@ -1361,9 +1366,9 @@ export const CATEGORIES: Category[] = [
         software: ['Figma'],
         thumbnail: '/images/Presentation/A proposal prototype/thumbnail.svg',
         problem:
-          "A consulting proposal where the methodology is the sell — five phases across four delivery waves. As slides it's five pages of cards, and by page three the client has lost the shape of the whole thing.",
+          "A consulting proposal where the methodology is the sell. Five phases across four delivery waves. As slides it's five pages of cards, and by page three the client has lost the shape of the whole thing.",
         solution:
-          'Built in Figma as a clickable prototype instead of a deck: the approach becomes one horizontal track the client pans along, so the sequence stays visible while they move through it.',
+          "Built in Figma as a clickable prototype instead of a deck. The approach becomes one horizontal track the client pans along, so the sequence stays visible while they move through it.",
         processRows: [
           {
             label: 'TRACK',
@@ -1377,7 +1382,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'RETURN',
-            text: 'Every path leads back to the opening requirements screen. A proposal gets revisited in a room full of people arguing — it needed a fixed point to return to, not a linear exit.',
+            text: "Every path leads back to the opening requirements screen. A proposal gets revisited in a room full of people arguing. It needed a fixed point to return to, not a linear exit.",
             textOnly: true,
           },
         ],
@@ -1401,13 +1406,13 @@ export const CATEGORIES: Category[] = [
         thumbnail: '/images/Presentation/A product pitch deck/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
-          'Six slides to sell an AI payroll and HR platform to enterprise buyers running payroll across multiple countries — people who sit through pitches for a living and have heard every version of “one platform” before.',
+          "Six slides to sell an AI payroll and HR platform to enterprise buyers running payroll across multiple countries. People who sit through pitches for a living and have heard every version of “one platform” before.",
         solution:
           "One claim per slide, ordered the way a sceptic asks for it: what's broken, what this is, how it flows, who already runs on it.",
         processRows: [
           {
             label: 'CLAIM',
-            text: 'It opens by naming the problem and the fix in the same breath — payroll is broken, we fixed it — before a single feature appears. A pitch that leads with capability is asking the room to work out why it should care, and enterprise buyers won’t do that work for you.',
+            text: "It opens by naming the problem and the fix in the same breath, payroll is broken and we fixed it, before a single feature appears. A pitch that leads with capability is asking the room to work out why it should care, and enterprise buyers won't do that work for you.",
             textOnly: true,
           },
           {
@@ -1417,7 +1422,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'PROOF',
-            text: "Credibility lands last and lands as numbers — companies onboarded, countries covered, monthly users — set large enough that they're the only thing on the slide. The line underneath is the actual closer: built by people who've done payroll the hard way.",
+            text: "Credibility lands last and lands as numbers. Companies onboarded, countries covered, monthly users, set large enough that they're the only thing on the slide. The line underneath is the actual closer: built by people who've done payroll the hard way.",
             textOnly: true,
           },
         ],
@@ -1432,7 +1437,7 @@ export const CATEGORIES: Category[] = [
         thumbnail: '/images/Presentation/A presentation system/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
-          'A consulting team producing a constant stream of client decks — kickoffs, scoping documents, executive committee updates — built mostly by consultants, not designers. Without a system every deck restarts every decision, and none of them match.',
+          "A consulting team producing a constant stream of client decks. Kickoffs, scoping documents, executive committee updates, built mostly by consultants, not designers. Without a system every deck restarts every decision, and none of them match.",
         solution:
           'A master template where the decisions are already made. Layouts, dividers, scope matrices and chart language, all locked, so a consultant fills a deck in rather than designing one.',
         processRows: [
@@ -1443,7 +1448,7 @@ export const CATEGORIES: Category[] = [
           },
           {
             label: 'DIVIDERS',
-            text: 'Dividers ship with visible placeholder copy — a title and a two-line description, with the line limit stated. An unlabelled empty slide gets skipped; a labelled one with a stated constraint gets filled correctly. The placeholder is the instruction.',
+            text: "Dividers ship with visible placeholder copy, a title and a two-line description, with the line limit stated. An unlabelled empty slide gets skipped. A labelled one with a stated constraint gets filled correctly. The placeholder is the instruction.",
             textOnly: true,
           },
           {
@@ -1464,23 +1469,23 @@ export const CATEGORIES: Category[] = [
         thumbnail: '/images/Presentation/An interactive deck/thumbnail.svg',
         software: ['PowerPoint', 'Illustrator'],
         problem:
-          'A thirty-three slide people update spanning four HR functions — shared services, talent acquisition, talent management and organisational development — presented to leaders who each mainly care about one of them. Linear slide order serves nobody in that room.',
+          "A thirty-three slide people update spanning four HR functions, shared services, talent acquisition, talent management and organisational development, presented to leaders who each mainly care about one of them. Linear slide order serves nobody in that room.",
         solution:
           'A persistent tab bar on every slide, so the deck gets navigated by function rather than sat through in sequence.',
         processRows: [
           {
             label: 'NAVIGATION',
-            text: 'Four function tabs hold the same position across all thirty-three slides, with the active one highlighted. It turns a deck into something closer to a product — when someone asks about hiring mid-presentation, the presenter clicks instead of scrubbing backwards through twenty slides.',
+            text: "Four function tabs hold the same position across all thirty-three slides, with the active one highlighted. It turns a deck into something closer to a product. When someone asks about hiring mid-presentation, the presenter clicks instead of scrubbing backwards through twenty slides.",
             textOnly: true,
           },
           {
             label: 'DATA',
-            text: 'Recruitment splits by designation, service line and location. Salary benchmarks against competitors. Ticket volumes and SLA trends. Headcount, org structures, six-month timelines. One chart language across all of it — same palette logic, same label treatment, same weight — so thirty slides of unrelated numbers still read as one document instead of thirty exports.',
+            text: "Recruitment splits by designation, service line and location. Salary benchmarks against competitors. Ticket volumes and SLA trends. Headcount, org structures, six-month timelines. One chart language across all of it, same palette logic, same label treatment, same weight, so thirty slides of unrelated numbers still read as one document instead of thirty exports.",
             textOnly: true,
           },
           {
             label: 'RHYTHM',
-            text: "Numbered full-bleed dividers between the four sections, then a consistent grid within them. In a deck this dense the dividers aren't decoration — they're the only moment the room gets to breathe before the next wall of data.",
+            text: "Numbered full-bleed dividers between the four sections, then a consistent grid within them. In a deck this dense the dividers aren't decoration. They're the only moment the room gets to breathe before the next wall of data.",
             textOnly: true,
           },
         ],
@@ -1549,36 +1554,11 @@ export const ROLES: Role[] = [
     title: 'Deputy Manager - Marketing Design',
     period: 'June 2023 - April 2025',
     bullets: [
-      [{ text: 'Led the ' }, { text: 'UI/UX', strong: true }, { text: ' function within the Marketing Design team.' }],
-      [
-        { text: 'Designed enterprise ' },
-        { text: 'dashboards', strong: true },
-        { text: ', ' },
-        { text: 'mobile apps,', strong: true },
-        { text: ' and ' },
-        { text: 'web experiences', strong: true },
-        { text: ' for clients across India and the Middle East.' },
-      ],
-      [
-        { text: 'Created ' },
-        { text: 'marketing collaterals', strong: true },
-        { text: ' including exhibition booths, brochures, e-magazines, and campaign assets.' },
-      ],
-      [
-        { text: 'Simplified complex business challenges into ' },
-        { text: 'strategic presentations,', strong: true },
-        { text: ' intuitive & user-centered digital solutions.' },
-      ],
-      [
-        { text: 'Built and maintained ' },
-        { text: 'scalable design systems', strong: true },
-        { text: ' to ensure consistency across projects.' },
-      ],
-      [
-        { text: 'Transformed ideas into ' },
-        { text: 'interactive dashboard prototypes,', strong: true },
-        { text: ' helping stakeholders visualize solutions before development.' },
-      ],
+      [{ text: 'Led the ' }, { text: 'UI/UX function', strong: true }, { text: ' inside the Marketing Design team.' }],
+      [{ text: 'Designed enterprise ' }, { text: 'dashboards', strong: true }, { text: ', ' }, { text: 'mobile apps', strong: true }, { text: ' and ' }, { text: 'web experiences', strong: true }, { text: ' for clients across India and the Middle East.' }],
+      [{ text: 'Built the ' }, { text: 'exhibition booths, brochures, e-magazines', strong: true }, { text: ' and campaign assets that went out alongside them.' }],
+      [{ text: 'Made the ' }, { text: 'deck system', strong: true }, { text: ' the consulting team still fills in, so a slide built at 11pm sits correctly next to one I built.' }],
+      [{ text: 'Prototyped dashboards', strong: true }, { text: ' before development, so stakeholders argued about the real thing instead of a description of it.' }],
     ],
   },
   {
@@ -1589,41 +1569,11 @@ export const ROLES: Role[] = [
     period: 'January 2019 - December 2022',
     progression: ['Graphic Designer', 'Visual Designer', 'Senior Visual Designer'],
     bullets: [
-      [
-        { text: 'Progressed through ' },
-        { text: 'three', strong: true },
-        { text: ' design roles, led marketing design for the ' },
-        { text: 'Partnerships, Startups,', strong: true },
-        { text: ' and ' },
-        { text: 'Marketplace teams.', strong: true },
-      ],
-      [
-        { text: 'Collaborated with ' },
-        { text: '100+', strong: true },
-        { text: ' global stakeholders across regions and business functions.' },
-      ],
-      [
-        { text: 'Drove branding and creative direction for flagship programs including ' },
-        { text: 'Freshstart, Orbitshift Podcast,', strong: true },
-        { text: ' and ' },
-        { text: 'Forge.', strong: true },
-      ],
-      [
-        { text: 'Played a key role in the ' },
-        { text: 'Freshworks global rebranding', strong: true },
-        { text: ' initiative, helping scale visual consistency across digital touchpoints.' },
-      ],
-      [
-        { text: 'Designed integrated ' },
-        { text: 'marketing campaigns, event branding, landing pages,', strong: true },
-        { text: ' and digital experiences for global audiences.' },
-      ],
-      [
-        { text: 'Recognized for creative excellence through awards including ' },
-        { text: 'Best Rookie (2019)', strong: true },
-        { text: ' and ' },
-        { text: 'Certificate of Innovation (2020).', strong: true },
-      ],
+      [{ text: 'Three roles in four years', strong: true }, { text: ', leading marketing design for the ' }, { text: 'Partnerships, Startups', strong: true }, { text: ' and ' }, { text: 'Marketplace', strong: true }, { text: ' teams.' }],
+      [{ text: 'Worked with ' }, { text: '100+ stakeholders', strong: true }, { text: ' across regions, most of whom wanted different things from the same asset.' }],
+      [{ text: 'Built the identities for ' }, { text: 'Freshstart, Orbitshift Podcast', strong: true }, { text: ' and ' }, { text: 'Forge', strong: true }, { text: ', all three of which are case studies on this site.' }],
+      [{ text: 'Part of the core team on the ' }, { text: 'global rebrand', strong: true }, { text: ', keeping the new system consistent as it rolled across digital touchpoints.' }],
+      [{ text: 'Best Rookie (2019)', strong: true }, { text: ' and ' }, { text: 'Certificate of Innovation (2020)', strong: true }, { text: '.' }],
     ],
   },
   {
@@ -1633,40 +1583,10 @@ export const ROLES: Role[] = [
     title: 'Graphic Designer',
     period: 'August 2017 - October 2018',
     bullets: [
-      [
-        { text: 'Designed executive presentations and visual communication materials for ' },
-        { text: 'Fortune 500 clients.', strong: true },
-      ],
-      [
-        { text: 'Created custom ' },
-        { text: 'illustrations, infographics,', strong: true },
-        { text: ' and ' },
-        { text: 'layouts', strong: true },
-        { text: ' for business-critical communications.' },
-      ],
-      [
-        { text: 'Collaborated with animation teams to develop ' },
-        { text: 'storyboards', strong: true },
-        { text: ' and ' },
-        { text: 'motion design assets.', strong: true },
-      ],
-      [
-        { text: 'Translated complex information into ' },
-        { text: 'visually engaging', strong: true },
-        { text: ' and ' },
-        { text: 'easy-to-understand presentations.', strong: true },
-      ],
-      [
-        { text: 'Maintained brand consistency while managing ' },
-        { text: 'high-volume', strong: true },
-        { text: ' creative requests.' },
-      ],
-      [
-        { text: 'Delivered creative solutions for global clients including ' },
-        { text: 'First Data, Cisco,', strong: true },
-        { text: ' and ' },
-        { text: 'McKinsey & Company.', strong: true },
-      ],
+      [{ text: 'Executive presentations for ' }, { text: 'Fortune 500 clients', strong: true }, { text: ', including ' }, { text: 'First Data, Cisco', strong: true }, { text: ' and ' }, { text: 'McKinsey & Company', strong: true }, { text: '.' }],
+      [{ text: 'Custom ' }, { text: 'illustrations, infographics', strong: true }, { text: ' and layouts for communications that had real money attached.' }],
+      [{ text: 'Storyboards and motion assets', strong: true }, { text: ' with the animation team.' }],
+      [{ text: 'High volume, strict brand rules, no room to be precious about any of it.' }],
     ],
   },
   {
@@ -1676,35 +1596,9 @@ export const ROLES: Role[] = [
     title: 'Junior Designer',
     period: 'April 2016 - July 2017',
     bullets: [
-      [
-        { text: 'Created ' },
-        { text: 'print', strong: true },
-        { text: ' and ' },
-        { text: 'digital advertisements', strong: true },
-        { text: ' for leading publications across the ' },
-        { text: 'ANZ market.', strong: true },
-      ],
-      [
-        { text: 'Adapted creative assets across industries while adhering to ' },
-        { text: 'strict brand guidelines.', strong: true },
-      ],
-      [{ text: 'Produced ' }, { text: 'high-volume advertising creatives', strong: true }, { text: ' with accuracy and attention to detail.' }],
-      [
-        { text: 'Collaborated with production teams', strong: true },
-        { text: ' to ensure timely delivery of campaign assets.' },
-      ],
-      [
-        { text: 'Developed strong foundations in ' },
-        { text: 'layout design, typography,', strong: true },
-        { text: ' and visual storytelling.' },
-      ],
-      [
-        { text: 'Gained expertise in ' },
-        { text: 'production workflows', strong: true },
-        { text: ' and ' },
-        { text: 'market-specific', strong: true },
-        { text: ' creative execution.' },
-      ],
+      [{ text: 'Print and digital advertising', strong: true }, { text: ' for publications across the ANZ market.' }],
+      [{ text: 'Adapted creative across industries under ' }, { text: 'strict brand guidelines', strong: true }, { text: ', at volume.' }],
+      [{ text: 'Learned ' }, { text: 'layout, typography and production workflow', strong: true }, { text: ' properly, which is the part that still holds everything else up.' }],
     ],
   },
 ];
@@ -1752,6 +1646,7 @@ export const CONNECT_LINKS: ConnectLink[] = [
   { label: 'Email', value: 'shriramsiva18726@gmail.com', href: 'mailto:shriramsiva18726@gmail.com' },
   { label: 'LinkedIn', value: '/in/shriramsiva', href: 'https://www.linkedin.com/in/shriramsiva/' },
   { label: 'Dribbble', value: '/shriramsiva', href: 'https://dribbble.com/shriramsiva' },
+  { label: 'WhatsApp', value: '+91 96772 56341', href: 'https://wa.me/919677256341' },
   { label: 'Resume', value: 'PDF', href: RESUME_HREF },
 ];
 
@@ -1871,7 +1766,7 @@ export const INTRO_TILES: IntroTile[] = [
       { text: 'motion systems,', accent: true },
       { text: ' and ' },
       { text: 'speculative rebrands', accent: true },
-      { text: ' — mostly how each one changes the way a system gets built.' },
+      { text: '. Mostly how each one changes the way a system gets built.' },
     ],
   },
   {
