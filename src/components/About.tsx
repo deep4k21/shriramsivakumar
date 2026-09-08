@@ -148,8 +148,8 @@ function IntroTile({
       style={{ ...reveal, opacity }}
     >
       <CardGlow />
-      <div className="flex items-center gap-2.25 font-heading text-lg font-semibold text-white">
-        <img src={tile.icon} alt="" aria-hidden="true" className="size-4.5" />
+      <div className="flex items-center gap-2.25 font-heading text-[19.8px] font-semibold text-white">
+        <img src={tile.icon} alt="" aria-hidden="true" className="size-5" />
         {tile.label}
       </div>
       {/*
@@ -157,7 +157,7 @@ function IntroTile({
         live in the copy, so a highlight can sit tight against the comma
         that follows it.
       */}
-      <div className="font-body text-[15px]/[1.6] text-grey">
+      <div className="font-body text-[16.5px]/[1.6] text-grey">
         {tile.segments.map((run, j) =>
           run.accent ? (
             <span key={j} className="font-bold text-teal">
