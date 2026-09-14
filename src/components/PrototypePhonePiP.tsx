@@ -43,8 +43,9 @@ function Notch() {
  * Styled like the site's one other real call-to-action button (the resume
  * download) rather than a bare text link — this button is the entire
  * content of its slot, not a caption under an image, and needed the visual
- * weight to read as the row's actual artefact. Centred both ways in the
- * slot, filling the column the way an image would.
+ * weight to read as the row's actual artefact. Centred vertically and
+ * flush with the slot's own right edge, matching how a stacked asset's
+ * `assetAlign: 'end'` sits away from the text column beside it.
  */
 export function PrototypePhonePiP({ pip }: { pip: ProcessRowPhonePiP }) {
   const [open, setOpen] = useState(false);
@@ -52,7 +53,7 @@ export function PrototypePhonePiP({ pip }: { pip: ProcessRowPhonePiP }) {
   useEscapeKey(close);
 
   return (
-    <div className="flex h-full min-h-[160px] w-full items-center justify-center">
+    <div className="flex h-full min-h-[160px] w-full items-center justify-end">
       <motion.button
         type="button"
         onClick={() => setOpen(true)}
