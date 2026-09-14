@@ -26,6 +26,13 @@ export interface ProcessRow {
    */
   wideSlot?: boolean;
   /**
+   * Centres the slot column both ways instead of the template default of
+   * pinning it to the top — for a slot whose content is a single compact
+   * element (a button) rather than an image that reads fine flush with the
+   * label beside it.
+   */
+  slotCenter?: boolean;
+  /**
    * The slot's aspect ratio as width/height (e.g. 1.5576).
    *
    * For a `prototype` row, this is the artboard's own ratio — Figma's
@@ -99,12 +106,11 @@ export interface ProcessRow {
    */
   document?: RowDocument;
   /**
-   * Renders the slot as a phone-shaped picture-in-picture: a static mockup
-   * fills the slot, with the live prototype held in a small inset in the
-   * lower-right corner. Clicking either box swaps which one is full size —
-   * the slot's own height never changes. The landscape counterpart to
-   * `prototype`, for a project whose artefact is a phone screen rather than
-   * a desktop one. Omit for a standard slot.
+   * Renders the slot as a text trigger that opens a live mobile prototype
+   * full screen in a phone-shaped lightbox, rather than an inline frame —
+   * a phone shown at case-study scale reads as a small mockup rather than a
+   * working app, so the device only appears once, at full size, once the
+   * reader asks for it. Omit for a standard slot.
    */
   phonePiP?: ProcessRowPhonePiP;
   /**
@@ -118,6 +124,29 @@ export interface ProcessRow {
    */
   accordion?: ProjectFaqItem[];
   /**
+   * Colours this row's own label teal instead of orange — for an
+   * `accordion` row meant to read as the project's FAQ section rather than
+   * as one more numbered step in the process, matching the label colour
+   * `Project.faq` itself uses. The questions inside stay orange either way;
+   * only the row's own heading changes.
+   */
+  accordionFaqStyle?: boolean;
+  /** Hides this accordion row's own heading — for a block that reads fine as a bare list right after the row above it. */
+  accordionHideLabel?: boolean;
+  /** Drops this accordion row's own top border/padding — pairs with the row above setting `joinNext`, so the two sit flush as one block. */
+  accordionJoinPrevious?: boolean;
+  /** Opens the first question on load instead of starting fully closed — matching `Project.faq`'s own default. */
+  accordionDefaultOpenFirst?: boolean;
+  /** Colours this row's own label teal instead of the default orange every process row uses. */
+  labelColor?: 'orange' | 'teal';
+  /**
+   * Drops this row's own bottom padding, so the row right after it (given
+   * matching `accordionHideLabel`/`joinPrevious` treatment) sits flush
+   * beneath it rather than with the usual gap — for two rows meant to read
+   * as one continuous block.
+   */
+  joinNext?: boolean;
+  /**
    * Combines this row with the one immediately after it into a single block:
    * two columns side by side, each stacking its own label, text and slot,
    * with a vertical rule between them — rather than two separate full-width
@@ -130,18 +159,10 @@ export interface ProcessRow {
   pairWithNext?: boolean;
 }
 
-/** One platform's live prototype in a `phonePiP` slot's inset. */
+/** A live mobile prototype, opened full screen from a text trigger rather than shown inline. */
 export interface ProcessRowPhonePiP {
-  /** The static mockup image, filling the slot until the inset is clicked. */
-  image: string;
-  /** Embed URL for the live prototype (never opened in a new tab). */
+  /** Embed URL for the live prototype. */
   embedUrl: string;
-  /**
-   * Where a text link under the frame opens the prototype full size, outside
-   * the modal's own PiP swap — some prototypes are worth a reader's whole
-   * screen rather than the inset's fixed size. Omit to leave the link out.
-   */
-  fullSizeUrl?: string;
 }
 
 export interface ProjectPrototype {
@@ -532,6 +553,33 @@ export const CATEGORIES: Category[] = [
           {
             label: 'WHAT I CHANGED',
             text: 'The build came back fast and mostly right. **This is the part that was not.**',
+            // No image slot, and stacked rather than the usual text-only
+            // two-column shape: a short intro line ahead of the FAQ row
+            // below reads better as its own full-width statement than as
+            // half a row beside an empty column. Teal rather than the usual
+            // orange label — it leads into the FAQ row right after it, which
+            // carries the same teal heading colour, so the two read as one
+            // continuous section rather than two unrelated rows.
+            textOnly: true,
+            stacked: true,
+            labelColor: 'teal',
+            // No bottom padding/border of its own — the FAQ row right after
+            // it joins flush, so the two read as one continuous block
+            // rather than two separate sections.
+            joinNext: true,
+          },
+          {
+            label: 'FAQ',
+            text: '',
+            // No visible heading of its own — WHAT I CHANGED right above it
+            // already introduces this as the review, so a second "FAQ"
+            // title between them would repeat rather than add anything.
+            // Its own accordion row rather than `Project.faq` itself: that
+            // field always opens its first item and always renders after
+            // every row, where this one starts fully closed.
+            accordionHideLabel: true,
+            accordionJoinPrevious: true,
+            accordionDefaultOpenFirst: true,
             accordion: [
               {
                 q: 'A whole home section went missing',
@@ -567,18 +615,15 @@ export const CATEGORIES: Category[] = [
             label: 'PROTOTYPE',
             text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
             slot: 'LIVE PROTOTYPE',
-            stacked: true,
-            // No fixed height: the frame fills the modal's own measured
-            // available height instead of a smaller fixed guess, so it reads
-            // as the tallest, most substantial slot in the modal without
-            // ever overflowing the viewport. Full width rather than the
-            // standard two-column split — a phone frame needs its own row to
-            // read as an actual phone rather than a mockup squeezed into a
-            // text column.
+            // Standard two-column row rather than a stacked one: the slot is
+            // now a single button, not an inline phone frame, so it no
+            // longer needs a row of its own to have room to read as a device.
+            // Centred rather than pinned to the top — a button reads fine
+            // sitting in the middle of its column, where an image usually
+            // wants to align with the label beside it.
+            slotCenter: true,
             phonePiP: {
-              image: '',
               embedUrl: 'https://helpful-muse-tool.lovable.app/home',
-              fullSizeUrl: 'https://helpful-muse-tool.lovable.app/home',
             },
           },
         ],

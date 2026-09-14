@@ -53,7 +53,7 @@ function renderSlot(row: ProcessRow, availableHeight?: string) {
       columns={row.assetColumns}
     />
   ) : row.phonePiP ? (
-    <PrototypePhonePiP pip={row.phonePiP} height={row.slotHeight ?? (row.slotMaxHeight ?? availableHeight)} />
+    <PrototypePhonePiP pip={row.phonePiP} />
   ) : row.prototype ? (
     <div
       className={row.slotAspect || row.slotAspectVideo ? 'mx-auto' : 'w-full'}
@@ -103,14 +103,14 @@ function renderSlot(row: ProcessRow, availableHeight?: string) {
 }
 
 /** A `pairWithNext` column's own label, text and slot, stacked vertically. */
-function PairColumn({ row }: { row: ProcessRow }) {
+function PairColumn({ row, availableHeight }: { row: ProcessRow; availableHeight?: string }) {
   return (
     <div className="flex h-full flex-col justify-between gap-20">
       <div className="flex flex-col gap-2">
         <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
         <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(row.text)}</p>
       </div>
-      <div className="w-full">{renderSlot(row)}</div>
+      <div className="w-full">{renderSlot(row, availableHeight)}</div>
     </div>
   );
 }
@@ -126,16 +126,46 @@ function PairColumn({ row }: { row: ProcessRow }) {
  * — no question open on load — where the project-level FAQ opens its first
  * item, so the two need separate state rather than sharing one counter.
  */
-function ProcessAccordionRow({ label, intro, items }: { label: string; intro: string; items: ProjectFaqItem[] }) {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+function ProcessAccordionRow({
+  label,
+  intro,
+  items,
+  faqStyle,
+  showLabel = true,
+  joinPrevious,
+  defaultOpenFirst,
+}: {
+  label: string;
+  intro: string;
+  items: ProjectFaqItem[];
+  faqStyle?: boolean;
+  /** Hides the row's own heading — for a block that reads fine as a bare list of questions right after the row above it. */
+  showLabel?: boolean;
+  /**
+   * Drops this row's own top border and top padding, so it sits flush
+   * beneath the row above instead of reading as a separate section — for
+   * an accordion of questions that continues the row right before it
+   * rather than starting a new one.
+   */
+  joinPrevious?: boolean;
+  /** Opens the first item on load instead of starting fully closed — matching `Project.faq`'s own default. */
+  defaultOpenFirst?: boolean;
+}) {
+  const [openIdx, setOpenIdx] = useState<number | null>(defaultOpenFirst ? 0 : null);
   const listId = `accordion-${label}`;
 
   return (
-    <div className="border-t border-white/7 py-5">
-      <div className="flex flex-col gap-2">
-        <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{label}</div>
-        <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(intro)}</p>
-      </div>
+    <div className={joinPrevious ? 'pb-5' : 'border-t border-white/7 py-5'}>
+      {(showLabel || intro) && (
+        <div className="flex flex-col gap-2">
+          {showLabel && (
+            <div className={`font-heading text-xs font-semibold tracking-[0.14em] ${faqStyle ? 'text-teal' : 'text-orange'}`}>
+              {label}
+            </div>
+          )}
+          {intro && <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(intro)}</p>}
+        </div>
+      )}
       <div data-accordion-list={listId} className="mt-4 flex flex-col">
         {items.map((item, i) => {
           const open = openIdx === i;
@@ -499,25 +529,35 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   className="grid items-stretch gap-8 divide-x divide-white/7 border-t border-white/7 py-5"
                   style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
                 >
-                  <PairColumn row={row} />
-                  <PairColumn row={next} />
+                  <PairColumn row={row} availableHeight={availableBodyHeight} />
+                  <PairColumn row={next} availableHeight={availableBodyHeight} />
                 </div>
               );
             }
 
             /*
-              A text-only row has no slot at all — not an empty one. It keeps
-              the two-column shape so the labels stay aligned with every other
-              row, and the text simply takes the width the image would have had.
+              A text-only row has no slot at all — not an empty one. By
+              default it keeps the two-column shape so the labels stay
+              aligned with every other row, and the text simply takes the
+              width the image would have had. `stacked` opts a row out of
+              that alignment in favour of reading as its own full-width
+              block — a closing note rather than one more numbered step
+              beside an empty column.
             */
             if (row.textOnly) {
               return (
                 <div
                   key={row.label}
-                  className="grid items-start gap-6 border-t border-white/7 py-5"
-                  style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
+                  className={
+                    row.stacked
+                      ? `flex flex-col gap-2 border-t border-white/7 pt-5 ${row.joinNext ? '' : 'pb-5'}`
+                      : 'grid items-start gap-6 border-t border-white/7 py-5'
+                  }
+                  style={row.stacked ? undefined : { gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}
                 >
-                  <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">
+                  <div
+                    className={`font-heading text-xs font-semibold tracking-[0.14em] ${row.labelColor === 'teal' ? 'text-teal' : 'text-orange'}`}
+                  >
                     {row.label}
                   </div>
                   <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(row.text)}</p>
@@ -537,7 +577,16 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             */
             if (row.accordion) {
               return (
-                <ProcessAccordionRow key={row.label} label={row.label} intro={row.text} items={row.accordion} />
+                <ProcessAccordionRow
+                  key={row.label}
+                  label={row.label}
+                  intro={row.text}
+                  items={row.accordion}
+                  faqStyle={row.accordionFaqStyle}
+                  showLabel={!row.accordionHideLabel}
+                  joinPrevious={row.accordionJoinPrevious}
+                  defaultOpenFirst={row.accordionDefaultOpenFirst}
+                />
               );
             }
 
@@ -547,7 +596,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                 className={
                   row.stacked
                     ? 'flex flex-col gap-5 border-t border-white/7 py-5'
-                    : 'grid items-start gap-6 border-t border-white/7 py-5'
+                    : `grid ${row.slotCenter ? 'items-center' : 'items-start'} gap-6 border-t border-white/7 py-5`
                 }
                 style={
                   row.stacked
@@ -571,7 +620,9 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                     {withEmphasis(row.text)}
                   </p>
                 </div>
-                <div className={row.stacked ? 'w-full' : 'self-start'}>{renderSlot(row, availableBodyHeight)}</div>
+                <div className={row.stacked ? 'w-full' : row.slotCenter ? 'h-full self-stretch' : 'self-start'}>
+                  {renderSlot(row, availableBodyHeight)}
+                </div>
               </div>
             );
           })}
