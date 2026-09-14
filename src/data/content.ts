@@ -68,11 +68,55 @@ export interface ProcessRow {
    */
   assetSet?: RowAsset[];
   /**
+   * Lays an `assetSet` of two top to bottom instead of side by side — a
+   * board and the token set applied beneath it, say, rather than two
+   * artefacts of the same kind shown for comparison. Each piece takes the
+   * slot's full width at its own ratio; `assetSet`'s usual height-led sizing
+   * (every piece the same height, width following) has no "same height" to
+   * share once there's only one column. Meaningless with fewer than two
+   * assets or without `assetSet` set at all.
+   */
+  assetStack?: boolean;
+  /**
+   * Horizontal alignment of a stacked `assetSet` within its slot column —
+   * `assetStack` only. Defaults to centred; `'end'` sits the artwork flush
+   * with the slot's own right edge instead, away from the text column
+   * beside it.
+   */
+  assetAlign?: 'center' | 'end';
+  /**
+   * Lays a row's `assetSet` side by side in even halves rather than the
+   * default's own-ratio share — two renderings of the same screen read as
+   * one comparison at equal width, not two differently-shaped artefacts.
+   * For a `textOnly`-style full-width row (`stacked: true`) whose images
+   * still want two columns rather than one shared height-led stack.
+   */
+  assetColumns?: boolean;
+  /**
    * Renders the slot as a paginated viewer for a multi-page document. Unlike
    * the prototype variant there is no static mockup behind it — the viewer
    * fills the slot. Omit for a standard single slot.
    */
   document?: RowDocument;
+  /**
+   * Renders the slot as a phone-shaped picture-in-picture: a static mockup
+   * fills the slot, with the live prototype held in a small inset in the
+   * lower-right corner. Clicking either box swaps which one is full size —
+   * the slot's own height never changes. The landscape counterpart to
+   * `prototype`, for a project whose artefact is a phone screen rather than
+   * a desktop one. Omit for a standard slot.
+   */
+  phonePiP?: ProcessRowPhonePiP;
+  /**
+   * Renders the row's text as the intro line above an accordion of
+   * question/answer pairs, in place of the slot a standard row would carry.
+   * The same collapsed-question, click-to-reveal pattern `Project.faq` uses,
+   * but scoped to this one row rather than sitting as its own section after
+   * every process row — the row keeps its own label and place in the
+   * sequence, and the accordion is what fills its slot. All items start
+   * closed. Omit for a standard row.
+   */
+  accordion?: ProjectFaqItem[];
   /**
    * Combines this row with the one immediately after it into a single block:
    * two columns side by side, each stacking its own label, text and slot,
@@ -84,6 +128,20 @@ export interface ProcessRow {
    * again on its own.
    */
   pairWithNext?: boolean;
+}
+
+/** One platform's live prototype in a `phonePiP` slot's inset. */
+export interface ProcessRowPhonePiP {
+  /** The static mockup image, filling the slot until the inset is clicked. */
+  image: string;
+  /** Embed URL for the live prototype (never opened in a new tab). */
+  embedUrl: string;
+  /**
+   * Where a text link under the frame opens the prototype full size, outside
+   * the modal's own PiP swap — some prototypes are worth a reader's whole
+   * screen rather than the inset's fixed size. Omit to leave the link out.
+   */
+  fullSizeUrl?: string;
 }
 
 export interface ProjectPrototype {
@@ -147,6 +205,13 @@ export interface RowAsset {
    * the tile's border directly.
    */
   padded?: boolean;
+  /**
+   * Overrides the row's own `assetAlign` for this one piece — a stack whose
+   * pieces don't all want the same treatment (a wide board flush with the
+   * text column's edge, a narrower comparison shot centred beneath it).
+   * `assetStack` only; meaningless anywhere else.
+   */
+  align?: 'center' | 'end';
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
@@ -185,6 +250,20 @@ export interface Project {
    * Podcast") need to set this.
    */
   title?: string;
+  /**
+   * Overrides the header's eyebrow line, which otherwise reads the category's
+   * own `title` (e.g. every UI/UX project shows "UI/UX DESIGN"). For a
+   * project that spans more than the category name alone describes — a
+   * mobile app inside a category that also holds desktop dashboards — this
+   * says so without changing what every other project in the category shows.
+   */
+  eyebrow?: string;
+  /**
+   * A one-line deck under the header's title, above the tab row. Optional —
+   * the header sits exactly as it does today for every project that omits
+   * this, which is all of them but the one that first needed it.
+   */
+  subtitle?: string;
   software: string[];
   /**
    * Artwork for the project's tile in the category panel and the banner at the
@@ -389,6 +468,123 @@ export const CATEGORIES: Category[] = [
       { value: '10+', label: 'GLOBAL MARKETS' },
     ],
     projects: [
+      {
+        name: 'Chamaco',
+        // The category's own eyebrow ("UI/UX DESIGN") undersells this one —
+        // it's a mobile app in a food-and-delivery vertical, inside a
+        // category that otherwise holds desktop dashboards and enterprise
+        // platforms, so the header says so.
+        eyebrow: 'UI/UX · Mobile · Food and delivery',
+        subtitle:
+          'A Mexican food ordering app, brand and all, built into a working prototype in two days.',
+        thumbnail: '/images/UIUX/Chamaco/1 Thumbnail.webp',
+        software: ['Figma', 'Claude', 'Lovable'],
+        problem:
+          "I set myself the brief I actually get. **A client wants something tappable by Monday** and it is already Thursday afternoon. No name, no brand, no visual system, and nobody to hand the production work to.\n\nI picked **food delivery** on purpose. It is the most crowded category in mobile, which makes standing out harder, and it is the vertical I would most likely be briefed on next.",
+        solution:
+          'Split the work by **what only a designer can actually do.**\n\n**Claude to think with. Figma for anything with a vector in it. Lovable to build.** I kept the naming, the brand, the wireframe and every judgment call, and handed off only what I could specify tightly enough.\n\nA complete ordering flow, live and clickable, in **the time a mood board usually takes.**',
+        // No `chips`/`typeface` — deliberately no Brand system row for this
+        // project. Row 2's design-system board carries the colour and type
+        // information the chip strip would otherwise duplicate.
+        processRows: [
+          {
+            label: 'GROUNDWORK',
+            // No image slot: the row's full width goes to the copy.
+            textOnly: true,
+            text: "Two days rules out recruited testing. What fits: pulling apart every major delivery app for colour, navigation and cart behaviour. **Checking trademarks before committing to a name.** Walking four people through the flow. Running a **contrast audit during the build, not after.**\n\n**Two names got killed before one survived.** The first was an outlaw motorcycle club. The second, a US restaurant group trading since the eighties.\n\n**Chamaco is Mexican slang for kid.** Nobody owns it, and it already means what the brand is. The new kid on the block.",
+          },
+          {
+            label: 'DESIGN SYSTEM',
+            text: 'Every big delivery app sits somewhere in the orange to red band. Chamaco runs **green and orange, with pink held back for anything you tap.**\n\nMexican pink got its name in 1949 and became the **unofficial colour of Mexico City.** It is the most distinctive colour available in this category, which is exactly why it is not the background. **Spend it everywhere and it stops meaning anything.**\n\nOne catch. At full strength it **fails contrast for body text,** so the accent runs two values. A bright one for fills, a darker one for anything carrying a label. The same split repeats across green and orange.\n\n**Nothing is a hex value in the build.** Every colour is a semantic token, so a button is primary-action rather than a particular green, and **dark mode mirrors every one of them** instead of being a second set of decisions made later.\n\nType splits the same way. **Salsa for display,** which carries the character, and **Roboto for body,** which stays out of the way. One face to be noticed, one to be read. Title 32/40, body 16/24, caption 13/18.',
+            slot: 'DESIGN SYSTEM',
+            stacked: true,
+            assetColumns: true,
+            assetSet: [
+              { src: '/images/UIUX/Chamaco/2A Design-system.webp', ratio: 1.7917 },
+              // Dark and light home, side by side within the one image — the
+              // token set applied, and the proof of the dark-mode claim above.
+              { src: '/images/UIUX/Chamaco/2B Color.webp', ratio: 1.0908 },
+            ],
+          },
+          {
+            label: 'APP ICON',
+            text: 'The icon had to work at the size of a thumbnail on a crowded home screen, so it carries the whole brand in one shape.\n\n**A sombrero, a taco, and a strand of papel picado bunting, arranged into a face.** The sombrero is one eye. The taco is the other. The bunting is the smile, and the scalloped hems read as teeth.\n\n**Three passes to get there.** Outline first, to test whether the shapes read at all. Then on dark, to check the weight held. Colour last, once the arrangement was settled.\n\n**The eyes do not match on purpose.** Symmetry would have been correct and forgettable, and forgettable is fatal on a screen full of delivery apps.',
+            slot: 'APP ICON — BUILD-UP',
+            stacked: true,
+            // The three-stage build-up is the point, so the full strip stays
+            // in frame rather than cropping to the final mark alone.
+            assetSet: [{ src: '/images/UIUX/Chamaco/3 app icon.webp', ratio: 4.0037 }],
+          },
+          {
+            label: 'WIREFRAME',
+            text: '**Every screen and every state drawn by hand in Figma** before a single prompt was written.\n\nOne thing came out of it the first layout did not have. The flow ended at order confirmation, which **skips the hardest screen in the category,** so live tracking went in.\n\n**AI can build a tracking screen. It cannot tell you your flow is missing one.**',
+            slot: 'WIREFRAME',
+            stacked: true,
+            assetColumns: true,
+            assetSet: [
+              { src: '/images/UIUX/Chamaco/4A Wireframe.webp', ratio: 1.2691 },
+              // Dark and light order tracking, side by side within the one
+              // image — the screen the copy above argues for, so it gets its
+              // own slot rather than sitting inside the wireframe sheet.
+              { src: '/images/UIUX/Chamaco/4B Tracking.webp', ratio: 1.1166 },
+            ],
+          },
+          {
+            label: 'WHAT I CHANGED',
+            text: 'The build came back fast and mostly right. **This is the part that was not.**',
+            accordion: [
+              {
+                q: 'A whole home section went missing',
+                a: 'The page shipped without it. The metadata still described the section that was not there.',
+              },
+              {
+                q: 'Every dish descriptor was the same length',
+                a: 'Padded to match. Real menus are uneven, and the uniformity read as filler the moment you scanned the list.',
+              },
+              {
+                q: 'A beer came back tagged vegetarian, with a spice rating',
+                a: 'Plausible-looking metadata applied to the wrong kind of item. Fast to generate, fast to miss.',
+              },
+              {
+                q: 'Category shortcuts wired to nothing',
+                a: 'They looked correct and did nothing. Working out which parts are only pretending to work is most of the review.',
+              },
+              {
+                q: 'The logo came back off-palette',
+                a: 'A cool grey ground with a dusty pink mark. All four values had drifted. None of them were the ones I specified.',
+              },
+              {
+                q: 'Theme, type and spacing pulled apart screen by screen',
+                a: 'Each screen was internally consistent and none of them agreed with each other. Pulling it back to one system was manual, start to finish.',
+              },
+              {
+                q: 'Reorder sat on the home screen of a first-time user',
+                a: 'It has nothing to reorder from. The four people testing the flow caught it. It now appears only once a first order exists.',
+              },
+            ],
+          },
+          {
+            label: 'PROTOTYPE',
+            text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
+            slot: 'LIVE PROTOTYPE',
+            stacked: true,
+            // No fixed height: the frame fills the modal's own measured
+            // available height instead of a smaller fixed guess, so it reads
+            // as the tallest, most substantial slot in the modal without
+            // ever overflowing the viewport. Full width rather than the
+            // standard two-column split — a phone frame needs its own row to
+            // read as an actual phone rather than a mockup squeezed into a
+            // text column.
+            phonePiP: {
+              image: '',
+              embedUrl: 'https://helpful-muse-tool.lovable.app/home',
+              fullSizeUrl: 'https://helpful-muse-tool.lovable.app/home',
+            },
+          },
+        ],
+        endNote:
+          'Two days produced a brand, a mark, a colour system that survives a contrast audit, and **something a client can hold in their hand.**\n\nEvery hour saved on production went straight back into the decisions. **The tools got faster. The judgment did not get optional.**',
+      },
       {
         name: 'Healthcare dashboard',
         thumbnail: '/images/UIUX/Healthdesk/thumbnail.svg',

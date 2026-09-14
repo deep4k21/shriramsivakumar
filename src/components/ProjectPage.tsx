@@ -1,13 +1,30 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import type { ProcessRow, Category } from '../data/content';
+import type { ProcessRow, Category, ProjectFaqItem } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { Overlay } from './Overlay';
 import { ProjectMetricsRow } from './ProjectMetricsRow';
 import { PrototypePiP } from './PrototypePiP';
+import { PrototypePhonePiP } from './PrototypePhonePiP';
 import { AssetSet } from './AssetSet';
 import { DocumentViewer } from './DocumentViewer';
 import { MotionClip } from './MotionClip';
+
+/**
+ * Renders a `**word**`-marked string as plain grey text with the marked
+ * phrases lifted to white — the emphasis treatment already used everywhere
+ * else on the site (career bullets, the about tiles), extended to the
+ * project template's own prose fields. No project's copy used `**` before
+ * this existed, so every existing `problem`/`solution`/`row.text` renders
+ * exactly as it did — this only activates where a project's own copy
+ * actually contains the markers.
+ */
+function withEmphasis(text: string) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  // `split` on a capturing group alternates plain, matched, plain, matched…
+  // starting and ending on a plain segment (possibly empty).
+  return parts.map((part, i) => (i % 2 === 1 ? <span key={i} className="font-semibold text-white">{part}</span> : part));
+}
 
 /**
  * The slot's content for one process row — the document viewer, prototype
@@ -15,13 +32,28 @@ import { MotionClip } from './MotionClip';
  * Pulled out of the row renderer so a `pairWithNext` pair can build both
  * sides' slots the same way a standalone row does.
  */
-function renderSlot(row: ProcessRow) {
+function renderSlot(row: ProcessRow, availableHeight?: string) {
   return row.document ? (
     <DocumentViewer doc={row.document} height={row.slotHeight} spread={row.wideSlot} fitHeight={row.slotAspect} />
   ) : row.motion ? (
     <MotionClip clip={row.motion} height={row.slotHeight} fitHeight={row.slotAspect} />
   ) : row.assetSet ? (
-    <AssetSet assets={row.assetSet} height={row.slotHeight} />
+    // `row.slotHeight` still wins when a row sets one explicitly — every
+    // project built before this exists already hand-tunes that value, so
+    // this only steps in for a row that hasn't (the ones new enough to want
+    // it). `slotMaxHeight` caps rather than sets outright, which is what a
+    // row sizing itself to the viewport wants: an image shorter than the
+    // available space keeps its own height instead of stretching to fill it.
+    <AssetSet
+      assets={row.assetSet}
+      height={row.slotHeight}
+      maxHeight={row.slotHeight ? undefined : (row.slotMaxHeight ?? availableHeight)}
+      stack={row.assetStack}
+      align={row.assetAlign}
+      columns={row.assetColumns}
+    />
+  ) : row.phonePiP ? (
+    <PrototypePhonePiP pip={row.phonePiP} height={row.slotHeight ?? (row.slotMaxHeight ?? availableHeight)} />
   ) : row.prototype ? (
     <div
       className={row.slotAspect || row.slotAspectVideo ? 'mx-auto' : 'w-full'}
@@ -76,9 +108,88 @@ function PairColumn({ row }: { row: ProcessRow }) {
     <div className="flex h-full flex-col justify-between gap-20">
       <div className="flex flex-col gap-2">
         <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
-        <p className="m-0 font-body text-[15px]/[1.7] text-grey">{row.text}</p>
+        <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(row.text)}</p>
       </div>
       <div className="w-full">{renderSlot(row)}</div>
+    </div>
+  );
+}
+
+/**
+ * A process row whose slot is an accordion rather than an image — the same
+ * collapsed-question pattern `Project.faq` uses (label in orange, `+`
+ * rotating to `×`, height-animated reveal, arrow-key roving focus), but
+ * keeping the row's own label and place in the process sequence rather than
+ * sitting as a separate section after every row.
+ *
+ * Own `openIdx`, not the modal's `openFaqIdx`: this row starts fully closed
+ * — no question open on load — where the project-level FAQ opens its first
+ * item, so the two need separate state rather than sharing one counter.
+ */
+function ProcessAccordionRow({ label, intro, items }: { label: string; intro: string; items: ProjectFaqItem[] }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const listId = `accordion-${label}`;
+
+  return (
+    <div className="border-t border-white/7 py-5">
+      <div className="flex flex-col gap-2">
+        <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{label}</div>
+        <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(intro)}</p>
+      </div>
+      <div data-accordion-list={listId} className="mt-4 flex flex-col">
+        {items.map((item, i) => {
+          const open = openIdx === i;
+          return (
+            <div key={item.q} className="border-t border-white/7 first:border-t-0">
+              <button
+                type="button"
+                data-accordion-row={i}
+                onClick={() => setOpenIdx(open ? null : i)}
+                onKeyDown={(e) => {
+                  const last = items.length - 1;
+                  let next: number | null = null;
+                  if (e.key === 'ArrowDown') next = i === last ? 0 : i + 1;
+                  else if (e.key === 'ArrowUp') next = i === 0 ? last : i - 1;
+                  else if (e.key === 'Home') next = 0;
+                  else if (e.key === 'End') next = last;
+                  if (next === null) return;
+                  e.preventDefault();
+                  e.currentTarget
+                    .closest(`[data-accordion-list="${listId}"]`)
+                    ?.querySelector<HTMLButtonElement>(`[data-accordion-row="${next}"]`)
+                    ?.focus();
+                }}
+                aria-expanded={open}
+                className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left"
+              >
+                <span className="font-heading text-xs font-semibold tracking-[-0.005em] text-orange">{item.q}</span>
+                <motion.span
+                  aria-hidden="true"
+                  className="flex-none text-orange"
+                  animate={{ rotate: open ? 45 : 0 }}
+                  transition={{ duration: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
+                >
+                  +
+                </motion.span>
+              </button>
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.div
+                    key="content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.24, ease: [0.2, 0.7, 0.2, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <p className="m-0 pb-5 font-body text-[15px]/[1.7] text-grey">{item.a}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -138,6 +249,23 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
     return () => observer.disconnect();
   }, []);
 
+  /*
+    The same "rest of the viewport" math the deck/prototype viewer below uses,
+    made available to any process-row slot that wants to cap itself to what's
+    actually on screen instead of guessing a fixed height that may run taller
+    than the reader's own window. `2 * clamp(24px, 5vh, 64px)` is the scrim's
+    own top+bottom padding (`Overlay`'s default), `headerHeight` is this
+    project's own sticky header, and `4rem` is the scrollable body's `p-8`
+    padding, top and bottom.
+
+    Falls back to a fixed guess before the header has been measured on first
+    render — `headerHeight` starts at 0, and a slot sizing itself off a
+    not-yet-real 0 would flash oversized for one frame.
+  */
+  const availableBodyHeight = headerHeight
+    ? `calc(100dvh - 2 * clamp(24px, 5vh, 64px) - ${headerHeight}px - 4rem)`
+    : '70vh';
+
   return (
     <Overlay
       z="z-60"
@@ -180,7 +308,9 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         >
           <div className="flex items-start justify-between gap-5">
             <div className="flex flex-col gap-1.5">
-              <div className="font-body text-[11px] tracking-[0.16em] text-teal">{category.title.toUpperCase()}</div>
+              <div className="font-body text-[11px] tracking-[0.16em] text-teal">
+                {(project.eyebrow ?? category.title).toUpperCase()}
+              </div>
               <motion.div
                 key={displayTitle}
                 className="font-heading text-[26px] font-semibold tracking-[-0.02em] text-white"
@@ -190,6 +320,22 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               >
                 {displayTitle}
               </motion.div>
+              {/*
+                Optional deck under the title. Sora, one step up from the
+                modal's own body size (`text-base`, used by the end note) —
+                the header sits above the rest of the copy, so it earns a
+                touch more presence than the running text does. Grey body
+                colour with the same white-emphasis spans the rest of the
+                project's copy uses, not Roboto — the brief named that
+                family for this line, but it isn't loaded anywhere on the
+                site (deliberately, in favour of Sora + Lora), and pulling in
+                a second body face for one line contradicts that more than
+                the line is worth. Flagged here rather than decided
+                silently either way.
+              */}
+              {project.subtitle && (
+                <p className="m-0 max-w-[52ch] font-body text-lg/[1.5] text-[#808080]">{project.subtitle}</p>
+              )}
             </div>
             <div className="flex items-center gap-3.5">
               <div className="flex flex-wrap justify-end gap-1.75">
@@ -291,11 +437,11 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             */}
             <div className="flex flex-col gap-2.5 rounded-[14px] border border-white/10 bg-white/7 px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{project.problemLabel ?? 'PROBLEM'}</div>
-              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.problem}</p>
+              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{withEmphasis(project.problem)}</p>
             </div>
             <div className="flex flex-col gap-2.5 rounded-[14px] border border-white/10 bg-white/7 px-7 py-6.5">
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">{project.solutionLabel ?? 'SOLUTION'}</div>
-              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{project.solution}</p>
+              <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{withEmphasis(project.solution)}</p>
             </div>
           </div>
 
@@ -374,8 +520,24 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">
                     {row.label}
                   </div>
-                  <p className="m-0 font-body text-[15px]/[1.7] text-grey">{row.text}</p>
+                  <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(row.text)}</p>
                 </div>
+              );
+            }
+
+            /*
+              A row whose slot is an accordion rather than an image — the
+              row's own text sits above it as an intro line (full width, the
+              same as a `textOnly` row), and the accordion fills the space a
+              standard row's image slot would have. Kept out of `renderSlot`:
+              every other slot type there is a small box beside the text, and
+              this one is the text's full-width sibling below it instead —
+              rendering it there would need the same two-column shape every
+              other slot uses, which this deliberately doesn't.
+            */
+            if (row.accordion) {
+              return (
+                <ProcessAccordionRow key={row.label} label={row.label} intro={row.text} items={row.accordion} />
               );
             }
 
@@ -406,10 +568,10 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                         : 'm-0 max-w-[420px] font-body text-[15px]/[1.7] text-grey'
                     }
                   >
-                    {row.text}
+                    {withEmphasis(row.text)}
                   </p>
                 </div>
-                <div className={row.stacked ? 'w-full' : 'self-start'}>{renderSlot(row)}</div>
+                <div className={row.stacked ? 'w-full' : 'self-start'}>{renderSlot(row, availableBodyHeight)}</div>
               </div>
             );
           })}
@@ -556,7 +718,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           {project.endNote && (
             <div className="rounded-[14px] border border-teal/20 bg-teal/10 px-7 py-6.5">
               <div className="mb-2 font-body text-[11px] tracking-[0.16em] text-teal">END NOTE</div>
-              <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{project.endNote}</p>
+              <p className="m-0 max-w-[820px] font-body text-base/[1.7] text-white">{withEmphasis(project.endNote)}</p>
             </div>
           )}
 
