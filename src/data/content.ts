@@ -106,11 +106,12 @@ export interface ProcessRow {
    */
   document?: RowDocument;
   /**
-   * Renders the slot as a text trigger that opens a live mobile prototype
-   * full screen in a phone-shaped lightbox, rather than an inline frame —
-   * a phone shown at case-study scale reads as a small mockup rather than a
-   * working app, so the device only appears once, at full size, once the
-   * reader asks for it. Omit for a standard slot.
+   * Renders the slot as an image banner — the same treatment the project's
+   * own hero banner uses — that opens a live mobile prototype full screen in
+   * a phone-shaped lightbox on click, rather than showing the prototype
+   * inline. A phone shown at case-study scale reads as a small mockup
+   * rather than a working app, so the device only appears once, at full
+   * size, once the reader asks for it. Omit for a standard slot.
    */
   phonePiP?: ProcessRowPhonePiP;
   /**
@@ -159,10 +160,12 @@ export interface ProcessRow {
   pairWithNext?: boolean;
 }
 
-/** A live mobile prototype, opened full screen from a text trigger rather than shown inline. */
+/** A live mobile prototype, opened full screen from a clickable banner rather than shown inline. */
 export interface ProcessRowPhonePiP {
   /** Embed URL for the live prototype. */
   embedUrl: string;
+  /** Background art for the banner trigger — a screenshot or mockup of the prototype itself. */
+  image: string;
 }
 
 export interface ProjectPrototype {
@@ -510,8 +513,13 @@ export const CATEGORIES: Category[] = [
         processRows: [
           {
             label: 'GROUNDWORK',
-            // No image slot: the row's full width goes to the copy.
+            // No image slot: the row's full width goes to the copy. Stacked
+            // rather than the textOnly default's two-column split — a single
+            // short label in its own 1fr column left a wide dead gap before
+            // three paragraphs of copy that don't need a label column beside
+            // them to stay legible.
             textOnly: true,
+            stacked: true,
             text: "Two days rules out recruited testing. What fits: pulling apart every major delivery app for colour, navigation and cart behaviour. **Checking trademarks before committing to a name.** Walking four people through the flow. Running a **contrast audit during the build, not after.**\n\n**Two names got killed before one survived.** The first was an outlaw motorcycle club. The second, a US restaurant group trading since the eighties.\n\n**Chamaco is Mexican slang for kid.** Nobody owns it, and it already means what the brand is. The new kid on the block.",
           },
           {
@@ -615,15 +623,17 @@ export const CATEGORIES: Category[] = [
             label: 'PROTOTYPE',
             text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
             slot: 'LIVE PROTOTYPE',
-            // Standard two-column row rather than a stacked one: the slot is
-            // now a single button, not an inline phone frame, so it no
-            // longer needs a row of its own to have room to read as a device.
-            // Centred rather than pinned to the top — a button reads fine
-            // sitting in the middle of its column, where an image usually
-            // wants to align with the label beside it.
-            slotCenter: true,
+            // Stacked, full width — the slot is a banner image, the same
+            // treatment the project's own hero uses, and needs the full row
+            // to read as a banner rather than a thumbnail squeezed into a
+            // text column.
+            stacked: true,
             phonePiP: {
               embedUrl: 'https://helpful-muse-tool.lovable.app/home',
+              // The same artwork as the hero banner, minus its title — the
+              // clean ground on the left is where the button sits, rather
+              // than crowding the lockup this image would otherwise carry.
+              image: '/images/UIUX/Chamaco/Thumbnail-no-text.webp',
             },
           },
         ],
@@ -1886,8 +1896,9 @@ export const RESUME_FILENAME = 'Shriram Sivakumar Resume.pdf';
 export const CONNECT_LINKS: ConnectLink[] = [
   { label: 'Email', value: 'shriramsiva18726@gmail.com', href: 'mailto:shriramsiva18726@gmail.com' },
   { label: 'LinkedIn', value: '/in/shriramsiva', href: 'https://www.linkedin.com/in/shriramsiva/' },
-  { label: 'Dribbble', value: '/shriramsiva', href: 'https://dribbble.com/shriramsiva' },
   { label: 'WhatsApp', value: '+91 96772 56341', href: 'https://wa.me/919677256341' },
+  { label: 'Instagram', value: '@shriramsiva', href: 'https://www.instagram.com/shriramsiva' },
+  { label: 'Dribbble', value: '/shriramsiva', href: 'https://dribbble.com/shriramsiva' },
   { label: 'Resume', value: 'PDF', href: RESUME_HREF },
 ];
 

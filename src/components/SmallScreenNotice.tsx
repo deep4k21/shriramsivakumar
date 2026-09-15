@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
+import { CONNECT_ICONS } from './connectIcons';
 import { DownloadCircleIcon } from './Icons';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
@@ -176,18 +177,23 @@ export function SmallScreenNotice() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.24, ease: EASE_OUT }}
       >
-        {CONNECT_LINKS.filter((l) => l.label !== 'Resume' && l.href !== '#').map((l) => (
-          <a
-            key={l.label}
-            href={l.href}
-            // External profiles open away from the page; `mailto:` has nowhere
-            // else to go, so it stays in place. Same rule as the Connect modal.
-            {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            className="rounded-[9px] border border-white/12 bg-white/6 px-4 py-2.5 font-body text-[13px] text-grey transition-colors duration-180 hover:text-teal"
-          >
-            {l.label}
-          </a>
-        ))}
+        {CONNECT_LINKS.filter((l) => l.label !== 'Resume' && l.href !== '#').map((l) => {
+          const Icon = CONNECT_ICONS[l.label];
+          return (
+            <a
+              key={l.label}
+              href={l.href}
+              // External profiles open away from the page; `mailto:` has
+              // nowhere else to go, so it stays in place. Same rule as the
+              // Connect modal.
+              {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              className="inline-flex items-center gap-1.5 rounded-[9px] border border-white/12 bg-white/6 px-4 py-2.5 font-body text-[13px] text-grey transition-colors duration-180 hover:text-teal"
+            >
+              {Icon && <Icon size={16} className="flex-none" />}
+              {l.label}
+            </a>
+          );
+        })}
       </motion.div>
     </main>
   );

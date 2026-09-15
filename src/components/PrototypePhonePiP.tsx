@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import type { ProcessRowPhonePiP } from '../data/content';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { Overlay } from './Overlay';
+import { PrototypeLoader } from './PrototypeLoader';
 
 /**
  * Slightly wider than a real phone's 390:844 — the point of opening this at
@@ -34,34 +35,57 @@ function Notch() {
  *
  * Named to match `prototype`'s picture-in-picture framing on the rest of the
  * site, but there is no static mockup here to swap with — this row's brief
- * carries no image of its own, only the live embed. Rather than an inline
- * preview frame sitting in the row (a phone shown at case-study scale reads
- * as a small mockup, not a working app, no matter how it's cropped or
- * scaled), the row is just a trigger, and the actual device only appears
- * once, full screen, once the reader asks for it.
- *
- * Styled like the site's one other real call-to-action button (the resume
- * download) rather than a bare text link — this button is the entire
- * content of its slot, not a caption under an image, and needed the visual
- * weight to read as the row's actual artefact. Centred vertically and
- * flush with the slot's own right edge, matching how a stacked asset's
- * `assetAlign: 'end'` sits away from the text column beside it.
+ * carries no image of its own for the *device* embed, only the live URL.
+ * Rather than an inline live preview frame sitting in the row (a phone
+ * shown at case-study scale reads as a small mockup, not a working app, no
+ * matter how it's cropped or scaled), the row is a clickable banner — the
+ * same image-fills-a-bordered-box treatment the project's own hero uses —
+ * and the actual device only appears once, full screen, once the reader
+ * clicks it.
  */
 export function PrototypePhonePiP({ pip }: { pip: ProcessRowPhonePiP }) {
   const [open, setOpen] = useState(false);
+  // Lives on the parent rather than the iframe unmounting/remounting it:
+  // `{open && ...}` looks like it would reset this for free, but the iframe
+  // itself commonly keeps its already-loaded document cached across a
+  // close/reopen (no fresh network request, no fresh `onLoad`) — so it has
+  // to be re-armed by hand on each open, otherwise a reopen after the first
+  // successful load would skip the spinner and jump straight to a frame
+  // that then never fires `onLoad` again.
+  const [loaded, setLoaded] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   useEscapeKey(close);
 
   return (
-    <div className="flex h-full min-h-[160px] w-full items-center justify-end">
+    <div className="w-full">
       <motion.button
         type="button"
-        onClick={() => setOpen(true)}
-        className="inline-flex cursor-pointer items-center gap-2.5 rounded-xl border border-teal bg-[#005961]/10 px-5 py-3 font-heading text-[15px] font-bold text-teal"
-        whileHover={{ y: -2, backgroundColor: 'rgba(0,184,201,0.1)' }}
-        transition={{ duration: 0.2 }}
+        onClick={() => {
+          setLoaded(false);
+          setOpen(true);
+        }}
+        className="relative grid aspect-5/1 w-full cursor-pointer items-center justify-start overflow-hidden rounded-[14px] border-0 p-0 pl-[clamp(20px,4vw,48px)]"
+        whileHover="hover"
       >
-        Open prototype in full screen ↗
+        <img src={pip.image} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover object-center" />
+        {/*
+          A scrim over the artwork rather than beside it — the banner is the
+          whole slot, so the call to action has to sit legibly on top of the
+          image, not squeezed into a caption strip under it. Darkens further
+          on hover, the same cue a filled button's own hover state gives.
+        */}
+        <motion.div
+          className="absolute inset-0 bg-black/35"
+          variants={{ hover: { backgroundColor: 'rgba(0,0,0,.5)' } }}
+          transition={{ duration: 0.2 }}
+        />
+        <motion.span
+          className="relative inline-flex items-center gap-2.5 rounded-xl border border-teal bg-[#0b1416]/80 px-5 py-3 font-heading text-[15px] font-bold text-teal backdrop-blur-sm"
+          variants={{ hover: { y: -2, backgroundColor: 'rgba(0,89,97,.7)' } }}
+          transition={{ duration: 0.2 }}
+        >
+          Open prototype in full screen ↗
+        </motion.span>
       </motion.button>
 
       {/*
@@ -91,7 +115,13 @@ export function PrototypePhonePiP({ pip }: { pip: ProcessRowPhonePiP }) {
                 */}
                 <div className="relative size-full overflow-hidden rounded-[2rem] bg-black">
                   <Notch />
-                  <iframe title="Live prototype (full size)" src={pip.embedUrl} className="size-full border-0" />
+                  {!loaded && <PrototypeLoader />}
+                  <iframe
+                    title="Live prototype (full size)"
+                    src={pip.embedUrl}
+                    className="size-full border-0"
+                    onLoad={() => setLoaded(true)}
+                  />
                 </div>
               </div>
             </Overlay>

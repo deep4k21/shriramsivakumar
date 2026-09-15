@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useState } from 'react';
 import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { CONNECT_ICONS } from './connectIcons';
 import { Overlay } from './Overlay';
 
 interface ConnectModalProps {
@@ -46,8 +47,12 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
     }
   };
 
-  const fieldClass =
-    'rounded-[10px] border border-white/10 bg-surface px-3.5 py-3.25 font-body text-[14.5px] text-white outline-none transition-colors duration-180 focus:border-teal';
+  // Both the fields and the link tiles below share this dark grey — a
+  // panel-level surface colour distinct from the page's own `bg-surface`
+  // black, which reads as a mismatched colour against this panel's lighter
+  // grey gradient.
+  const SURFACE = 'bg-[#242730]';
+  const fieldClass = `rounded-[10px] border border-white/10 ${SURFACE} px-3.5 py-3.25 font-body text-[14.5px] text-white outline-none transition-colors duration-180 focus:border-teal`;
 
   return (
     <Overlay
@@ -137,30 +142,41 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
         </form>
 
         <div className="grid grid-cols-2 gap-2 border-t border-white/15 pt-4.5">
-          {CONNECT_LINKS.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              // Real external profiles open in a new tab rather than
-              // navigating the reader away from the site entirely — unlike
-              // the rest of the site's in-page convention, which is about
-              // content the site itself hosts, not third-party profiles. A
-              // `mailto:` link has nowhere else to go, so it's left as a
-              // plain same-tab link.
-              //
-              // The resume saves rather than navigates: without `download` a
-              // same-tab PDF replaces the site in the tab, which loses the
-              // modal and the reader's place behind it.
-              {...(l.href.startsWith('http')
-                ? { target: '_blank', rel: 'noopener noreferrer' }
-                : l.href === RESUME_HREF
-                  ? { download: RESUME_FILENAME }
-                  : {})}
-              className={`flex items-center justify-between gap-3 rounded-[9px] bg-surface px-3.5 py-2.5 font-body text-[13px] text-white! transition-colors duration-180 hover:text-teal! ${l.label === 'Email' ? 'col-span-2' : ''}`}
-            >
-              {l.label} <span className="truncate text-grey">{l.value}</span>
-            </a>
-          ))}
+          {CONNECT_LINKS.map((l) => {
+            const Icon = CONNECT_ICONS[l.label];
+            return (
+              <a
+                key={l.label}
+                href={l.href}
+                // Real external profiles open in a new tab rather than
+                // navigating the reader away from the site entirely — unlike
+                // the rest of the site's in-page convention, which is about
+                // content the site itself hosts, not third-party profiles. A
+                // `mailto:` link has nowhere else to go, so it's left as a
+                // plain same-tab link.
+                //
+                // The resume saves rather than navigates: without `download`
+                // a same-tab PDF replaces the site in the tab, which loses
+                // the modal and the reader's place behind it.
+                {...(l.href.startsWith('http')
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : l.href === RESUME_HREF
+                    ? { download: RESUME_FILENAME }
+                    : {})}
+                // Stacked rather than the label and value side by side — a
+                // long value like the email address had nowhere to go at
+                // half the panel's width and just ran into an ellipsis; a
+                // line of its own gives it the full tile width to sit in.
+                className={`flex min-w-0 flex-col gap-0.5 rounded-[9px] ${SURFACE} px-3.5 py-2.5 font-body text-[13px] text-white! transition-colors duration-180 hover:text-teal!`}
+              >
+                <span className="flex items-center gap-1.5">
+                  {Icon && <Icon size={16} className="flex-none text-teal" />}
+                  {l.label}
+                </span>
+                <span className="truncate text-grey">{l.value}</span>
+              </a>
+            );
+          })}
         </div>
     </Overlay>
   );
