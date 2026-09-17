@@ -382,6 +382,37 @@ export interface Category {
    * them. Defaults to 1.
    */
   artScale?: number;
+  /**
+   * How much of the tile's height the artwork may take, as a share.
+   *
+   * Separate from `artScale` because the mosaic's two tile shapes are bound by
+   * different axes: the tall tiles have height to spare and are limited by
+   * width, while the short wide ones are the reverse — at a 720px viewport
+   * they are only ~265px tall, so a height ceiling there silently discards any
+   * width increase and the drawing renders far smaller than its `artScale`
+   * asks for. Tuning the two axes per category is what lets each tile fill its
+   * own free space instead of sharing one compromise. Defaults to 1.
+   */
+  artMaxHeight?: number;
+  /**
+   * How much of the tile's width the copy leaves free on its right, as a
+   * share, so the text clears the artwork.
+   *
+   * Derived from `artScale` before this existed, which over-reserved on the
+   * short wide tiles: there the drawing is bound by height and renders far
+   * narrower than `artScale` asks for, so reserving that share left ~200px of
+   * dead space between the sentence and the picture. Set per category to match
+   * what each drawing actually occupies. Defaults to `artScale`.
+   */
+  artTextReserve?: number;
+  /**
+   * Whether this tile's artwork is limited by height rather than width — true
+   * for the mosaic's short, wide tiles. The copy's reserve then has to follow
+   * the tile's height, since that is what decides how wide the drawing
+   * actually renders; on the tall tiles width decides it and the height term
+   * would over-reserve.
+   */
+  artHeightBound?: boolean;
   stats: CategoryStat[];
   projects: Project[];
 }
@@ -474,7 +505,6 @@ export function placeholderAssets(
 export const CATEGORIES: Category[] = [
   {
     id: 'ui-ux',
-    icon: '/images/menuicons/uiux.svg',
     title: 'UI/UX Design',
     short: 'UI/UX',
     linkLabel: 'UI/UX Design',
@@ -484,7 +514,10 @@ export const CATEGORIES: Category[] = [
     lead: 'Complex enterprise workflows turned into',
     leadBold: 'scalable products.',
     art: '/images/portfolio/UI-UX.svg',
-    artScale: 0.39,
+    artScale: 0.58,
+    artMaxHeight: 1.10,
+    artTextReserve: 0.26,
+    artHeightBound: true,
     stats: [
       { value: '20+', label: 'PRODUCTS' },
       { value: '6', label: 'YEARS IN UI/UX' },
@@ -905,6 +938,8 @@ export const CATEGORIES: Category[] = [
     icon: '/images/menuicons/brandidentity.svg',
     art: '/images/portfolio/brand.svg',
     artScale: 0.49,
+    artMaxHeight: 0.62,
+    artTextReserve: 0.44,
     title: 'Brand Identity',
     short: 'Brand Identity',
     tags: 'Identity · Strategy · Guidelines',
@@ -1171,6 +1206,8 @@ export const CATEGORIES: Category[] = [
     icon: '/images/menuicons/campaigns.svg',
     art: '/images/portfolio/marketing.svg',
     artScale: 0.54,
+    artMaxHeight: 0.62,
+    artTextReserve: 0.505,
     title: 'Marketing Campaigns',
     short: 'Campaigns',
     tags: 'Creative · Growth · Performance',
@@ -1553,7 +1590,10 @@ export const CATEGORIES: Category[] = [
     id: 'presentations',
     icon: '/images/menuicons/presentation.svg',
     art: '/images/portfolio/ppt.svg',
-    artScale: 0.43,
+    artScale: 0.65,
+    artMaxHeight: 1.10,
+    artTextReserve: 0.35,
+    artHeightBound: true,
     title: 'Presentations',
     short: 'Presentations',
     tags: 'Pitch · Product · Strategy',

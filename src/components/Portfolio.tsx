@@ -335,7 +335,10 @@ function CategoryCard({
           setFill({ x: e.clientX - r.left, y: e.clientY - r.top });
         }}
         onPointerLeave={() => setFill(null)}
-        className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden ${CARD_GLASS_FLAT} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
+        // `@container-size` so the copy's reserve can be expressed against the
+        // tile's own height (`cqh`) as well as its width — the drawing is
+        // height-bound on the wide tiles, so the gutter has to follow that axis.
+        className={`group relative flex size-full cursor-pointer flex-col gap-[clamp(10px,1.4vh,16px)] overflow-hidden @container-size ${CARD_GLASS_FLAT} px-[clamp(20px,2vw,32px)] py-[clamp(18px,2.4vh,30px)] text-left`}
         animate={{
           opacity: hidden ? 0 : 1,
           // The bloom is the hover cue, alongside the gradient coming up.
@@ -377,11 +380,36 @@ function CategoryCard({
         The wide tiles used to lay copy and link out in a row along the bottom
         instead, which read as a different card from the tall ones beside them.
       */}
+      {/*
+        The copy column reserves the band the artwork occupies on its right,
+        rather than running the full tile width underneath it. `max-w-[38ch]`
+        alone did not do this: that is a fixed ~485px measure regardless of
+        tile size, so on the narrower tall tiles the sentence reached ~200px
+        into the drawing and the two overlapped. Reserving the art's own
+        share (`artScale`) plus the gap it sits in keeps them apart at every
+        viewport, and the tiles without art keep the full width.
+
+        The reserve carries a real gutter of its own on top of the art's
+        inset, not just the inset: matching the inset exactly put the text's
+        last character flush against the drawing's bounding box — measured,
+        the gap was 0px on all four tiles — which read as cramped even though
+        nothing technically overlapped.
+
+        It is applied to the prose only, not to this column: the link row sits
+        at the tile's bottom edge, below where the drawing's mass actually is,
+        so reserving the art band for it too only narrowed it for nothing —
+        on the tall tiles that wrapped "Continue to Campaigns →" onto two
+        lines and broke the tag line after "Strategy ·".
+      */}
       <div className="relative flex min-h-0 flex-1 flex-col">
         {/*
-          The category line — "Enterprise · SaaS · Product". Set in the body
-          face at the tile's own size, above the description rather than beside
-          it, so the two read as one block of copy.
+          The category line — "Enterprise · SaaS · Product". Outside the
+          reserved block below: it is a single short line at the very top of
+          the tile, where the bottom-anchored drawing never reaches, so
+          reserving the art's band for it only cost it width. At the tall
+          tiles' reserve that left 227px for "Creative · Growth ·
+          Performance", four pixels short of fitting, so it wrapped to two
+          lines against otherwise empty space.
         */}
         <motion.div
           className="font-body text-[clamp(13px,1vw,16px)]/[1.65] font-medium"
@@ -390,6 +418,36 @@ function CategoryCard({
         >
           {cat.tags}
         </motion.div>
+        <div
+          /*
+            Reserved against the tile's width *and* its height, taking
+            whichever the drawing actually ends up wider under.
+
+            A width-only reserve cannot track art that is height-bound: on the
+            wide tiles the drawing is capped by `artMaxHeight`, so it grows
+            with the tile's height while a fixed width share stays put —
+            measured, the copy cleared it by 29px at a 720px viewport and
+            overlapped it by 112px at 1080. `max()` of the two keeps the
+            gutter correct there, since the height cap is what decides the
+            drawing's real width.
+
+            Only where the drawing is actually height-bound, though. The tall
+            tiles are the opposite — width decides their art — so including
+            the height term for them reserved far more than the picture uses
+            and squeezed their copy into a narrow ribbon.
+          */
+          style={
+            cat.art
+              ? {
+                  paddingRight: `calc(${
+                    cat.artHeightBound
+                      ? `max(${(cat.artTextReserve ?? cat.artScale ?? 1) * 100}%, ${(cat.artMaxHeight ?? 1) * 100}cqh)`
+                      : `${(cat.artTextReserve ?? cat.artScale ?? 1) * 100}%`
+                  } + clamp(14px,1.4vw,26px) + clamp(16px,1.8vw,34px))`,
+                }
+              : undefined
+          }
+        >
         {/*
           Hovering swaps the sentence describing the category for the work it
           actually holds, under a "Curated Collection" label. Both states are
@@ -442,6 +500,7 @@ function CategoryCard({
             )}
           </AnimatePresence>
         </div>
+        </div>
         <div className="flex-1" />
 
         {/*
@@ -458,27 +517,40 @@ function CategoryCard({
             alt=""
             aria-hidden="true"
             /*
-              Anchored to the tile's bottom-right rather than centred on its
-              height: the drawing sits in the corner the copy leaves free, which
-              is what stops it floating in the middle of a tall tile.
+              A full-height band down the tile's right side, rather than a box
+              anchored into the bottom-right corner.
 
-              `object-contain` with the box bottom-aligned means the drawing
-              grows into whatever room it is given without ever leaving the
-              tile, so the per-category scale only has to say how much of that
-              room to take.
-            */
-            /*
-              Sized by width, with the height following from the drawing's own
-              proportions — `h-auto`, so nothing is fitted to a box and the
-              artwork is simply as tall as that width makes it.
+              The corner anchoring was what kept the wide tiles' drawings
+              small: the art could only grow into the strip left below the
+              copy, which on a 265px-tall tile is barely 150px, so a height cap
+              scaled every width increase straight back down — raising
+              `artScale` moved the number and not the picture. Given the whole
+              height to work with, `object-contain` sizes the drawing against
+              the band's *width* on these tiles instead, which is the axis that
+              actually has room.
 
-              Height-based sizing does not work here: the mosaic's tall and wide
-              tiles differ by nearly 200px, and `object-contain` then fits each
-              drawing to whichever side is shorter, which left the tall tiles'
-              art at a third the size of the others.
+              `inset-y` insets rather than `inset-y-0` so the drawing never
+              touches the tile's rounded edge, and `object-contain` with
+              `object-right` keeps it flush to that side at its own
+              proportions.
+
+              The drawing fills the tile's full inset height and is sized to
+              it, taking the vertical space beside the copy rather than only
+              the strip beneath it.
+
+              `object-contain` fits to whichever axis runs out first, so any
+              height ceiling below the tile's own height silently discarded
+              every width increase — raising `artScale` from 0.54 to 0.86
+              left the rendered picture at an identical 156px, because the
+              cap, not the width, was deciding the size. Giving it the whole
+              inset band and letting `artScale` set the box width makes width
+              the axis that decides on these short, wide tiles.
             */
-            className="pointer-events-none absolute right-[clamp(14px,1.4vw,26px)] bottom-[clamp(14px,1.8vh,24px)] h-auto select-none"
-            style={{ width: `${(cat.artScale ?? 1) * 100}%` }}
+            className="pointer-events-none absolute right-[clamp(14px,1.4vw,26px)] bottom-[clamp(6px,0.8vh,12px)] h-auto object-contain object-bottom-right select-none"
+            style={{
+              width: `${(cat.artScale ?? 1) * 100}%`,
+              maxHeight: `${(cat.artMaxHeight ?? 1) * 100}%`,
+            }}
           />
         )}
           <motion.div
