@@ -505,6 +505,7 @@ export function placeholderAssets(
 export const CATEGORIES: Category[] = [
   {
     id: 'ui-ux',
+    icon: '/images/menuicons/uiux.svg',
     title: 'UI/UX Design',
     short: 'UI/UX',
     linkLabel: 'UI/UX Design',
