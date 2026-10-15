@@ -545,6 +545,33 @@ export const CATEGORIES: Category[] = [
         // project. Row 2's design-system board carries the colour and type
         // information the chip strip would otherwise duplicate.
         processRows: [
+          /*
+            The prototype leads rather than closing the case study.
+
+            Everything after it is written explanation — the groundwork, the
+            system, the icon, the wireframe, the review — and stacking all of
+            that ahead of the one thing a reader can actually open made the
+            project read as an essay with a link at the end. Putting the
+            working app directly under the solution lets someone try it first
+            and read the reasoning after.
+          */
+          {
+            label: 'PROTOTYPE',
+            text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
+            slot: 'LIVE PROTOTYPE',
+            // Stacked, full width — the slot is a banner image, the same
+            // treatment the project's own hero uses, and needs the full row
+            // to read as a banner rather than a thumbnail squeezed into a
+            // text column.
+            stacked: true,
+            phonePiP: {
+              embedUrl: 'https://helpful-muse-tool.lovable.app/home',
+              // The same artwork as the hero banner, minus its title — the
+              // clean ground on the left is where the button sits, rather
+              // than crowding the lockup this image would otherwise carry.
+              image: '/images/UIUX/Chamaco/Thumbnail-no-text.webp',
+            },
+          },
           {
             label: 'GROUNDWORK',
             // No image slot: the row's full width goes to the copy. Stacked
@@ -652,23 +679,6 @@ export const CATEGORIES: Category[] = [
                 a: 'It has nothing to reorder from. The four people testing the flow caught it. It now appears only once a first order exists.',
               },
             ],
-          },
-          {
-            label: 'PROTOTYPE',
-            text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
-            slot: 'LIVE PROTOTYPE',
-            // Stacked, full width — the slot is a banner image, the same
-            // treatment the project's own hero uses, and needs the full row
-            // to read as a banner rather than a thumbnail squeezed into a
-            // text column.
-            stacked: true,
-            phonePiP: {
-              embedUrl: 'https://helpful-muse-tool.lovable.app/home',
-              // The same artwork as the hero banner, minus its title — the
-              // clean ground on the left is where the button sits, rather
-              // than crowding the lockup this image would otherwise carry.
-              image: '/images/UIUX/Chamaco/Thumbnail-no-text.webp',
-            },
           },
         ],
         endNote:

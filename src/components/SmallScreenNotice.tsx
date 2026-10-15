@@ -1,10 +1,19 @@
 import { motion } from 'motion/react';
-import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
+import { CATEGORIES, CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { CONNECT_ICONS } from './connectIcons';
 import { DownloadCircleIcon } from './Icons';
 import { MobileWork } from './mobile/MobileWork';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
+
+/**
+ * How many projects the site holds, counted from the data.
+ *
+ * Written out, this number goes stale the first time a project is added or
+ * dropped — and a portfolio that miscounts its own work is a bad first
+ * impression on the one screen that is asking the reader to switch device.
+ */
+const PROJECT_COUNT = CATEGORIES.reduce((n, c) => n + c.projects.length, 0);
 
 /**
  * What a phone or narrow window gets instead of the desktop site.
@@ -49,67 +58,10 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
       */
       className={`relative flex min-h-dvh flex-col items-center px-6 text-center ${
         work
-          ? 'justify-start pt-[clamp(84px,14vh,132px)] pb-14'
+          ? 'justify-start pt-[clamp(48px,8vh,80px)] pb-14'
           : 'justify-center py-14'
       }`}
     >
-      {/*
-        Pinned to the top of the viewport rather than sitting in the flow, so
-        it stays a banner about the screen instead of reading as the headline
-        of the content below it.
-
-        Glass rather than a solid green fill, matching the cards across the
-        rest of the site: a green-tinted gradient over the chalkboard with a
-        lit rim, so the pill sits on the surface instead of punching a flat
-        block through it.
-
-        The tint also settles the contrast question a solid fill created —
-        orange on this ground measures 5.8:1 at the gradient's lightest
-        point, where white on a flat accent fill was 2.10:1 and would have
-        been hard work at this size.
-      */}
-      <motion.div
-        className="absolute inset-x-0 top-[clamp(16px,4vh,32px)] mx-auto inline-flex w-fit items-center gap-2.5 rounded-full border border-orange/25 bg-[linear-gradient(158deg,rgba(255,154,92,.20),rgba(18,19,24,.42)_55%,rgba(255,154,92,.14))] px-4 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.05)]"
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: EASE_OUT }}
-      >
-        {/*
-          A spinner rather than a static dot: this says work is underway, not
-          that something is simply "on". Drawn as an SVG ring with a gap and
-          spun by motion, so it honours `reducedMotion` from `MotionConfig`
-          like everything else here — a CSS `animate-spin` would keep turning
-          for a reader who has asked the OS for stillness.
-        */}
-        <motion.svg
-          viewBox="0 0 24 24"
-          className="size-[clamp(12px,3.4vw,14px)] flex-none text-orange"
-          fill="none"
-          aria-hidden="true"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-        >
-          {/* The full ring, dimmed — the track the bright arc travels around. */}
-          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" opacity={0.3} />
-          {/*
-            A quarter of the circumference (2πr ≈ 56.5, so ~14) drawn bright,
-            the rest left as a gap. That single visible arc is what makes the
-            rotation legible.
-          */}
-          <circle
-            cx="12"
-            cy="12"
-            r="9"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray="14 43"
-          />
-        </motion.svg>
-        <span className="font-body text-[clamp(11px,3.2vw,12.5px)] font-semibold tracking-[0.04em] text-orange">
-          The mobile version is still being drawn
-        </span>
-      </motion.div>
 
       {/*
         The plane sits directly above the name as a signature mark, close
@@ -152,8 +104,37 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.12, ease: EASE_OUT }}
       >
-        <div className="font-heading text-[clamp(19px,5.4vw,23px)]/[1.3] font-semibold tracking-[-0.01em] text-white">
-          Best viewed on <span className="text-green">desktop</span>
+        {/*
+          An invitation rather than a disclaimer.
+
+          "Best viewed on desktop" told the reader what was wrong with where
+          they were standing, which was fair when this screen held nothing
+          but an apology. With the case studies below it the page is no
+          longer a dead end, so the line points somewhere instead — the work
+          is here, and the full site is a device away. "desktop" keeps the
+          accent because it is the actionable word.
+        */}
+        {/*
+          Orange, and the whole line rather than one accented word.
+
+          Everything else on this screen is teal — the role under the name,
+          the resume button, the contact chips — so white-on-dark put the one
+          instruction competing with its own surroundings for attention.
+          Orange is the only accent the screen does not already spend, which
+          makes this the first thing the eye lands on.
+        */}
+        {/*
+          Sized to hold one line at every width this screen covers.
+
+          The line is 34 characters, and at the old 19px floor it needed
+          334px of measure inside a 312px column on a 360px phone — so it
+          wrapped, and a two-line instruction reads as a paragraph rather
+          than a heading. Scaling with the viewport instead of holding a
+          floor keeps it on one line; `nowrap` makes that a guarantee
+          rather than something that happens to hold.
+        */}
+        <div className="font-heading text-[min(5.1vw,23px)]/[1.3] font-semibold tracking-[-0.01em] whitespace-nowrap text-orange">
+          The full version lives on desktop.
         </div>
         {/*
           `max-w` in characters rather than pixels, so the measure stays
@@ -161,8 +142,19 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
           to the full width of a tablet.
         */}
         <p className="m-0 max-w-[32ch] font-body text-[clamp(14px,3.9vw,15px)]/[1.65] text-grey text-pretty">
-          This portfolio leans on a full-width canvas — pinned sections, a
-          scroll that moves in steps, and artwork that travels between them.
+          {/*
+            What is actually on the other side, rather than how it is built.
+            The old line described the layout — pinned sections, a scroll
+            that moves in steps — which is a reason for the reader to switch
+            device only if they already care about the craft. The work
+            itself is the better argument.
+
+            The count is read from the data rather than written in, so it
+            cannot drift as projects are added or removed.
+          */}
+          20+ projects across {CATEGORIES.length} fields. UI/UX, Brand
+          Identity, Campaigns and Presentations, each one from a different brief, a
+          different vertical, a different global market.
         </p>
       </motion.div>
 
