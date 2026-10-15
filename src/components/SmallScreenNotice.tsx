@@ -13,7 +13,7 @@ const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
  * dropped — and a portfolio that miscounts its own work is a bad first
  * impression on the one screen that is asking the reader to switch device.
  */
-const PROJECT_COUNT = CATEGORIES.reduce((n, c) => n + c.projects.length, 0);
+// const PROJECT_COUNT = CATEGORIES.reduce((n, c) => n + c.projects.length, 0);
 
 /**
  * What a phone or narrow window gets instead of the desktop site.
