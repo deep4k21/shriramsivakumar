@@ -19,7 +19,7 @@ import { MotionClip } from './MotionClip';
  * exactly as it did — this only activates where a project's own copy
  * actually contains the markers.
  */
-function withEmphasis(text: string) {
+export function withEmphasis(text: string) {
   const parts = text.split(/\*\*(.+?)\*\*/g);
   // `split` on a capturing group alternates plain, matched, plain, matched…
   // starting and ending on a plain segment (possibly empty).

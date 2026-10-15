@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { CONNECT_LINKS, RESUME_FILENAME, RESUME_HREF } from '../data/content';
 import { CONNECT_ICONS } from './connectIcons';
 import { DownloadCircleIcon } from './Icons';
+import { MobileWork } from './mobile/MobileWork';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
@@ -19,7 +20,15 @@ const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
  * offers, so a reader who lands here on a phone has both the explanation and
  * a way to reach him.
  */
-export function SmallScreenNotice() {
+/**
+ * `work` adds the featured case studies between the notice and the actions.
+ *
+ * Off by default, so the live screen renders exactly as it did before this
+ * existed — the projects are only shown at `?mobile=2`, which is there to
+ * demo the addition before it is agreed. Turning it on for everyone is a
+ * one-word change at the call site in `App`.
+ */
+export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
   return (
     /*
       The status pill rides at the top of the screen; the rest is one centred
@@ -32,7 +41,18 @@ export function SmallScreenNotice() {
       together, the actions together — so the relationships read instead of
       four blocks floating at equal distance.
     */
-    <main className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-14 text-center">
+    <main
+      /*
+        Centred as a single screen normally; top-aligned and scrolling when
+        the work is shown, since four project cards no longer fit one
+        screen and centring would compress them instead.
+      */
+      className={`relative flex min-h-dvh flex-col items-center px-6 text-center ${
+        work
+          ? 'justify-start pt-[clamp(84px,14vh,132px)] pb-14'
+          : 'justify-center py-14'
+      }`}
+    >
       {/*
         Pinned to the top of the viewport rather than sitting in the flow, so
         it stays a banner about the screen instead of reading as the headline
@@ -145,6 +165,42 @@ export function SmallScreenNotice() {
           scroll that moves in steps, and artwork that travels between them.
         </p>
       </motion.div>
+
+      {/*
+        The featured work, between the notice and the actions — shown only
+        when `work` is set.
+
+        The screen explains that the full site needs a desktop, which leaves
+        a reader on a phone with nothing of the work itself to look at. These
+        four case studies read fine here, so they sit between the caveat and
+        the ways to get in touch.
+
+        Left-aligned inside the centred column: the cards carry paragraphs of
+        copy, and centred body text is hard to read down a narrow screen.
+      */}
+      {work && (
+        <motion.div
+          /*
+            Pulled out past the screen's own `px-6` gutter and given back a
+            smaller one of its own: `MobileWork` carries `px-5` too, so
+            nesting the two left 44px of padding each side and squeezed the
+            cards to a narrow ribbon. The negative margin cancels the outer
+            gutter so only the section's own spacing applies.
+          */
+          /*
+            `mb-4` on top of the resume button's own `mt-9`: the section
+            dropped its vertical padding so the gap above it could match the
+            screen's rhythm, which also removed the space under the last
+            card and left it 18px from the button against 36px above.
+          */
+          className="-mx-6 mt-9 mb-4 w-[calc(100%+3rem)] max-w-none text-left"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3, ease: EASE_OUT }}
+        >
+          <MobileWork />
+        </motion.div>
+      )}
 
       {/*
         The resume gets its own button rather than a chip in the row below:

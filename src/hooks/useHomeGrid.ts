@@ -202,7 +202,7 @@ const CONCURRENT = 8;
 
 const randBetween = ([lo, hi]: [number, number]) => lo + Math.random() * (hi - lo);
 
-const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file, bg }, i) => ({
+export const SLOTS: HomeGridSlot[] = CELLS.map(({ cell, file, bg }, i) => ({
   key: `cell-${cell[0]}-${cell[1]}`,
   src: `/images/homegrid/Design/${file}`,
   // The travel photo for the same cell — index-matched to CELLS, not offset,

@@ -52,6 +52,7 @@ export function AssetSet({
   stack,
   align = 'center',
   columns,
+  fit = false,
 }: {
   assets: RowAsset[];
   height?: string;
@@ -75,6 +76,20 @@ export function AssetSet({
    * artefacts sized to their own content.
    */
   columns?: boolean;
+  /**
+   * Sizes each stacked piece to its own image rather than to the height
+   * budget — the box takes the column's full width and is as tall as the
+   * artwork makes it, with `maxHeight` acting as a ceiling instead of a
+   * fixed height.
+   *
+   * For a narrow column, where the height-led sizing `stack` normally uses
+   * leaves most of the box empty: width binds first there, so the image
+   * shrinks to fit while the box keeps the full height it was given. On a
+   * phone that measured 63–322px of artwork inside a 613px box.
+   *
+   * `stack` only; the side-by-side modes already size to their content.
+   */
+  fit?: boolean;
 }) {
   const cap = height ?? maxHeightProp ?? `${DEFAULT_MAX_HEIGHT}px`;
   /*
@@ -139,7 +154,9 @@ export function AssetSet({
               natural size.
             */
             style={
-              stack
+              stack && fit
+                ? { flex: `0 0 auto`, width: '100%', maxHeight: cap }
+                : stack
                 ? { flex: `0 0 auto`, height: cap, width: `calc(${cap} * ${a.ratio ?? 1})`, maxWidth: '100%' }
                 : columns
                   ? { flex: `1 1 0%`, height: cap, minWidth: 0 }
@@ -153,7 +170,7 @@ export function AssetSet({
               onClick={() => setOpen(a)}
               aria-label={a.caption ? `View ${a.caption}` : 'View asset'}
               className={`flex min-h-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border transition-colors duration-180 ${
-                stack ? 'size-full' : 'flex-1'
+                stack && fit ? 'h-auto w-full' : stack ? 'size-full' : 'flex-1'
               } ${a.padded ? 'p-6' : 'p-0'} ${
                 a.white
                   ? 'border-black/10 bg-white hover:border-black/20'
@@ -167,8 +184,22 @@ export function AssetSet({
                 alt=""
                 // Contained on both axes, so a portrait piece letterboxes inside
                 // the slot instead of being cropped to its shape.
-                className={`block object-contain ${stack || columns || height ? 'max-h-full max-w-full' : 'w-full'}`}
-                style={stack || columns || height ? undefined : { maxHeight: '100%' }}
+                className={`block object-contain ${
+                  stack && fit
+                    ? // Full column width, natural height — the box is sized
+                      // by this image rather than the image fitted into a box.
+                      'h-auto w-full'
+                    : stack || columns || height
+                      ? 'max-h-full max-w-full'
+                      : 'w-full'
+                }`}
+                style={
+                  stack && fit
+                    ? { maxHeight: cap }
+                    : stack || columns || height
+                      ? undefined
+                      : { maxHeight: '100%' }
+                }
               />
             </button>
             {a.caption && (

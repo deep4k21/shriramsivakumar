@@ -13,7 +13,11 @@ import { Career } from './components/Career';
 import { ProjectPage } from './components/ProjectPage';
 import { ConnectModal } from './components/ConnectModal';
 import { SmallScreenNotice } from './components/SmallScreenNotice';
+// Parked with the `?mobile=1` route below — restore both together.
+// import { MobileApp } from './components/mobile/MobileApp';
+// import { MobileWorkOnly } from './components/mobile/MobileWorkOnly';
 import { useIsSmallScreen } from './hooks/useIsSmallScreen';
+import { MOBILE_WORK_ONLY } from './hooks/useMobilePreview';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useNavVisible } from './hooks/useNavVisible';
 import { usePointerGlow } from './hooks/usePointerGlow';
@@ -449,6 +453,33 @@ function DesktopApp({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
  */
 function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   const isSmall = useIsSmallScreen();
+
+  /*
+    The in-progress mobile layout, opted into by `?mobile=1`.
+
+    Checked before the media query rather than inside the small branch, so the
+    preview can also be opened on a desktop window — the layout is being built
+    against a phone's proportions, but reviewing it should not require one.
+    Narrow viewports without the flag keep getting the notice until the mobile
+    site is complete enough to replace it.
+  */
+  /*
+    `?mobile=1` — the full in-progress mobile site (hero, intro, about, work
+    and a bottom nav). Parked rather than deleted: those sections are built
+    and working, but the current question is only whether the featured work
+    belongs on the notice screen, and leaving a second half-finished layout
+    reachable invites it into that conversation. Restore the line to bring it
+    back.
+  */
+  // if (MOBILE_PREVIEW) return <MobileApp />;
+
+  /*
+    `?mobile=2` — the live notice screen with the featured case studies added
+    between the copy and the actions. The same component the site serves
+    today, with its `work` flag on, so what is being reviewed is the real
+    screen plus the change rather than a mock-up of it.
+  */
+  if (MOBILE_WORK_ONLY) return <SmallScreenNotice work />;
 
   // `null` until the media query has been read — see `useIsSmallScreen`.
   // Rendering nothing for that first frame avoids showing the desktop site

@@ -60,7 +60,12 @@ interface HeroCardContent {
 const FLIP_MS = 850;
 const FLIP_EASE = [0.7, 0, 0.2, 1] as const;
 
-const HERO_DESIGN: HeroCardContent = {
+/*
+  Exported alongside `HeroCardFace` because `MobileHero` renders that same
+  card: the face is laid out in container units, so the mobile layout only has
+  to hand it a phone-shaped box rather than redraw the composition.
+*/
+export const HERO_DESIGN: HeroCardContent = {
   accent: '#FF9A5C',
   quote: ['Mid-iteration', ' on a new layout'],
   status: ['Available', ' for work'],
@@ -78,7 +83,7 @@ const HERO_DESIGN: HeroCardContent = {
   role: 'Visual & UI/UX Designer',
 };
 
-const HERO_TRAVEL: HeroCardContent = {
+export const HERO_TRAVEL: HeroCardContent = {
   accent: '#47C89A',
   quote: ['Mid-flight,', ' mid-thought'],
   status: ['Currently', ' in Chennai'],
@@ -339,7 +344,7 @@ const CARD_HOVER_SCALE = 1.05;
 const CARD_ORIGIN = '53.98% 50%';
 const HOVER_SPRING = { type: 'spring', stiffness: 320, damping: 26, mass: 0.7 } as const;
 
-function HeroCardFace({
+export function HeroCardFace({
   content,
   back = false,
   hovered = false,
