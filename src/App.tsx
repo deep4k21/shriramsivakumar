@@ -17,7 +17,8 @@ import { SmallScreenNotice } from './components/SmallScreenNotice';
 // import { MobileApp } from './components/mobile/MobileApp';
 // import { MobileWorkOnly } from './components/mobile/MobileWorkOnly';
 import { useIsSmallScreen } from './hooks/useIsSmallScreen';
-import { MOBILE_WORK_ONLY } from './hooks/useMobilePreview';
+// Parked with the `?mobile=1` and `?mobile=2` routes below.
+// import { MOBILE_PREVIEW, MOBILE_WORK_ONLY } from './hooks/useMobilePreview';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useNavVisible } from './hooks/useNavVisible';
 import { usePointerGlow } from './hooks/usePointerGlow';
@@ -474,12 +475,11 @@ function App({ config = DEFAULT_CONFIG }: { config?: SiteConfig }) {
   // if (MOBILE_PREVIEW) return <MobileApp />;
 
   /*
-    `?mobile=2` — the live notice screen with the featured case studies added
-    between the copy and the actions. The same component the site serves
-    today, with its `work` flag on, so what is being reviewed is the real
-    screen plus the change rather than a mock-up of it.
+    `?mobile=2` — retired. It previewed the notice screen with the featured
+    case studies added, which is now simply what `SmallScreenNotice` renders,
+    so the flag and the live screen would show the same thing.
   */
-  if (MOBILE_WORK_ONLY) return <SmallScreenNotice work />;
+  // if (MOBILE_WORK_ONLY) return <SmallScreenNotice work />;
 
   // `null` until the media query has been read — see `useIsSmallScreen`.
   // Rendering nothing for that first frame avoids showing the desktop site

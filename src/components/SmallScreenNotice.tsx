@@ -7,15 +7,6 @@ import { MobileWork } from './mobile/MobileWork';
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 
 /**
- * How many projects the site holds, counted from the data.
- *
- * Written out, this number goes stale the first time a project is added or
- * dropped — and a portfolio that miscounts its own work is a bad first
- * impression on the one screen that is asking the reader to switch device.
- */
-// const PROJECT_COUNT = CATEGORIES.reduce((n, c) => n + c.projects.length, 0);
-
-/**
  * What a phone or narrow window gets instead of the desktop site.
  *
  * The layout this replaces is built entirely out of pinned sections, a scroll
@@ -29,15 +20,7 @@ const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
  * offers, so a reader who lands here on a phone has both the explanation and
  * a way to reach him.
  */
-/**
- * `work` adds the featured case studies between the notice and the actions.
- *
- * Off by default, so the live screen renders exactly as it did before this
- * existed — the projects are only shown at `?mobile=2`, which is there to
- * demo the addition before it is agreed. Turning it on for everyone is a
- * one-word change at the call site in `App`.
- */
-export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
+export function SmallScreenNotice() {
   return (
     /*
       The status pill rides at the top of the screen; the rest is one centred
@@ -52,15 +35,11 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
     */
     <main
       /*
-        Centred as a single screen normally; top-aligned and scrolling when
-        the work is shown, since four project cards no longer fit one
-        screen and centring would compress them instead.
+        Top-aligned and scrolling rather than centred on one screen: the four
+        project cards below no longer fit a single viewport, and centring
+        would compress them instead of letting the page run.
       */
-      className={`relative flex min-h-dvh flex-col items-center px-6 text-center ${
-        work
-          ? 'justify-start pt-[clamp(48px,8vh,80px)] pb-14'
-          : 'justify-center py-14'
-      }`}
+      className="relative flex min-h-dvh flex-col items-center justify-start px-6 pt-[clamp(48px,8vh,80px)] pb-14 text-center"
     >
 
       {/*
@@ -159,19 +138,17 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
       </motion.div>
 
       {/*
-        The featured work, between the notice and the actions — shown only
-        when `work` is set.
+        The featured work, between the notice and the actions.
 
-        The screen explains that the full site needs a desktop, which leaves
-        a reader on a phone with nothing of the work itself to look at. These
+        The screen explains that the full site needs a desktop, which left a
+        reader on a phone with nothing of the work itself to look at. These
         four case studies read fine here, so they sit between the caveat and
         the ways to get in touch.
 
         Left-aligned inside the centred column: the cards carry paragraphs of
         copy, and centred body text is hard to read down a narrow screen.
       */}
-      {work && (
-        <motion.div
+      <motion.div
           /*
             Pulled out past the screen's own `px-6` gutter and given back a
             smaller one of its own: `MobileWork` carries `px-5` too, so
@@ -190,9 +167,8 @@ export function SmallScreenNotice({ work = false }: { work?: boolean } = {}) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease: EASE_OUT }}
         >
-          <MobileWork />
-        </motion.div>
-      )}
+        <MobileWork />
+      </motion.div>
 
       {/*
         The resume gets its own button rather than a chip in the row below:
