@@ -1057,11 +1057,27 @@ export function Hero({ flipOnHover }: HeroProps) {
             while the cells kept growing — which is exactly the drift that left
             it smaller than its own cell on wide screens.
           */
-          className="relative box-content w-[36.885vw] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
+          /*
+            Width now tracks the viewport's *height*, not its width.
+
+            Both axes used to come from different places — `36.885vw` across
+            and `64.8vh` down — so narrowing the window squashed the card
+            without shortening it. Measured, it went 415×648 at 1920 wide to
+            238×648 at 1100, an aspect collapse from 0.64 to 0.37.
+
+            `70.9vh` reproduces the width the card had on a 1920px screen:
+            the body is 58.56% of this wrapper, so 415px of body needs a
+            709px box, which against the 648px height is 70.9vh. Both axes
+            now come from the same place, so the card holds its shape at
+            every width. The `max-w` keeps it inside a window too
+            narrow to fit it, which is the one case where shrinking is
+            better than overflowing.
+          */
+          className="relative box-content w-[70.9vh] max-w-[calc(100vw-40px)] px-[clamp(16px,3vw,60px)] py-[clamp(10px,2.5vh,26px)]"
           // Expressed against the face's own width rather than as a percentage
           // of this wrapper, which also carries horizontal padding and would
           // shift by the wrong amount.
-          style={{ transform: 'translateX(calc(36.885vw * -0.0398))' }}
+          style={{ transform: 'translateX(calc(70.9vh * -0.0398))' }}
         >
           <div
             // No `perspective` here: it would only reach direct 3D children,
