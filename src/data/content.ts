@@ -1386,14 +1386,21 @@ export const CATEGORIES: Category[] = [
             stacked: true,
             slotAspectVideo: true,
             // Served from embed.figma.com rather than the /proto/ share link:
-            // Figma refuses to frame the latter. Chrome switched off, so the
-            // reader sees the artefact rather than the player.
+            // Figma refuses to frame the latter.
+            //
+            // Unlike the site's other three prototypes, this one keeps
+            // Figma's own chrome (no `hide-ui=1`). Those are single screens
+            // where the artefact is the whole point and the player would
+            // only be furniture around it. This is a multi-step display ad —
+            // the behaviour is what it is demonstrating — so a reader who
+            // clicks through needs a way back, and without the player's
+            // arrows there is none.
             prototype: {
               embedUrl:
                 'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
                 '?node-id=2765-6203&starting-point-node-id=2765%3A6203' +
                 '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
-                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+                '&hotspot-hints=0&embed-host=share',
             },
           },
           {
