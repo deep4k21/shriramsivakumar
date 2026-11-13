@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------------
+ * Freshstart brand tokens.
+ *
+ * Ported from `freshstart-handoff/tokens/tokens.css`. Only the `--fs-*`
+ * layer is reproduced here: the handoff's `--site-*` tokens are a stand-in
+ * for a site that doesn't already have its own, and this one does, so the
+ * frame keeps using `global.css` (`--color-teal`, `--font-heading`, …) and
+ * the stand-in values are dropped rather than duplicated alongside them.
+ *
+ * Everything below is scoped to `.fs-brand`. Freshstart is a different
+ * design system that happens to be displayed inside this one — its light
+ * grounds, its own blues and its own family would be wrong anywhere else on
+ * the site, so the tokens cannot be reachable from outside a spread.
+ * ------------------------------------------------------------------- */
+
+.fs-brand {
+  /* ---- Colour ---- */
+  --fs-launch-cyan: #6ae2f2; /* RGB 106 226 242 · C56 M7 Y0 K5 */
+  --fs-founder-blue: #4f56e8; /* RGB 79 86 232  · C66 M63 Y0 K9 */
+  --fs-midnight: #302a7c; /* RGB 48 42 124  · C61 M66 Y0 K51 */
+  --fs-mist: #eef2fb; /* RGB 238 242 251 · C5 M4 Y0 K2 */
+  --fs-white: #ffffff;
+  --fs-ink-muted: #4a4f6e; /* secondary text on Mist/White: 7.3:1 on Mist */
+  --fs-line: #dde3f3; /* hairlines and swatch borders */
+  --fs-line-soft: #e1e6f3;
+  --fs-gradient: linear-gradient(135deg, var(--fs-launch-cyan) 0%, var(--fs-founder-blue) 100%);
+
+  /*
+   * Neue Haas Unica needs a paid web licence, so only Inter Tight is loaded
+   * (see `index.html`). The licensed name stays first in the stack: when a
+   * licence exists, adding the @font-face is the only change needed.
+   */
+  --fs-font: 'Neue Haas Unica', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+
+  --fs-display-size: 64px;
+  --fs-display-lh: 1.05;
+  --fs-display-track: -0.025em;
+  --fs-display-weight: 600;
+  --fs-h1-size: 40px;
+  --fs-h1-lh: 1.15;
+  --fs-h1-track: -0.02em;
+  --fs-h1-weight: 600;
+  --fs-h2-size: 28px;
+  --fs-h2-lh: 1.25;
+  --fs-h2-track: -0.01em;
+  --fs-h2-weight: 600;
+  --fs-body-size: 16px;
+  --fs-body-lh: 1.6;
+  --fs-body-weight: 400;
+  --fs-caption-size: 12px;
+  --fs-caption-lh: 1.4;
+  --fs-caption-track: 0.14em;
+  --fs-caption-weight: 600;
+
+  /* ---- Spread chrome ---- */
+  --fs-spread-w: 1168px; /* design width; spreads are 16:9 and scaled to fit */
+  --fs-spread-h: 657px;
+  --fs-spread-pad: 40px 48px;
+  --fs-spread-radius: 16px;
+  --fs-tile-radius: 10px;
+  --fs-card-radius: 14px;
+
+  /* ---- Icons ---- */
+  --fs-icon-size: 24px;
+  --fs-icon-stroke: 2px;
+  --fs-icon-dot: var(--fs-launch-cyan);
+
+  font-family: var(--fs-font);
+  color: var(--fs-midnight);
+}
+
+/*
+ * The five type steps, as classes rather than utilities: spread 13 displays
+ * this scale as the brand's documentation, so the sizes have to come from
+ * one place that the spread itself can point at.
+ */
+.fs-display {
+  font: var(--fs-display-weight) var(--fs-display-size) / var(--fs-display-lh) var(--fs-font);
+  letter-spacing: var(--fs-display-track);
+}
+.fs-h1 {
+  font: var(--fs-h1-weight) var(--fs-h1-size) / var(--fs-h1-lh) var(--fs-font);
+  letter-spacing: var(--fs-h1-track);
+}
+.fs-h2 {
+  font: var(--fs-h2-weight) var(--fs-h2-size) / var(--fs-h2-lh) var(--fs-font);
+  letter-spacing: var(--fs-h2-track);
+}
+.fs-body {
+  font: var(--fs-body-weight) var(--fs-body-size) / var(--fs-body-lh) var(--fs-font);
+}
+.fs-caption {
+  font: var(--fs-caption-weight) var(--fs-caption-size) / var(--fs-caption-lh) var(--fs-font);
+  letter-spacing: var(--fs-caption-track);
+  text-transform: uppercase;
+}
+
+/*
+ * Keyboard focus inside a spread.
+ *
+ * The spreads are light where the rest of the site is dark, so the frame's
+ * own focus treatment would be tuned for the wrong ground. Teal is kept —
+ * it is the site's focus colour and reads on Mist and Midnight alike — and
+ * `:focus-visible` means a pointer click does not leave a ring behind.
+ */
+.fs-brand :focus-visible {
+  outline: 2px solid var(--color-teal, #00b8c9);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+/*
+ * The wordmark placeholder.
+ *
+ * "freshstart" is artwork, never live text — it ships as
+ * `freshstart-lockup.svg`. Quicksand stands in until that file exists, and
+ * this class is the one place that decision lives: when the SVG arrives,
+ * delete the class, the Quicksand link in `index.html`, and `FsLockup`'s
+ * text branch together.
+ */
+.fs-wordmark-placeholder {
+  font-family: 'Quicksand', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 500;
+}
