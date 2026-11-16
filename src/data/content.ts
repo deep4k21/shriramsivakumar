@@ -319,19 +319,6 @@ export interface Project {
   typeface?: string;
   processRows: ProcessRow[];
   /**
-   * Replaces the process rows with a component of the project's own.
-   *
-   * One project — Freshstart — is a brand book rather than a sequence of
-   * process steps: fifteen fixed-format artboards drawn in that brand's own
-   * design system, which the row layout cannot express. Naming the body here
-   * keeps that an exception the data declares, rather than a condition the
-   * renderer carries for every project.
-   *
-   * `processRows` still has to be supplied, and is still what the category
-   * tile and the mobile case study read.
-   */
-  customBody?: 'freshstart';
-  /**
    * The closing note. Optional: a deck argues its own ending, so the
    * presentation projects omit the row rather than repeating the last slide.
    */
@@ -1045,17 +1032,9 @@ export const CATEGORIES: Category[] = [
       // this sits 2nd and that sits 4th, per instruction.
       {
         name: 'Freshstart',
-        subtitle: 'Brand identity proposal · portfolio piece',
         thumbnail: '/images/Brand Identity/Freshstart/thumbnail-light.svg',
         thumbnailDark: '/images/Brand Identity/Freshstart/thumbnail-dark.svg',
         software: ['Illustrator', 'Figma'],
-        /*
-          The case study is the brand book itself — see `customBody`. The
-          process rows below still describe the three steps, and are what the
-          category tile and the mobile case study read; on desktop the same
-          three steps are spread 04.
-        */
-        customBody: 'freshstart',
         problem:
           "A startup partnership programme lived inside a larger SaaS brand with no mark of its own. Nothing signalled that it belonged to the family, or that it stood for something distinct within it.",
         solution:

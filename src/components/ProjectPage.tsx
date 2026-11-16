@@ -8,7 +8,6 @@ import { PrototypePiP } from './PrototypePiP';
 import { PrototypePhonePiP } from './PrototypePhonePiP';
 import { AssetSet } from './AssetSet';
 import { DocumentViewer } from './DocumentViewer';
-import { FreshstartCaseStudy, FreshstartCover } from './freshstart/FreshstartCaseStudy';
 import { MotionClip } from './MotionClip';
 
 /**
@@ -416,14 +415,6 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
         </div>
 
         <div className="flex flex-col gap-6.5 p-8">
-          {/*
-            A project with its own cover shows it here, in the banner's place:
-            the Freshstart brand book opens on the lockup across both grounds,
-            which is what the banner would otherwise be duplicating.
-          */}
-          {project.customBody === 'freshstart' && <FreshstartCover />}
-
-          {!project.customBody && (
           <div className="relative grid aspect-[915/338] w-full place-items-center overflow-hidden rounded-[14px] border border-white/7 bg-[repeating-linear-gradient(120deg,#111316,#111316_9px,#171A1E_9px,#171A1E_18px)]">
             {project.thumbnail ? (
               <img
@@ -467,29 +458,6 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               </div>
             )}
           </div>
-          )}
-
-          {/*
-            A project with its own numbered body labels this pair as one of
-            its sections, so it reads as part of the sequence rather than as
-            untitled copy ahead of it.
-
-            Label and panels are one element, not two siblings: as siblings the
-            body's own 26px gap would sit between them, leaving this label
-            further from its content than every other section's is from its
-            spread. The `gap-3.5` matches what those sections use.
-          */}
-          <div className={project.customBody ? 'flex flex-col gap-3.5' : 'contents'}>
-          {project.customBody && (
-            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
-              <h2 className="m-0 font-heading text-xs font-semibold tracking-[0.14em] text-teal">
-                02 · Brief
-              </h2>
-              <p className="m-0 font-body text-sm text-grey">
-                What was missing, and the one idea that fixed it.
-              </p>
-            </div>
-          )}
 
           <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
             {/*
@@ -505,7 +473,6 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               <div className="font-heading text-xs font-semibold tracking-[0.14em] text-green">{project.solutionLabel ?? 'SOLUTION'}</div>
               <p className="m-0 font-body text-[15.5px]/[1.7] text-grey">{withEmphasis(project.solution)}</p>
             </div>
-          </div>
           </div>
 
           {/* Omitted entirely for a project with no single palette — see Project.chips. */}
@@ -535,14 +502,6 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           )}
 
           {/*
-            A project whose body is its own component renders that instead of
-            the process rows — see `Project.customBody`. Everything around it
-            stays the shared modal's: header, tool pills, tabs, the
-            problem/solution pair above and the footer below.
-          */}
-          {project.customBody === 'freshstart' && <FreshstartCaseStudy />}
-
-          {/*
             Both columns top-align and the row's height follows its own
             content, rather than the text sitting flush with the top of a
             fixed-height image and leaving empty space below it once the copy
@@ -551,7 +510,7 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
             the row) size to whichever is taller instead of forcing every row
             to match the image's height.
           */}
-          {!project.customBody && project.processRows.map((row, i) => {
+          {project.processRows.map((row, i) => {
             // Rendered as the right half of the previous row's pair, not on
             // its own — see `pairWithNext` below.
             if (i > 0 && project.processRows[i - 1].pairWithNext) return null;
