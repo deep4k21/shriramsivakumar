@@ -1032,8 +1032,15 @@ export const CATEGORIES: Category[] = [
       // this sits 2nd and that sits 4th, per instruction.
       {
         name: 'Freshstart',
-        thumbnail: '/images/Brand Identity/Freshstart/thumbnail-light.svg',
-        thumbnailDark: '/images/Brand Identity/Freshstart/thumbnail-dark.svg',
+        subtitle: 'Brand identity proposal · portfolio piece',
+        /*
+          The brand book's own cover, cropped to the banner ratio every other
+          project uses. The slide is 16:9 with the lockup in the middle third,
+          so it is cropped around the artwork rather than resized — a straight
+          fit would fill the banner with the slide's empty ground.
+        */
+        thumbnail: '/images/Brand Identity/Freshstart/01-cover.webp',
+        thumbnailDark: '/images/Brand Identity/Freshstart/01-cover-dark.webp',
         software: ['Illustrator', 'Figma'],
         problem:
           "A startup partnership programme lived inside a larger SaaS brand with no mark of its own. Nothing signalled that it belonged to the family, or that it stood for something distinct within it.",
@@ -1045,27 +1052,200 @@ export const CATEGORIES: Category[] = [
           { color: '#322A78', border: 'rgba(255,255,255,0.15)' },
         ],
         typeface: 'Neue Haas Unica',
+        /*
+          The brand book, spread by spread.
+
+          Each row carries one page of the guidelines as artwork rather than
+          as markup: these are a designer's slides, fixed compositions that
+          document a finished system, so rebuilding them in the browser would
+          add a second source of truth for something that will not change.
+
+          Spread 02 is absent on purpose — it is the problem/solution pair,
+          which the modal already renders above these rows as live text.
+
+          Every spread is 2336 x 1316, so they share one ratio. The label is
+          the spread's own title; the artwork repeats it, which is how the
+          book itself is set.
+        */
         processRows: [
           {
-            label: 'ORIGIN',
-            text: "Started from the parent brand's existing community icon, three figures holding hands. Already understood internally, so the new mark would inherit meaning rather than introduce it.",
-            slot: 'SOURCE ICON',
-            assetSet: [{ src: '/images/Brand Identity/Freshstart/ORIGIN.webp', ratio: 2.4786 }],
-          },
-          {
-            label: 'TRANSLATION',
-            text: 'Morphed that icon toward the parent brand’s signature drop shape, so the sub-mark would sit inside the existing visual family rather than beside it.',
-            slot: 'SHAPE STUDIES',
+            label: 'BRAND STORY',
+            text: 'One purpose and three pillars, so the mark has something to stand for.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
             assetSet: [
-              { src: '/images/Brand Identity/Freshstart/TRANSLATION.webp', ratio: 4.7885, white: true, padded: true },
+              { src: '/images/Brand Identity/Freshstart/03-brand-story.webp', ratio: 1.7751 },
             ],
           },
           {
-            label: 'INVERSION',
-            text: 'Inverting the colour direction turned the drop’s negative space into a rocket silhouette. Partnership and startup became the same shape.',
-            slot: 'FINAL MARK',
+            label: 'PROCESS',
+            text: "Started from the parent brand's community icon — three figures holding hands — then morphed it toward the family's drop shape. Inverting the colour turned the negative space into a rocket.",
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
             assetSet: [
-              { src: '/images/Brand Identity/Freshstart/INVERSION.webp', ratio: 2.9305, white: true, padded: true },
+              { src: '/images/Brand Identity/Freshstart/04-process.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'LOGO SYSTEM',
+            text: 'Four lockups, each shown on light and dark.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/05-logo-system.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'CONSTRUCTION',
+            text: 'The geometry behind the drop and its launch trails.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/06-construction.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'CLEAR SPACE & MINIMUM SIZE',
+            text: 'How much room the mark needs, and how small it goes.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/07-clear-space-and-size.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'BACKGROUNDS',
+            text: 'Which lockup belongs on which ground.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/08-backgrounds.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'MISUSE',
+            text: 'Eight things the files are not for.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/09-misuse.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'COLOUR',
+            text: 'Five values, with print conversions.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/10-colour.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'GRADIENT RULES',
+            text: 'Two stops, one direction.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/11-gradient-rules.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'ACCESSIBLE PAIRS',
+            text: 'Every pairing, with its measured contrast.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/12-accessible-pairs.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'TYPOGRAPHY',
+            text: 'One family, five steps.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/13-typography.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'ICONOGRAPHY',
+            text: 'Twelve icons on a shared 24px grid.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/14-iconography.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'VOICE & TONE',
+            text: 'How it sounds, written against what it is not.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/15-voice-and-tone.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'APPLICATIONS',
+            text: 'Logo, colour, type and icons working together.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/16-applications.webp', ratio: 1.7751 },
+            ],
+          },
+          {
+            label: 'CLOSE',
+            text: 'Where the system lands.',
+            stacked: true,
+            // The slot's default cap is one viewport tall, which is shorter
+            // than a full-width 16:9 spread; without raising it the image
+            // overflows its row and laps the ones above and below.
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Freshstart/17-close.webp', ratio: 1.7751 },
             ],
           },
         ],
