@@ -5,10 +5,15 @@ import type { ProcessRow } from '../../data/content';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { AssetSet } from '../AssetSet';
+import { BehaviourCards } from '../BehaviourCards';
+import { DecisionGrid } from '../DecisionGrid';
 import { DocumentViewer } from '../DocumentViewer';
 import { withEmphasis } from '../ProjectPage';
+import { PersonaCard } from '../PersonaCard';
+import { PrototypeBanner } from '../PrototypeBanner';
 import { PrototypePhonePiP } from '../PrototypePhonePiP';
 import { PrototypePiP } from '../PrototypePiP';
+import { ResearchCard } from '../ResearchCard';
 import type { FeaturedProject } from './featuredProjects';
 
 const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
@@ -25,6 +30,43 @@ const EASE_OUT = [0.2, 0.7, 0.2, 1] as const;
 function MobileSlot({ row }: { row: ProcessRow }) {
   if (row.document) {
     return <DocumentViewer doc={row.document} fitHeight={row.slotAspect} />;
+  }
+  /*
+    The card slots render as they do on desktop: both are built from the
+    site's own card styles at whatever width they are given, so a phone needs
+    no separate version of either.
+  */
+  if (row.persona) {
+    return <PersonaCard persona={row.persona} />;
+  }
+  if (row.research) {
+    return <ResearchCard research={row.research} />;
+  }
+  /*
+    The three screens stack rather than sitting abreast. `ScreenTrio` lays
+    them out by ratio in one row, which at a phone's width leaves each about
+    120px across — a picture of a screen rather than a readable one.
+  */
+  if (row.screens) {
+    return (
+      <div className="flex flex-col gap-3">
+        {row.screens.shots.map((s) => (
+          <img
+            key={s.src}
+            src={s.src}
+            alt={s.alt}
+            className="w-full rounded-xl border border-white/10"
+          />
+        ))}
+        {row.screens.wireframes && (
+          <img
+            src={row.screens.wireframes.src}
+            alt={row.screens.wireframes.alt}
+            className="w-full rounded-xl border border-white/10"
+          />
+        )}
+      </div>
+    );
   }
   if (row.prototype) {
     return (
@@ -231,10 +273,49 @@ export function MobileProjectModal({
               >
                 {row.label}
               </div>
+              {row.heading && (
+                <h3 className="m-0 font-heading text-[16px]/[1.4] font-semibold text-white">
+                  {row.heading}
+                </h3>
+              )}
               {row.text && (
                 <p className="m-0 font-body text-[14px]/[1.7] whitespace-pre-line text-grey">
                   {withEmphasis(row.text)}
                 </p>
+              )}
+              {row.bullets && (
+                <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+                  {row.bullets.map((item) => (
+                    <li key={item} className="flex gap-2 font-body text-[14px]/[1.6] text-grey">
+                      <span aria-hidden="true" className="flex-none text-teal">
+                        ·
+                      </span>
+                      {withEmphasis(item)}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {row.textAfter && (
+                <p className="m-0 font-body text-[14px]/[1.7] text-grey">
+                  {withEmphasis(row.textAfter)}
+                </p>
+              )}
+              {/* The pillars read as a list here, as they do beside the
+                  screens on desktop. */}
+              {row.pillars && (
+                <ol className="m-0 flex list-none flex-col gap-3 p-0">
+                  {row.pillars.map((pillar) => (
+                    <li key={pillar.title} className="flex flex-col gap-1">
+                      <span
+                        className="font-heading text-[13px] font-semibold"
+                        style={{ color: pillar.color ?? 'var(--color-teal)' }}
+                      >
+                        {pillar.title}
+                      </span>
+                      <span className="font-body text-[13px]/[1.55] text-grey">{pillar.text}</span>
+                    </li>
+                  ))}
+                </ol>
               )}
               {/*
                 A row whose slot is an accordion of questions, rather than
@@ -243,6 +324,22 @@ export function MobileProjectModal({
               */}
               {row.accordion && <MobileAccordion items={row.accordion} />}
               <MobileSlot row={row} />
+              {/*
+                The decisions grid and the "try this" cards stack to one
+                column at this width, and the prototype banner links out the
+                same way it does on desktop, so all three are the shared
+                components rather than phone-specific copies.
+              */}
+              {row.decisions && <DecisionGrid decisions={row.decisions} />}
+              {row.prototypeBanner && <PrototypeBanner banner={row.prototypeBanner} />}
+              {row.behaviours && (
+                <div className="flex flex-col gap-3">
+                  <span className="font-heading text-[11px] font-semibold tracking-[0.14em] text-teal uppercase">
+                    Try this
+                  </span>
+                  <BehaviourCards cards={row.behaviours} />
+                </div>
+              )}
             </div>
           ))}
 

@@ -727,166 +727,7 @@ export const CATEGORIES: Category[] = [
       { value: '5', label: 'INDUSTRIES' },
       { value: '10+', label: 'GLOBAL MARKETS' },
     ],
-    projects: [
-      {
-        name: 'Chamaco',
-        // The category's own eyebrow ("UI/UX DESIGN") undersells this one —
-        // it's a mobile app in a food-and-delivery vertical, inside a
-        // category that otherwise holds desktop dashboards and enterprise
-        // platforms, so the header says so.
-        eyebrow: 'UI/UX · Mobile · Food and delivery',
-        subtitle:
-          'A Mexican food ordering app, brand and all, built into a working prototype in two days.',
-        thumbnail: '/images/UIUX/Chamaco/1 Thumbnail.webp',
-        software: ['Figma', 'Claude', 'Lovable'],
-        problem:
-          "I set myself the brief I actually get. **A client wants something tappable by Monday** and it is already Thursday afternoon. No name, no brand, no visual system, and nobody to hand the production work to.\n\nI picked **food delivery** on purpose. It is the most crowded category in mobile, which makes standing out harder, and it is the vertical I would most likely be briefed on next.",
-        solution:
-          'Split the work by **what only a designer can actually do.**\n\n**Claude to think with. Figma for anything with a vector in it. Lovable to build.** I kept the naming, the brand, the wireframe and every judgment call, and handed off only what I could specify tightly enough.\n\nA complete ordering flow, live and clickable, in **the time a mood board usually takes.**',
-        // No `chips`/`typeface` — deliberately no Brand system row for this
-        // project. Row 2's design-system board carries the colour and type
-        // information the chip strip would otherwise duplicate.
-        processRows: [
-          /*
-            The prototype leads rather than closing the case study.
-
-            Everything after it is written explanation — the groundwork, the
-            system, the icon, the wireframe, the review — and stacking all of
-            that ahead of the one thing a reader can actually open made the
-            project read as an essay with a link at the end. Putting the
-            working app directly under the solution lets someone try it first
-            and read the reasoning after.
-          */
-          {
-            label: 'PROTOTYPE',
-            text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
-            slot: 'LIVE PROTOTYPE',
-            // Stacked, full width — the slot is a banner image, the same
-            // treatment the project's own hero uses, and needs the full row
-            // to read as a banner rather than a thumbnail squeezed into a
-            // text column.
-            stacked: true,
-            phonePiP: {
-              embedUrl: 'https://helpful-muse-tool.lovable.app/home',
-              // The same artwork as the hero banner, minus its title — the
-              // clean ground on the left is where the button sits, rather
-              // than crowding the lockup this image would otherwise carry.
-              image: '/images/UIUX/Chamaco/Thumbnail-no-text.webp',
-            },
-          },
-          {
-            label: 'GROUNDWORK',
-            // No image slot: the row's full width goes to the copy. Stacked
-            // rather than the textOnly default's two-column split — a single
-            // short label in its own 1fr column left a wide dead gap before
-            // three paragraphs of copy that don't need a label column beside
-            // them to stay legible.
-            textOnly: true,
-            stacked: true,
-            text: "Two days rules out recruited testing. What fits: pulling apart every major delivery app for colour, navigation and cart behaviour. **Checking trademarks before committing to a name.** Walking four people through the flow. Running a **contrast audit during the build, not after.**\n\n**Two names got killed before one survived.** The first was an outlaw motorcycle club. The second, a US restaurant group trading since the eighties.\n\n**Chamaco is Mexican slang for kid.** Nobody owns it, and it already means what the brand is. The new kid on the block.",
-          },
-          {
-            label: 'DESIGN SYSTEM',
-            text: 'Every big delivery app sits somewhere in the orange to red band. Chamaco runs **green and orange, with pink held back for anything you tap.**\n\nMexican pink got its name in 1949 and became the **unofficial colour of Mexico City.** It is the most distinctive colour available in this category, which is exactly why it is not the background. **Spend it everywhere and it stops meaning anything.**\n\nOne catch. At full strength it **fails contrast for body text,** so the accent runs two values. A bright one for fills, a darker one for anything carrying a label. The same split repeats across green and orange.\n\n**Nothing is a hex value in the build.** Every colour is a semantic token, so a button is primary-action rather than a particular green, and **dark mode mirrors every one of them** instead of being a second set of decisions made later.\n\nType splits the same way. **Salsa for display,** which carries the character, and **Roboto for body,** which stays out of the way. One face to be noticed, one to be read. Title 32/40, body 16/24, caption 13/18.',
-            slot: 'DESIGN SYSTEM',
-            stacked: true,
-            assetColumns: true,
-            assetSet: [
-              { src: '/images/UIUX/Chamaco/2A Design-system.webp', ratio: 1.7917 },
-              // Dark and light home, side by side within the one image — the
-              // token set applied, and the proof of the dark-mode claim above.
-              { src: '/images/UIUX/Chamaco/2B Color.webp', ratio: 1.0908 },
-            ],
-          },
-          {
-            label: 'APP ICON',
-            text: 'The icon had to work at the size of a thumbnail on a crowded home screen, so it carries the whole brand in one shape.\n\n**A sombrero, a taco, and a strand of papel picado bunting, arranged into a face.** The sombrero is one eye. The taco is the other. The bunting is the smile, and the scalloped hems read as teeth.\n\n**Three passes to get there.** Outline first, to test whether the shapes read at all. Then on dark, to check the weight held. Colour last, once the arrangement was settled.\n\n**The eyes do not match on purpose.** Symmetry would have been correct and forgettable, and forgettable is fatal on a screen full of delivery apps.',
-            slot: 'APP ICON — BUILD-UP',
-            stacked: true,
-            // The three-stage build-up is the point, so the full strip stays
-            // in frame rather than cropping to the final mark alone.
-            assetSet: [{ src: '/images/UIUX/Chamaco/3 app icon.webp', ratio: 4.0037 }],
-          },
-          {
-            label: 'WIREFRAME',
-            text: '**Every screen and every state drawn by hand in Figma** before a single prompt was written.\n\nOne thing came out of it the first layout did not have. The flow ended at order confirmation, which **skips the hardest screen in the category,** so live tracking went in.\n\n**AI can build a tracking screen. It cannot tell you your flow is missing one.**',
-            slot: 'WIREFRAME',
-            stacked: true,
-            assetColumns: true,
-            assetSet: [
-              { src: '/images/UIUX/Chamaco/4A Wireframe.webp', ratio: 1.2691 },
-              // Dark and light order tracking, side by side within the one
-              // image — the screen the copy above argues for, so it gets its
-              // own slot rather than sitting inside the wireframe sheet.
-              { src: '/images/UIUX/Chamaco/4B Tracking.webp', ratio: 1.1166 },
-            ],
-          },
-          {
-            label: 'WHAT I CHANGED',
-            text: 'The build came back fast and mostly right. **This is the part that was not.**',
-            // No image slot, and stacked rather than the usual text-only
-            // two-column shape: a short intro line ahead of the FAQ row
-            // below reads better as its own full-width statement than as
-            // half a row beside an empty column. Teal rather than the usual
-            // orange label — it leads into the FAQ row right after it, which
-            // carries the same teal heading colour, so the two read as one
-            // continuous section rather than two unrelated rows.
-            textOnly: true,
-            stacked: true,
-            labelColor: 'teal',
-            // No bottom padding/border of its own — the FAQ row right after
-            // it joins flush, so the two read as one continuous block
-            // rather than two separate sections.
-            joinNext: true,
-          },
-          {
-            label: 'FAQ',
-            text: '',
-            // No visible heading of its own — WHAT I CHANGED right above it
-            // already introduces this as the review, so a second "FAQ"
-            // title between them would repeat rather than add anything.
-            // Its own accordion row rather than `Project.faq` itself: that
-            // field always opens its first item and always renders after
-            // every row, where this one starts fully closed.
-            accordionHideLabel: true,
-            accordionJoinPrevious: true,
-            accordionDefaultOpenFirst: true,
-            accordion: [
-              {
-                q: 'A whole home section went missing',
-                a: 'The page shipped without it. The metadata still described the section that was not there.',
-              },
-              {
-                q: 'Every dish descriptor was the same length',
-                a: 'Padded to match. Real menus are uneven, and the uniformity read as filler the moment you scanned the list.',
-              },
-              {
-                q: 'A beer came back tagged vegetarian, with a spice rating',
-                a: 'Plausible-looking metadata applied to the wrong kind of item. Fast to generate, fast to miss.',
-              },
-              {
-                q: 'Category shortcuts wired to nothing',
-                a: 'They looked correct and did nothing. Working out which parts are only pretending to work is most of the review.',
-              },
-              {
-                q: 'The logo came back off-palette',
-                a: 'A cool grey ground with a dusty pink mark. All four values had drifted. None of them were the ones I specified.',
-              },
-              {
-                q: 'Theme, type and spacing pulled apart screen by screen',
-                a: 'Each screen was internally consistent and none of them agreed with each other. Pulling it back to one system was manual, start to finish.',
-              },
-              {
-                q: 'Reorder sat on the home screen of a first-time user',
-                a: 'It has nothing to reorder from. The four people testing the flow caught it. It now appears only once a first order exists.',
-              },
-            ],
-          },
-        ],
-        endNote:
-          'Two days produced a brand, a mark, a colour system that survives a contrast audit, and **something a client can hold in their hand.**\n\nEvery hour saved on production went straight back into the decisions. **The tools got faster. The judgment did not get optional.**',
-      },
-      {
+    projects: [      {
         name: 'Healthcare dashboard',
         /*
           The hero, the triage trio and the behaviour clips all come from the
@@ -1014,187 +855,6 @@ export const CATEGORIES: Category[] = [
         ],
         endNote:
           'The brief asked for five features. The exercise was deciding which four could be quieter, then building it so every number had to be true.',
-      },
-      {
-        name: 'Prudent',
-        thumbnail: '/images/UIUX/Prudent/thumbnail.svg',
-        software: ['Figma'],
-        problem:
-          "A client redesign. An enterprise lending platform had three distinct products and a page that didn't make clear what any of them did. Everything competed for the same level of attention, so nothing held it.",
-        solution:
-          "A rebuilt hierarchy that explains the products in sequence, and photography of actual people in a category that usually shows none.",
-        // TODO: replace with the real palette from Figma.
-        chips: [
-          { color: '#0B2A4A', border: 'rgba(255,255,255,0.15)' },
-          { color: '#1C4E80', border: 'rgba(255,255,255,0.15)' },
-          { color: '#4A90D9', border: 'rgba(255,255,255,0.15)' },
-          { color: '#E8EEF4', border: 'rgba(255,255,255,0.15)' },
-          { color: '#F2A33C', border: 'rgba(255,255,255,0.15)' },
-        ],
-        // TODO: replace with the real typeface from Figma.
-        typeface: 'Inter',
-        processRows: [
-          {
-            label: 'DIAGNOSIS',
-            text: "The original page had the components but not the order. Products sat in a flat block with no way to tell them apart. Proof and capability were interleaved. A first-time visitor couldn't answer what the thing does before being asked to book a demo.",
-            slot: 'BEFORE / AUDIT',
-            // 2940 × 1464 — wider than 16:9, so contained rather than cropped
-            // to a ratio it doesn't fit.
-            assetSet: [{ src: '/images/UIUX/Prudent/Diagnosis.webp', ratio: 2.0082 }],
-          },
-          {
-            label: 'HIERARCHY',
-            text: "I rebuilt it as a sequence. How it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section, wholesale, correspondent and retail, because a feature grid speaks to none of them.",
-            slot: 'STRUCTURE / SECTION FLOW',
-            // 2486 × 1308.
-            assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.webp', ratio: 1.9006 }],
-          },
-          {
-            label: 'PRESENCE',
-            text: "Enterprise fintech runs on abstraction. Gradients, icons, empty dashboards. This uses cut-out photography of people sitting on and standing beside the product, at full scale. The interface screenshots carry the explanation, which frees the imagery to do the thing abstraction can't. Make it look like software people actually use.",
-            slot: 'MOCKUPS',
-            stacked: true,
-            // The artboard measures 1.774 — 16:9 within a rounding error — so
-            // the standard video slot fits it with no letterboxing, unlike the
-            // healthcare dashboard's 1.409 which needed its own ratio.
-            slotAspectVideo: true,
-            // Served from embed.figma.com rather than the /proto/ share link:
-            // Figma refuses to frame the latter. The player's chrome is
-            // switched off — footer bar and prev/next/reset — so only the
-            // artefact shows.
-            prototype: {
-              embedUrl:
-                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
-                '?node-id=2705-4911&starting-point-node-id=2705%3A4911' +
-                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
-                '&hide-ui=1&hotspot-hints=0&embed-host=share',
-            },
-          },
-        ],
-        endNote:
-          "Nothing on the original page was wrong. It was all there, in the wrong order, and that turns out to be the harder problem to see. The engagement ended before the rebuild shipped. The order stayed.",
-      },
-      {
-        name: 'PowerBI demos',
-        thumbnail: '/images/UIUX/PowerBI Dashboards/thumbnail.svg',
-        software: ['Figma', 'Power BI'],
-        // A collection rather than a single case study, so the two-column row is
-        // relabelled: there is no one problem/solution pair across four builds.
-        problemLabel: 'CONTEXT',
-        problem:
-          "A set of Power BI dashboards built in-house across compliance, client management, commercial performance and multi-market reporting. Four different audiences, four different questions.",
-        solutionLabel: 'THROUGHLINE',
-        solution:
-          'Every one had the same underlying job: make a dense data screen answer its main question before anyone starts reading.',
-        // `chips`/`typeface` omitted: four separate client palettes, so a single
-        // chip row would be misleading. The brand-system row renders nothing.
-        processRows: [
-          {
-            label: 'COMPLIANCE',
-            text: "Five exception counters and three charts kept fighting for the top of the screen. Nothing won until the filters moved out into their own panel. Once narrowing a query stopped costing the overview, the counters could stay loud and the charts could stay quiet.",
-            slot: 'VENDOR COMPLIANCE',
-            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
-            // width for these 1.47–1.78:1 screenshots inside a ~455px
-            // two-column slot, so the image was squeezed narrower than the box
-            // and came out shorter too, leaving a gap of empty background above
-            // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/COMPLIANCE.webp', ratio: 1.646 }],
-          },
-          {
-            label: 'ENGAGEMENT',
-            text: "Account teams open this between calls, so it had about four seconds to work. RAG status and pursuit numbers went up top and everything else went below. The illustration was the argument I had with myself. A screen this commercial reads cold without it.",
-            slot: 'CLIENT 360',
-            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
-            // width for these 1.47–1.78:1 screenshots inside a ~455px
-            // two-column slot, so the image was squeezed narrower than the box
-            // and came out shorter too, leaving a gap of empty background above
-            // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/ENGAGEMENT.webp', ratio: 1.7708 }],
-          },
-          {
-            label: 'PERFORMANCE',
-            text: "Four KPIs, all genuinely important, none more important than the others. Colour ended up doing the separating that hierarchy couldn't, and everything underneath was sequenced to explain those four in order rather than compete with them.",
-            slot: 'REVENUE OVERVIEW',
-            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
-            // width for these 1.47–1.78:1 screenshots inside a ~455px
-            // two-column slot, so the image was squeezed narrower than the box
-            // and came out shorter too, leaving a gap of empty background above
-            // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PERFORMANCE.webp', ratio: 1.7751 }],
-          },
-          {
-            label: 'PORTFOLIO',
-            text: 'Six markets, each with subsidiaries, each with its own numbers. Collapsing the subsidiaries by default was the only way the parent view stayed readable. On mobile it broke entirely, so the country list became the navigation instead of a sidebar.',
-            slot: 'MULTI-MARKET — DESKTOP / MOBILE',
-            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
-            // width for these 1.47–1.78:1 screenshots inside a ~455px
-            // two-column slot, so the image was squeezed narrower than the box
-            // and came out shorter too, leaving a gap of empty background above
-            // it. Left to size itself, the image fills its own box exactly.
-            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PORTFOLIO.webp', ratio: 1.4742 }],
-          },
-        ],
-        endNote:
-          "Every one of these had to survive contact with the tool. Power BI decides a lot for you. The design work is in what's left.",
-      },
-      {
-        name: 'GlobeIA',
-        thumbnail: '/images/UIUX/GlobelA/thumbnail.svg',
-        software: ['Figma'],
-        problem:
-          "People arriving here don't know which check they need. The answer depends on which country is asking, not what they want. And the client wanted the booking form locked on screen at all times, since it's the only conversion that matters.",
-        solution:
-          'A page that answers "which service is mine" before it asks for anything, with the booking panel permanently in view so the answer and the action are never more than a glance apart.',
-        // TODO: replace with the real palette from Figma.
-        chips: [
-          { color: '#0E3B2E', border: 'rgba(255,255,255,0.15)' },
-          { color: '#1F7A5C', border: 'rgba(255,255,255,0.15)' },
-          { color: '#4FB08A', border: 'rgba(255,255,255,0.15)' },
-          { color: '#EEF4F1', border: 'rgba(255,255,255,0.15)' },
-          { color: '#E8B04B', border: 'rgba(255,255,255,0.15)' },
-        ],
-        // TODO: replace with the real typeface from Figma.
-        typeface: 'Inter',
-        processRows: [
-          {
-            label: 'ORIENTATION',
-            text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion, RCMP, FBI, apostille, fingerprinting, each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
-            slot: 'SERVICE SELECTION',
-            // 2486 × 1142.
-            assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.webp', ratio: 2.1769 }],
-          },
-          {
-            // The prototype sits here rather than on the final row: the locked
-            // nav and booking panel are what it demonstrates, so the reader can
-            // try the scroll behaviour straight after reading about it.
-            label: 'CONSTRAINT',
-            text: "The locked booking panel was the client's requirement, and it takes roughly a third of the viewport permanently. Everything else had to work in a narrower column. Shorter measure, tighter cards, no full-width sections. The nav locks with it, so the page scrolls underneath a frame that never moves.",
-            slot: 'MOCKUPS',
-            stacked: true,
-            // 1.778 measured off the rendered artboard — 16:9, so the standard
-            // video slot fits it exactly.
-            slotAspectVideo: true,
-            // Served from embed.figma.com rather than the /proto/ share link:
-            // Figma refuses to frame the latter. Chrome switched off, so the
-            // reader sees the artefact rather than the player.
-            prototype: {
-              embedUrl:
-                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
-                '?node-id=2705-5319&starting-point-node-id=2705%3A5319' +
-                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
-                '&hide-ui=1&hotspot-hints=0&embed-host=share',
-            },
-          },
-          {
-            label: 'REASSURANCE',
-            text: 'This is a category where people are anxious about getting it wrong. So: a with-and-without comparison making the alternative concrete, country-specific guides for the two audiences actually moving to Spain, trust numbers, and an FAQ that answers the question the accordion already started.',
-            slot: 'TRUST + FAQ',
-            // 1667 × 617.
-            assetSet: [{ src: '/images/UIUX/GlobelA/REASSURANCE.webp', ratio: 2.7018 }],
-          },
-        ],
-        endNote:
-          "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem. It went live and has since been adapted into their own brand.",
       },
       /*
         The sixth UI/UX project, sitting after GlobeIA rather than replacing
@@ -1418,6 +1078,346 @@ export const CATEGORIES: Category[] = [
         endNote:
           'Four bikes, four neons, one rule: every screen answers a question a rider is actually asking.',
       },
+
+      {
+        name: 'Chamaco',
+        // The category's own eyebrow ("UI/UX DESIGN") undersells this one —
+        // it's a mobile app in a food-and-delivery vertical, inside a
+        // category that otherwise holds desktop dashboards and enterprise
+        // platforms, so the header says so.
+        eyebrow: 'UI/UX · Mobile · Food and delivery',
+        subtitle:
+          'A Mexican food ordering app, brand and all, built into a working prototype in two days.',
+        thumbnail: '/images/UIUX/Chamaco/1 Thumbnail.webp',
+        software: ['Figma', 'Claude', 'Lovable'],
+        problem:
+          "I set myself the brief I actually get. **A client wants something tappable by Monday** and it is already Thursday afternoon. No name, no brand, no visual system, and nobody to hand the production work to.\n\nI picked **food delivery** on purpose. It is the most crowded category in mobile, which makes standing out harder, and it is the vertical I would most likely be briefed on next.",
+        solution:
+          'Split the work by **what only a designer can actually do.**\n\n**Claude to think with. Figma for anything with a vector in it. Lovable to build.** I kept the naming, the brand, the wireframe and every judgment call, and handed off only what I could specify tightly enough.\n\nA complete ordering flow, live and clickable, in **the time a mood board usually takes.**',
+        // No `chips`/`typeface` — deliberately no Brand system row for this
+        // project. Row 2's design-system board carries the colour and type
+        // information the chip strip would otherwise duplicate.
+        processRows: [
+          /*
+            The prototype leads rather than closing the case study.
+
+            Everything after it is written explanation — the groundwork, the
+            system, the icon, the wireframe, the review — and stacking all of
+            that ahead of the one thing a reader can actually open made the
+            project read as an essay with a link at the end. Putting the
+            working app directly under the solution lets someone try it first
+            and read the reasoning after.
+          */
+          {
+            label: 'PROTOTYPE',
+            text: 'Clickable end to end, splash through to **live order tracking.** Both themes, both complete.',
+            slot: 'LIVE PROTOTYPE',
+            // Stacked, full width — the slot is a banner image, the same
+            // treatment the project's own hero uses, and needs the full row
+            // to read as a banner rather than a thumbnail squeezed into a
+            // text column.
+            stacked: true,
+            phonePiP: {
+              embedUrl: 'https://helpful-muse-tool.lovable.app/home',
+              // The same artwork as the hero banner, minus its title — the
+              // clean ground on the left is where the button sits, rather
+              // than crowding the lockup this image would otherwise carry.
+              image: '/images/UIUX/Chamaco/Thumbnail-no-text.webp',
+            },
+          },
+          {
+            label: 'GROUNDWORK',
+            // No image slot: the row's full width goes to the copy. Stacked
+            // rather than the textOnly default's two-column split — a single
+            // short label in its own 1fr column left a wide dead gap before
+            // three paragraphs of copy that don't need a label column beside
+            // them to stay legible.
+            textOnly: true,
+            stacked: true,
+            text: "Two days rules out recruited testing. What fits: pulling apart every major delivery app for colour, navigation and cart behaviour. **Checking trademarks before committing to a name.** Walking four people through the flow. Running a **contrast audit during the build, not after.**\n\n**Two names got killed before one survived.** The first was an outlaw motorcycle club. The second, a US restaurant group trading since the eighties.\n\n**Chamaco is Mexican slang for kid.** Nobody owns it, and it already means what the brand is. The new kid on the block.",
+          },
+          {
+            label: 'DESIGN SYSTEM',
+            text: 'Every big delivery app sits somewhere in the orange to red band. Chamaco runs **green and orange, with pink held back for anything you tap.**\n\nMexican pink got its name in 1949 and became the **unofficial colour of Mexico City.** It is the most distinctive colour available in this category, which is exactly why it is not the background. **Spend it everywhere and it stops meaning anything.**\n\nOne catch. At full strength it **fails contrast for body text,** so the accent runs two values. A bright one for fills, a darker one for anything carrying a label. The same split repeats across green and orange.\n\n**Nothing is a hex value in the build.** Every colour is a semantic token, so a button is primary-action rather than a particular green, and **dark mode mirrors every one of them** instead of being a second set of decisions made later.\n\nType splits the same way. **Salsa for display,** which carries the character, and **Roboto for body,** which stays out of the way. One face to be noticed, one to be read. Title 32/40, body 16/24, caption 13/18.',
+            slot: 'DESIGN SYSTEM',
+            stacked: true,
+            assetColumns: true,
+            assetSet: [
+              { src: '/images/UIUX/Chamaco/2A Design-system.webp', ratio: 1.7917 },
+              // Dark and light home, side by side within the one image — the
+              // token set applied, and the proof of the dark-mode claim above.
+              { src: '/images/UIUX/Chamaco/2B Color.webp', ratio: 1.0908 },
+            ],
+          },
+          {
+            label: 'APP ICON',
+            text: 'The icon had to work at the size of a thumbnail on a crowded home screen, so it carries the whole brand in one shape.\n\n**A sombrero, a taco, and a strand of papel picado bunting, arranged into a face.** The sombrero is one eye. The taco is the other. The bunting is the smile, and the scalloped hems read as teeth.\n\n**Three passes to get there.** Outline first, to test whether the shapes read at all. Then on dark, to check the weight held. Colour last, once the arrangement was settled.\n\n**The eyes do not match on purpose.** Symmetry would have been correct and forgettable, and forgettable is fatal on a screen full of delivery apps.',
+            slot: 'APP ICON — BUILD-UP',
+            stacked: true,
+            // The three-stage build-up is the point, so the full strip stays
+            // in frame rather than cropping to the final mark alone.
+            assetSet: [{ src: '/images/UIUX/Chamaco/3 app icon.webp', ratio: 4.0037 }],
+          },
+          {
+            label: 'WIREFRAME',
+            text: '**Every screen and every state drawn by hand in Figma** before a single prompt was written.\n\nOne thing came out of it the first layout did not have. The flow ended at order confirmation, which **skips the hardest screen in the category,** so live tracking went in.\n\n**AI can build a tracking screen. It cannot tell you your flow is missing one.**',
+            slot: 'WIREFRAME',
+            stacked: true,
+            assetColumns: true,
+            assetSet: [
+              { src: '/images/UIUX/Chamaco/4A Wireframe.webp', ratio: 1.2691 },
+              // Dark and light order tracking, side by side within the one
+              // image — the screen the copy above argues for, so it gets its
+              // own slot rather than sitting inside the wireframe sheet.
+              { src: '/images/UIUX/Chamaco/4B Tracking.webp', ratio: 1.1166 },
+            ],
+          },
+          {
+            label: 'WHAT I CHANGED',
+            text: 'The build came back fast and mostly right. **This is the part that was not.**',
+            // No image slot, and stacked rather than the usual text-only
+            // two-column shape: a short intro line ahead of the FAQ row
+            // below reads better as its own full-width statement than as
+            // half a row beside an empty column. Teal rather than the usual
+            // orange label — it leads into the FAQ row right after it, which
+            // carries the same teal heading colour, so the two read as one
+            // continuous section rather than two unrelated rows.
+            textOnly: true,
+            stacked: true,
+            labelColor: 'teal',
+            // No bottom padding/border of its own — the FAQ row right after
+            // it joins flush, so the two read as one continuous block
+            // rather than two separate sections.
+            joinNext: true,
+          },
+          {
+            label: 'FAQ',
+            text: '',
+            // No visible heading of its own — WHAT I CHANGED right above it
+            // already introduces this as the review, so a second "FAQ"
+            // title between them would repeat rather than add anything.
+            // Its own accordion row rather than `Project.faq` itself: that
+            // field always opens its first item and always renders after
+            // every row, where this one starts fully closed.
+            accordionHideLabel: true,
+            accordionJoinPrevious: true,
+            accordionDefaultOpenFirst: true,
+            accordion: [
+              {
+                q: 'A whole home section went missing',
+                a: 'The page shipped without it. The metadata still described the section that was not there.',
+              },
+              {
+                q: 'Every dish descriptor was the same length',
+                a: 'Padded to match. Real menus are uneven, and the uniformity read as filler the moment you scanned the list.',
+              },
+              {
+                q: 'A beer came back tagged vegetarian, with a spice rating',
+                a: 'Plausible-looking metadata applied to the wrong kind of item. Fast to generate, fast to miss.',
+              },
+              {
+                q: 'Category shortcuts wired to nothing',
+                a: 'They looked correct and did nothing. Working out which parts are only pretending to work is most of the review.',
+              },
+              {
+                q: 'The logo came back off-palette',
+                a: 'A cool grey ground with a dusty pink mark. All four values had drifted. None of them were the ones I specified.',
+              },
+              {
+                q: 'Theme, type and spacing pulled apart screen by screen',
+                a: 'Each screen was internally consistent and none of them agreed with each other. Pulling it back to one system was manual, start to finish.',
+              },
+              {
+                q: 'Reorder sat on the home screen of a first-time user',
+                a: 'It has nothing to reorder from. The four people testing the flow caught it. It now appears only once a first order exists.',
+              },
+            ],
+          },
+        ],
+        endNote:
+          'Two days produced a brand, a mark, a colour system that survives a contrast audit, and **something a client can hold in their hand.**\n\nEvery hour saved on production went straight back into the decisions. **The tools got faster. The judgment did not get optional.**',
+      },
+      {
+        name: 'Prudent',
+        thumbnail: '/images/UIUX/Prudent/thumbnail.svg',
+        software: ['Figma'],
+        problem:
+          "A client redesign. An enterprise lending platform had three distinct products and a page that didn't make clear what any of them did. Everything competed for the same level of attention, so nothing held it.",
+        solution:
+          "A rebuilt hierarchy that explains the products in sequence, and photography of actual people in a category that usually shows none.",
+        // TODO: replace with the real palette from Figma.
+        chips: [
+          { color: '#0B2A4A', border: 'rgba(255,255,255,0.15)' },
+          { color: '#1C4E80', border: 'rgba(255,255,255,0.15)' },
+          { color: '#4A90D9', border: 'rgba(255,255,255,0.15)' },
+          { color: '#E8EEF4', border: 'rgba(255,255,255,0.15)' },
+          { color: '#F2A33C', border: 'rgba(255,255,255,0.15)' },
+        ],
+        // TODO: replace with the real typeface from Figma.
+        typeface: 'Inter',
+        processRows: [
+          {
+            label: 'DIAGNOSIS',
+            text: "The original page had the components but not the order. Products sat in a flat block with no way to tell them apart. Proof and capability were interleaved. A first-time visitor couldn't answer what the thing does before being asked to book a demo.",
+            slot: 'BEFORE / AUDIT',
+            // 2940 × 1464 — wider than 16:9, so contained rather than cropped
+            // to a ratio it doesn't fit.
+            assetSet: [{ src: '/images/UIUX/Prudent/Diagnosis.webp', ratio: 2.0082 }],
+          },
+          {
+            label: 'HIERARCHY',
+            text: "I rebuilt it as a sequence. How it works, then what each product does, then who it's for. Three products became a tabbed section so each one gets a real explanation and a live interface screenshot instead of a shared paragraph. Buyer segmentation moved to its own section, wholesale, correspondent and retail, because a feature grid speaks to none of them.",
+            slot: 'STRUCTURE / SECTION FLOW',
+            // 2486 × 1308.
+            assetSet: [{ src: '/images/UIUX/Prudent/HIERARCHY.webp', ratio: 1.9006 }],
+          },
+          {
+            label: 'PRESENCE',
+            text: "Enterprise fintech runs on abstraction. Gradients, icons, empty dashboards. This uses cut-out photography of people sitting on and standing beside the product, at full scale. The interface screenshots carry the explanation, which frees the imagery to do the thing abstraction can't. Make it look like software people actually use.",
+            slot: 'MOCKUPS',
+            stacked: true,
+            // The artboard measures 1.774 — 16:9 within a rounding error — so
+            // the standard video slot fits it with no letterboxing, unlike the
+            // healthcare dashboard's 1.409 which needed its own ratio.
+            slotAspectVideo: true,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. The player's chrome is
+            // switched off — footer bar and prev/next/reset — so only the
+            // artefact shows.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2705-4911&starting-point-node-id=2705%3A4911' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
+          },
+        ],
+        endNote:
+          "Nothing on the original page was wrong. It was all there, in the wrong order, and that turns out to be the harder problem to see. The engagement ended before the rebuild shipped. The order stayed.",
+      },
+      {
+        name: 'GlobeIA',
+        thumbnail: '/images/UIUX/GlobelA/thumbnail.svg',
+        software: ['Figma'],
+        problem:
+          "People arriving here don't know which check they need. The answer depends on which country is asking, not what they want. And the client wanted the booking form locked on screen at all times, since it's the only conversion that matters.",
+        solution:
+          'A page that answers "which service is mine" before it asks for anything, with the booking panel permanently in view so the answer and the action are never more than a glance apart.',
+        // TODO: replace with the real palette from Figma.
+        chips: [
+          { color: '#0E3B2E', border: 'rgba(255,255,255,0.15)' },
+          { color: '#1F7A5C', border: 'rgba(255,255,255,0.15)' },
+          { color: '#4FB08A', border: 'rgba(255,255,255,0.15)' },
+          { color: '#EEF4F1', border: 'rgba(255,255,255,0.15)' },
+          { color: '#E8B04B', border: 'rgba(255,255,255,0.15)' },
+        ],
+        // TODO: replace with the real typeface from Figma.
+        typeface: 'Inter',
+        processRows: [
+          {
+            label: 'ORIENTATION',
+            text: "The old page led with what the company does. This one leads with what the visitor needs to figure out. Services became an accordion, RCMP, FBI, apostille, fingerprinting, each stating plainly who it's for and what it's required for, so people self-select instead of reading four dense paragraphs to find their one.",
+            slot: 'SERVICE SELECTION',
+            // 2486 × 1142.
+            assetSet: [{ src: '/images/UIUX/GlobelA/ORIENTATION.webp', ratio: 2.1769 }],
+          },
+          {
+            // The prototype sits here rather than on the final row: the locked
+            // nav and booking panel are what it demonstrates, so the reader can
+            // try the scroll behaviour straight after reading about it.
+            label: 'CONSTRAINT',
+            text: "The locked booking panel was the client's requirement, and it takes roughly a third of the viewport permanently. Everything else had to work in a narrower column. Shorter measure, tighter cards, no full-width sections. The nav locks with it, so the page scrolls underneath a frame that never moves.",
+            slot: 'MOCKUPS',
+            stacked: true,
+            // 1.778 measured off the rendered artboard — 16:9, so the standard
+            // video slot fits it exactly.
+            slotAspectVideo: true,
+            // Served from embed.figma.com rather than the /proto/ share link:
+            // Figma refuses to frame the latter. Chrome switched off, so the
+            // reader sees the artefact rather than the player.
+            prototype: {
+              embedUrl:
+                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
+                '?node-id=2705-5319&starting-point-node-id=2705%3A5319' +
+                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
+                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            },
+          },
+          {
+            label: 'REASSURANCE',
+            text: 'This is a category where people are anxious about getting it wrong. So: a with-and-without comparison making the alternative concrete, country-specific guides for the two audiences actually moving to Spain, trust numbers, and an FAQ that answers the question the accordion already started.',
+            slot: 'TRUST + FAQ',
+            // 1667 × 617.
+            assetSet: [{ src: '/images/UIUX/GlobelA/REASSURANCE.webp', ratio: 2.7018 }],
+          },
+        ],
+        endNote:
+          "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem. It went live and has since been adapted into their own brand.",
+      },
+      {
+        name: 'PowerBI demos',
+        thumbnail: '/images/UIUX/PowerBI Dashboards/thumbnail.svg',
+        software: ['Figma', 'Power BI'],
+        // A collection rather than a single case study, so the two-column row is
+        // relabelled: there is no one problem/solution pair across four builds.
+        problemLabel: 'CONTEXT',
+        problem:
+          "A set of Power BI dashboards built in-house across compliance, client management, commercial performance and multi-market reporting. Four different audiences, four different questions.",
+        solutionLabel: 'THROUGHLINE',
+        solution:
+          'Every one had the same underlying job: make a dense data screen answer its main question before anyone starts reading.',
+        // `chips`/`typeface` omitted: four separate client palettes, so a single
+        // chip row would be misleading. The brand-system row renders nothing.
+        processRows: [
+          {
+            label: 'COMPLIANCE',
+            text: "Five exception counters and three charts kept fighting for the top of the screen. Nothing won until the filters moved out into their own panel. Once narrowing a query stopped costing the overview, the counters could stay loud and the charts could stay quiet.",
+            slot: 'VENDOR COMPLIANCE',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/COMPLIANCE.webp', ratio: 1.646 }],
+          },
+          {
+            label: 'ENGAGEMENT',
+            text: "Account teams open this between calls, so it had about four seconds to work. RAG status and pursuit numbers went up top and everything else went below. The illustration was the argument I had with myself. A screen this commercial reads cold without it.",
+            slot: 'CLIENT 360',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/ENGAGEMENT.webp', ratio: 1.7708 }],
+          },
+          {
+            label: 'PERFORMANCE',
+            text: "Four KPIs, all genuinely important, none more important than the others. Colour ended up doing the separating that hierarchy couldn't, and everything underneath was sequenced to explain those four in order rather than compete with them.",
+            slot: 'REVENUE OVERVIEW',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PERFORMANCE.webp', ratio: 1.7751 }],
+          },
+          {
+            label: 'PORTFOLIO',
+            text: 'Six markets, each with subsidiaries, each with its own numbers. Collapsing the subsidiaries by default was the only way the parent view stayed readable. On mobile it broke entirely, so the country list became the navigation instead of a sidebar.',
+            slot: 'MULTI-MARKET — DESKTOP / MOBILE',
+            // No fixed height: `slotHeight: '460px'` demanded up to 817px of
+            // width for these 1.47–1.78:1 screenshots inside a ~455px
+            // two-column slot, so the image was squeezed narrower than the box
+            // and came out shorter too, leaving a gap of empty background above
+            // it. Left to size itself, the image fills its own box exactly.
+            assetSet: [{ src: '/images/UIUX/PowerBI Dashboards/PORTFOLIO.webp', ratio: 1.4742 }],
+          },
+        ],
+        endNote:
+          "Every one of these had to survive contact with the tool. Power BI decides a lot for you. The design work is in what's left.",
+      },
       /*
       ...['Client onboarding flow'].map(
         (name) => ({
@@ -1456,71 +1456,7 @@ export const CATEGORIES: Category[] = [
       { value: '10+', label: 'MARKETS' },
       { value: '100+', label: 'GLOBAL COLLABORATIONS' },
     ],
-    projects: [
-      {
-        name: 'This website',
-        thumbnail: '/images/Brand Identity/Portfolio Website/Thumbnail.webp',
-        software: ['Claude Design', 'Claude Code', 'Figma'],
-        problem:
-          "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template.",
-        solution:
-          'Rebuilt from a blank slate with a real brand system underneath, and an architecture where nothing ever opens off-page.',
-        chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#FFFFFF']),
-        typeface: 'Sora + Lora',
-        processRows: [
-          {
-            label: 'COLOR THEORY',
-            text: 'Three colours, three jobs. Orange is design. Green is travel. Teal sits between them and carries every header on the site.\n\nThe split isn\u2019t decorative. Orange only appears where the work is, green only where the travelling is. Teal is what connects the two, which is why it\u2019s the colour you\u2019ve read the most of since you landed here.',
-            slot: 'THE PALETTE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Color.webp', ratio: 2.0879 }],
-          },
-          {
-            label: 'FONT THEORY',
-            text: 'Every headline here is two fonts. Sora sets it up, Lora lands it.\n\n\u201CLayovers to Layouts,\u201D then I\u2019m Shriram in serif. \u201CThe more I,\u201D then design in serif. The serif always takes the word the sentence was built for. Nothing else on the site uses it.\n\nI tried seven serifs before this. Crimson Pro was in for a while and got dropped for being too quiet on a dark background. Lora held its weight.',
-            slot: 'THE PAIR',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Font.webp', ratio: 2.0879 }],
-          },
-          {
-            label: 'DRAWING BOARD',
-            text: 'Back to the drawing board, taken literally. The site is a chalkboard. The grid still shows through, the illustrations are drawn rather than rendered, and nothing carried over from the old build.\n\nStarting from a blank slate meant deciding what a portfolio is for before deciding what it looks like. It\u2019s for someone who has four minutes and a hiring decision.',
-            slot: 'THE SURFACE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Drawing Board.webp', ratio: 2.0879 }],
-          },
-          {
-            label: 'NAVIGATION',
-            text: 'You never leave the page. Categories open in place, projects open on top of them, and the back button is never the way out.\n\nFour categories, five projects each, one modal pattern for all twenty. Tabs across the top move you between projects without closing anything. Close returns you exactly where you were.\n\nThe constraint was deliberate. Every tab you open is a chance to lose someone.',
-            slot: 'THE ARCHITECTURE',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Navigation.webp', ratio: 2.0879 }],
-          },
-          {
-            label: 'WORKFLOW',
-            text: 'I direct, Claude builds, my developer ships it in Claude Code. Three parts, one decision-maker.\n\nI write the spec and the copy, Claude Design does the layout passes, and the file goes to my developer who builds it. When something came back wrong, I said what was wrong rather than accepting it.',
-            slot: 'THE STACK',
-            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Workflow.webp', ratio: 4.2611 }],
-          },
-        ],
-        faq: [
-          {
-            q: 'So did you design this, or did Claude?',
-            a: 'Every decision is mine. The type rule, the colour roles, the never-leave-the-page architecture, what each project says and why. Claude built what I specified and I pushed back when the spec was wrong.',
-          },
-          {
-            q: 'Where did the AI actually fall short?',
-            a: "Structure it could hold. Judgement it couldn't. It didn't know which design guidelines mattered here, when a case study should break the template instead of follow it, or how the project navigation should feel to use. That stayed with me.",
-          },
-          {
-            q: 'What was hardest to get right?',
-            a: 'The typography. Seven serifs before Lora, and the first colour-to-font rule I wrote had to be scrapped entirely once headlines started carrying two voices.',
-          },
-          {
-            q: 'Would you work this way on a client project?',
-            a: "Yes, with the same split. AI moves faster than I can draw. It doesn't know what the client needs, and it never will.",
-          },
-        ],
-        endNote:
-          'The riskiest page here is this one. Every other project asks you to trust the work. This one is the work.',
-      },
-      // 2nd project: previously "Sub-brand architecture" — swapped with it so
+    projects: [      // 2nd project: previously "Sub-brand architecture" — swapped with it so
       // this sits 2nd and that sits 4th, per instruction.
       {
         name: 'Freshstart',
@@ -1744,108 +1680,6 @@ export const CATEGORIES: Category[] = [
         endNote:
           "The rocket wasn't the plan. It appeared once the colour inverted, and two ideas resolved into one shape.",
       },
-      // 3rd project — previously "Identity guidelines", replaced with the
-      // podcast identity per instruction (2026-08-25).
-      {
-        name: 'Orbitshift Podcast',
-        thumbnail: '/images/Brand Identity/Orbitshift Podcast/thumbnail-light.svg',
-        thumbnailDark: '/images/Brand Identity/Orbitshift Podcast/thumbnail-dark.svg',
-        title: 'Orbitshift Podcast',
-        software: ['Illustrator', 'Figma'],
-        problem:
-          'A startup programme wanted to reach founders beyond its own product ecosystem. That meant a podcast that could stand as its own media property while still reading as part of the family.',
-        solution: "A rocket leaving its orbit. The name's meaning, drawn as one line.",
-        chips: [
-          { color: '#00B9FF', border: 'rgba(255,255,255,0.15)' },
-          { color: '#A33CFF', border: 'rgba(255,255,255,0.15)' },
-        ],
-        typeface: 'Rubik',
-        processRows: [
-          {
-            label: 'TRAJECTORY',
-            text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up, and the same thing an hour with someone further along is meant to trigger.",
-            slot: 'CONCEPT',
-            assetSet: [
-              {
-                src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.webp',
-                ratio: 7.1308,
-                white: true,
-                padded: true,
-              },
-            ],
-          },
-          {
-            label: 'ESCAPE',
-            text: "The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably. Breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.",
-            slot: 'MARK CONSTRUCTION',
-            assetSet: [
-              { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.webp', ratio: 3.368, white: true, padded: true },
-            ],
-          },
-          {
-            label: 'SURFACE',
-            // A full tall screenshot of the site alongside the social work: the
-            // dark-to-light scroll transition is the point and is lost if only
-            // the hero is shown.
-            text: 'The system extended into a site that opens in deep space and resolves into daylight as you scroll, with guest portraits duotoned into the palette, then out again across episode artwork, launch banners and social posts.',
-            slot: 'WEBSITE + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/SURFACE.webp', ratio: 1.7778 }],
-          },
-        ],
-        metrics: {
-          label: 'OUTCOME',
-          stats: [
-            { value: '2', label: 'SEASONS PRODUCED' },
-            { value: '47+', label: 'EPISODES PUBLISHED' },
-            { value: '4', label: 'PLATFORMS DISTRIBUTED' },
-          ],
-        },
-        endNote:
-          "The rocket sits outside the ring, not inside it. That was the whole argument. The point was never to orbit well.",
-      },
-      // 4th project — previously "Sub-brand architecture" (itself previously
-      // 2nd, swapped with "A sub logo system" above).
-      {
-        name: 'Uplift',
-        thumbnail: '/images/Brand Identity/Uplift/thumbnail-light.svg',
-        thumbnailDark: '/images/Brand Identity/Uplift/thumbnail-dark.svg',
-        software: ['Illustrator', 'Figma'],
-        problem:
-          "A global marketing technology brand needed an identity for its New York chapter. Something with its own energy that still read as family, not a separate company.",
-        solution:
-          "A wordmark engineered from the parent brand's own arrow, so the event, the city and the company all live inside the same letterforms.",
-        chips: [
-          { color: '#2146EC', border: 'rgba(255,255,255,0.15)' },
-          { color: '#0A1533', border: 'rgba(255,255,255,0.15)' },
-          { color: '#4FDCCE', border: 'rgba(255,255,255,0.15)' },
-          { color: '#FFFAEF', border: 'rgba(255,255,255,0.15)' },
-        ],
-        typeface: 'Roboto',
-        processRows: [
-          {
-            label: 'REFERENCES',
-            text: "Four starting points, all pointing the same way: the parent brand's arrow, the physical act of being lifted, a torch held above a city, and the rising axis of a growth chart.",
-            slot: 'MOODBOARD',
-            assetSet: [{ src: '/images/Brand Identity/Uplift/REFERENCES.webp', ratio: 1.9326 }],
-          },
-          {
-            label: 'CONSTRUCTION',
-            text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
-            slot: 'LETTERFORM STUDIES',
-            assetSet: [
-              { src: '/images/Brand Identity/Uplift/CONSTRUCTION.webp', ratio: 6.3976, white: true, padded: true },
-            ],
-          },
-          {
-            label: 'EXTENSION',
-            text: "The arrow scales out of the logo and into the environment — repeated as a backdrop pattern over a mapped world, so the mark's single gesture becomes the brand's ambient texture.",
-            slot: 'BACKDROP + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Uplift/EXTENSION.webp', ratio: 1.4151 }],
-          },
-        ],
-        endNote:
-          "Four ideas share one wordmark. An arrow, a lift, a torch, an axis. None of them announce themselves. You find them one at a time.",
-      },
       {
         name: 'Forge',
         subtitle: 'Identity for a startup accelerator programme',
@@ -2005,6 +1839,172 @@ export const CATEGORIES: Category[] = [
         ],
         endNote:
           "An anvil doesn't make anything by itself. It's the surface something else gets made on, which is the more honest description of what a programme like this actually does.",
+      },
+
+      {
+        name: 'This website',
+        thumbnail: '/images/Brand Identity/Portfolio Website/Thumbnail.webp',
+        software: ['Claude Design', 'Claude Code', 'Figma'],
+        problem:
+          "The old site was a gallery. Work displayed, nothing argued. It didn't hold up on a phone, and it looked like every other portfolio built from a template.",
+        solution:
+          'Rebuilt from a blank slate with a real brand system underneath, and an architecture where nothing ever opens off-page.',
+        chips: chipsFrom(['#00B8C9', '#FF9A5C', '#47C89A', '#FFFFFF']),
+        typeface: 'Sora + Lora',
+        processRows: [
+          {
+            label: 'COLOR THEORY',
+            text: 'Three colours, three jobs. Orange is design. Green is travel. Teal sits between them and carries every header on the site.\n\nThe split isn\u2019t decorative. Orange only appears where the work is, green only where the travelling is. Teal is what connects the two, which is why it\u2019s the colour you\u2019ve read the most of since you landed here.',
+            slot: 'THE PALETTE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Color.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'FONT THEORY',
+            text: 'Every headline here is two fonts. Sora sets it up, Lora lands it.\n\n\u201CLayovers to Layouts,\u201D then I\u2019m Shriram in serif. \u201CThe more I,\u201D then design in serif. The serif always takes the word the sentence was built for. Nothing else on the site uses it.\n\nI tried seven serifs before this. Crimson Pro was in for a while and got dropped for being too quiet on a dark background. Lora held its weight.',
+            slot: 'THE PAIR',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Font.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'DRAWING BOARD',
+            text: 'Back to the drawing board, taken literally. The site is a chalkboard. The grid still shows through, the illustrations are drawn rather than rendered, and nothing carried over from the old build.\n\nStarting from a blank slate meant deciding what a portfolio is for before deciding what it looks like. It\u2019s for someone who has four minutes and a hiring decision.',
+            slot: 'THE SURFACE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Drawing Board.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'NAVIGATION',
+            text: 'You never leave the page. Categories open in place, projects open on top of them, and the back button is never the way out.\n\nFour categories, five projects each, one modal pattern for all twenty. Tabs across the top move you between projects without closing anything. Close returns you exactly where you were.\n\nThe constraint was deliberate. Every tab you open is a chance to lose someone.',
+            slot: 'THE ARCHITECTURE',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Navigation.webp', ratio: 2.0879 }],
+          },
+          {
+            label: 'WORKFLOW',
+            text: 'I direct, Claude builds, my developer ships it in Claude Code. Three parts, one decision-maker.\n\nI write the spec and the copy, Claude Design does the layout passes, and the file goes to my developer who builds it. When something came back wrong, I said what was wrong rather than accepting it.',
+            slot: 'THE STACK',
+            assetSet: [{ src: '/images/Brand Identity/Portfolio Website/Workflow.webp', ratio: 4.2611 }],
+          },
+        ],
+        faq: [
+          {
+            q: 'So did you design this, or did Claude?',
+            a: 'Every decision is mine. The type rule, the colour roles, the never-leave-the-page architecture, what each project says and why. Claude built what I specified and I pushed back when the spec was wrong.',
+          },
+          {
+            q: 'Where did the AI actually fall short?',
+            a: "Structure it could hold. Judgement it couldn't. It didn't know which design guidelines mattered here, when a case study should break the template instead of follow it, or how the project navigation should feel to use. That stayed with me.",
+          },
+          {
+            q: 'What was hardest to get right?',
+            a: 'The typography. Seven serifs before Lora, and the first colour-to-font rule I wrote had to be scrapped entirely once headlines started carrying two voices.',
+          },
+          {
+            q: 'Would you work this way on a client project?',
+            a: "Yes, with the same split. AI moves faster than I can draw. It doesn't know what the client needs, and it never will.",
+          },
+        ],
+        endNote:
+          'The riskiest page here is this one. Every other project asks you to trust the work. This one is the work.',
+      },
+      // 4th project — previously "Sub-brand architecture" (itself previously
+      // 2nd, swapped with "A sub logo system" above).
+      {
+        name: 'Uplift',
+        thumbnail: '/images/Brand Identity/Uplift/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Uplift/thumbnail-dark.svg',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          "A global marketing technology brand needed an identity for its New York chapter. Something with its own energy that still read as family, not a separate company.",
+        solution:
+          "A wordmark engineered from the parent brand's own arrow, so the event, the city and the company all live inside the same letterforms.",
+        chips: [
+          { color: '#2146EC', border: 'rgba(255,255,255,0.15)' },
+          { color: '#0A1533', border: 'rgba(255,255,255,0.15)' },
+          { color: '#4FDCCE', border: 'rgba(255,255,255,0.15)' },
+          { color: '#FFFAEF', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Roboto',
+        processRows: [
+          {
+            label: 'REFERENCES',
+            text: "Four starting points, all pointing the same way: the parent brand's arrow, the physical act of being lifted, a torch held above a city, and the rising axis of a growth chart.",
+            slot: 'MOODBOARD',
+            assetSet: [{ src: '/images/Brand Identity/Uplift/REFERENCES.webp', ratio: 1.9326 }],
+          },
+          {
+            label: 'CONSTRUCTION',
+            text: 'The U becomes an upward arrow. The P grows out of it, so the mark reads bottom-to-top as foundation into elevation. The L lifts the rest of the word off its baseline and doubles as a chart axis.',
+            slot: 'LETTERFORM STUDIES',
+            assetSet: [
+              { src: '/images/Brand Identity/Uplift/CONSTRUCTION.webp', ratio: 6.3976, white: true, padded: true },
+            ],
+          },
+          {
+            label: 'EXTENSION',
+            text: "The arrow scales out of the logo and into the environment — repeated as a backdrop pattern over a mapped world, so the mark's single gesture becomes the brand's ambient texture.",
+            slot: 'BACKDROP + APPLICATION',
+            assetSet: [{ src: '/images/Brand Identity/Uplift/EXTENSION.webp', ratio: 1.4151 }],
+          },
+        ],
+        endNote:
+          "Four ideas share one wordmark. An arrow, a lift, a torch, an axis. None of them announce themselves. You find them one at a time.",
+      },
+      // 3rd project — previously "Identity guidelines", replaced with the
+      // podcast identity per instruction (2026-08-25).
+      {
+        name: 'Orbitshift Podcast',
+        thumbnail: '/images/Brand Identity/Orbitshift Podcast/thumbnail-light.svg',
+        thumbnailDark: '/images/Brand Identity/Orbitshift Podcast/thumbnail-dark.svg',
+        title: 'Orbitshift Podcast',
+        software: ['Illustrator', 'Figma'],
+        problem:
+          'A startup programme wanted to reach founders beyond its own product ecosystem. That meant a podcast that could stand as its own media property while still reading as part of the family.',
+        solution: "A rocket leaving its orbit. The name's meaning, drawn as one line.",
+        chips: [
+          { color: '#00B9FF', border: 'rgba(255,255,255,0.15)' },
+          { color: '#A33CFF', border: 'rgba(255,255,255,0.15)' },
+        ],
+        typeface: 'Rubik',
+        processRows: [
+          {
+            label: 'TRAJECTORY',
+            text: "An orbit shift is the moment a body stops circling at one altitude and commits to a higher one. That's the same move a company makes going from startup to scale-up, and the same thing an hour with someone further along is meant to trigger.",
+            slot: 'CONCEPT',
+            assetSet: [
+              {
+                src: '/images/Brand Identity/Orbitshift Podcast/TRAJECTORY.webp',
+                ratio: 7.1308,
+                white: true,
+                padded: true,
+              },
+            ],
+          },
+          {
+            label: 'ESCAPE',
+            text: "The rocket sits outside the ring rather than inside it. Containment would have meant a company orbiting comfortably. Breaking the circle meant leaving the path it was on. The gradient runs violet to blue along the direction of travel.",
+            slot: 'MARK CONSTRUCTION',
+            assetSet: [
+              { src: '/images/Brand Identity/Orbitshift Podcast/ESCAPE.webp', ratio: 3.368, white: true, padded: true },
+            ],
+          },
+          {
+            label: 'SURFACE',
+            // A full tall screenshot of the site alongside the social work: the
+            // dark-to-light scroll transition is the point and is lost if only
+            // the hero is shown.
+            text: 'The system extended into a site that opens in deep space and resolves into daylight as you scroll, with guest portraits duotoned into the palette, then out again across episode artwork, launch banners and social posts.',
+            slot: 'WEBSITE + APPLICATION',
+            assetSet: [{ src: '/images/Brand Identity/Orbitshift Podcast/SURFACE.webp', ratio: 1.7778 }],
+          },
+        ],
+        metrics: {
+          label: 'OUTCOME',
+          stats: [
+            { value: '2', label: 'SEASONS PRODUCED' },
+            { value: '47+', label: 'EPISODES PUBLISHED' },
+            { value: '4', label: 'PLATFORMS DISTRIBUTED' },
+          ],
+        },
+        endNote:
+          "The rocket sits outside the ring, not inside it. That was the whole argument. The point was never to orbit well.",
       },
     ],
   },
