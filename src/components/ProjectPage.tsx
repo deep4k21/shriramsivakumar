@@ -9,6 +9,11 @@ import { PrototypePhonePiP } from './PrototypePhonePiP';
 import { AssetSet } from './AssetSet';
 import { DocumentViewer } from './DocumentViewer';
 import { MotionClip } from './MotionClip';
+import { PersonaCard } from './PersonaCard';
+import { ResearchCard } from './ResearchCard';
+import { ChipGroup } from './ChipGroup';
+import { ScreenTrio } from './ScreenTrio';
+import { RowLiveTail } from './RowLiveTail';
 
 /**
  * Renders a `**word**`-marked string as plain grey text with the marked
@@ -35,6 +40,12 @@ export function withEmphasis(text: string) {
 function renderSlot(row: ProcessRow, availableHeight?: string) {
   return row.document ? (
     <DocumentViewer doc={row.document} height={row.slotHeight} spread={row.wideSlot} fitHeight={row.slotAspect} />
+  ) : row.persona ? (
+    <PersonaCard persona={row.persona} />
+  ) : row.research ? (
+    <ResearchCard research={row.research} />
+  ) : row.screens ? (
+    <ScreenTrio screens={row.screens} />
   ) : row.motion ? (
     <MotionClip clip={row.motion} height={row.slotHeight} fitHeight={row.slotAspect} />
   ) : row.assetSet ? (
@@ -476,6 +487,86 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
           </div>
 
           {/* Omitted entirely for a project with no single palette — see Project.chips. */}
+          {/*
+            A palette whose grouping is itself the system — a base set, a
+            colour per product, a single caution value — shown as named rows
+            with every swatch labelled. A flat strip would lose the structure
+            that is the point of it.
+          */}
+          {project.chipRows && project.typeface && (
+            <div className="flex flex-wrap items-start gap-6">
+              <span className="font-heading text-[15.5px] font-semibold tracking-[-0.01em] text-teal">
+                Brand system
+              </span>
+              <div
+                className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-6 rounded-2xl px-6.5 py-5"
+                style={{ background: '#15171C' }}
+              >
+                <div className="flex min-w-0 flex-col gap-7">
+                  {project.chipRows.map((row) => (
+                    <div key={row.label} className="flex min-w-0 flex-wrap items-start gap-5">
+                      {/*
+                        One label width across the rows, so "Base" and
+                        "Colour = bike" put their swatches on the same left
+                        edge instead of each row starting wherever its own
+                        label happens to end.
+                      */}
+                      <ChipGroup label={row.label} chips={row.chips} labelWidth={108} />
+                      {/*
+                        The aside shares the row behind a divider: a caution
+                        colour is defined by staying distinct from the palette
+                        beside it, which a separate row below would hide.
+                      */}
+                      {row.aside && (
+                        <>
+                          <span
+                            aria-hidden="true"
+                            className="h-[72px] w-px flex-none self-center"
+                            style={{ background: 'rgba(255,255,255,0.12)' }}
+                          />
+                          <ChipGroup label={row.aside.label} chips={row.aside.chips} />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-none flex-col items-end gap-1">
+                  <span className="font-body text-[13px] text-[#9AA1AC]">Typeface</span>
+                  {/*
+                    A pairing is shown as two lines, the display face set in
+                    itself at display size and the text face beneath it —
+                    which is the comparison the row is making.
+                  */}
+                  {project.typeface.includes(' · ') ? (
+                    (() => {
+                      const [display, body] = project.typeface.split(' · ');
+                      return (
+                        <>
+                          <span
+                            className="text-[26px]/[1.05] font-normal tracking-[0.01em] text-white uppercase"
+                            style={{ fontFamily: "'Bebas Neue', 'Oswald', sans-serif" }}
+                          >
+                            {display}
+                          </span>
+                          <span
+                            className="text-[14px] text-[#C9D0DA]"
+                            style={{ fontFamily: "'Barlow', sans-serif" }}
+                          >
+                            {body}
+                          </span>
+                        </>
+                      );
+                    })()
+                  ) : (
+                    <span className="font-heading text-[13.5px] font-semibold tracking-[-0.005em] text-[#F2F4F7]">
+                      {project.typeface}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {project.chips && project.typeface && (
           <div className="flex flex-wrap items-center gap-6">
             <span className="font-heading text-[15.5px] font-semibold tracking-[-0.01em] text-teal">Brand system</span>
@@ -483,15 +574,48 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               className="flex flex-1 flex-wrap items-center gap-6 rounded-2xl px-6.5 py-4.5"
               style={{ background: '#15171C' }}
             >
-              <div className="flex min-w-0 flex-1 items-center gap-3.5">
-                <span className="font-body text-[13px] text-[#9AA1AC]">Color</span>
-                <div className="flex min-w-0 flex-1 items-stretch gap-3">
-                  {project.chips.map((c) => (
-                    <span key={c.color} className="h-12 flex-1 rounded-lg" style={{ background: c.color }} />
-                  ))}
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                <div className="flex min-w-0 items-center gap-3.5">
+                  <span className="font-body text-[13px] text-[#9AA1AC]">Color</span>
+                  <div className="flex min-w-0 flex-1 items-stretch gap-3">
+                    {project.chips.map((c) => (
+                      <span key={c.color} className="h-12 flex-1 rounded-lg" style={{ background: c.color }} />
+                    ))}
+                  </div>
                 </div>
+                {/*
+                  Status colours sit under the palette rather than beside it:
+                  they are a different kind of value — a fixed meaning, not a
+                  brand choice — and each carries its own word, so the row
+                  reads as definitions rather than as more swatches.
+                */}
+                {project.statusChips && (
+                  <div className="flex min-w-0 items-center gap-3.5">
+                    <span className="font-body text-[13px] text-[#9AA1AC]">Status</span>
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
+                      {project.statusChips.map((c) => (
+                        <span
+                          key={c.color}
+                          className="flex h-8 items-center rounded-lg px-3.5 font-heading text-[12.5px] font-semibold tracking-[-0.005em] text-white"
+                          style={{ background: c.color }}
+                        >
+                          {c.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-3.5">
+              {/*
+                Aligned to the first row rather than centred in the box: with
+                a status row present the box is two rows tall, and a centred
+                typeface would float between them instead of reading across
+                from the palette it belongs to.
+              */}
+              <div
+                className={`flex items-center gap-3.5 ${project.statusChips ? 'self-start' : ''}`}
+                style={project.statusChips ? { height: 48 } : undefined}
+              >
                 <span className="font-body text-[13px] text-[#9AA1AC]">Typeface</span>
                 <span className="font-heading text-[13.5px] font-semibold tracking-[-0.005em] text-[#F2F4F7]">
                   {project.typeface}
@@ -560,7 +684,13 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   >
                     {row.label}
                   </div>
+                  {row.heading && (
+                    <h3 className="m-0 font-heading text-[19px]/[27px] font-semibold text-white">
+                      {row.heading}
+                    </h3>
+                  )}
                   <p className="m-0 font-body text-[15px]/[1.7] text-grey">{withEmphasis(row.text)}</p>
+                  <RowLiveTail row={row} />
                 </div>
               );
             }
@@ -610,6 +740,11 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
               >
                 <div className="flex flex-col gap-2">
                   <div className="font-heading text-xs font-semibold tracking-[0.14em] text-orange">{row.label}</div>
+                  {row.heading && (
+                    <h3 className="m-0 font-heading text-[19px]/[27px] font-semibold text-white">
+                      {row.heading}
+                    </h3>
+                  )}
                   <p
                     className={
                       row.stacked
@@ -619,10 +754,51 @@ export function ProjectPage({ category, initialProjectIdx = 0, onBackToCategory,
                   >
                     {withEmphasis(row.text)}
                   </p>
+                  {row.bullets && (
+                    <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+                      {row.bullets.map((item) => (
+                        <li key={item} className="flex gap-2.5 font-body text-[15px]/[1.7] text-grey">
+                          <span aria-hidden="true" className="flex-none text-teal">
+                            ·
+                          </span>
+                          {withEmphasis(item)}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {row.textAfter && (
+                    <p className="m-0 font-body text-[15px]/[1.7] text-grey">
+                      {withEmphasis(row.textAfter)}
+                    </p>
+                  )}
+                  {/*
+                    Pillars sit with the row's own copy rather than below the
+                    slot: they are the argument the screens beside them
+                    illustrate, so splitting the two would leave the text
+                    column short and the list orphaned under the images.
+                  */}
+                  {row.pillars && (
+                    <ol className="m-0 mt-2 flex list-none flex-col gap-3 p-0">
+                      {row.pillars.map((pillar) => (
+                        <li key={pillar.title} className="flex flex-col gap-1">
+                          <span
+                            className="font-heading text-[13.5px] font-semibold tracking-[-0.005em]"
+                            style={{ color: pillar.color ?? 'var(--color-teal)' }}
+                          >
+                            {pillar.title}
+                          </span>
+                          <span className="font-body text-[13px]/[1.55] text-grey">
+                            {pillar.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
                 </div>
                 <div className={row.stacked ? 'w-full' : row.slotCenter ? 'h-full self-stretch' : 'self-start'}>
                   {renderSlot(row, availableBodyHeight)}
                 </div>
+                <RowLiveTail row={row} />
               </div>
             );
           })}

@@ -69,6 +69,54 @@ export interface ProcessRow {
    */
   motion?: RowMotion;
   /**
+   * Renders the slot as a persona card built from markup rather than an
+   * exported sheet, so its text stays selectable, searchable and readable by
+   * a screen reader. Omit for a standard slot.
+   */
+  persona?: RowPersona;
+  /**
+   * Renders the slot as a row of live screens at three widths, with an
+   * optional toggle back to the wireframes they came from.
+   */
+  screens?: RowScreens;
+  /**
+   * Renders the slot as a research card — cited findings rather than an
+   * invented persona.
+   */
+  research?: RowResearch;
+  /**
+   * A heading between the row's label and its body text.
+   *
+   * Set as its own line rather than as bold inside `text`, which renders one
+   * paragraph and would run the heading into the prose that follows it.
+   */
+  heading?: string;
+  /**
+   * A short list between the row's text and whatever follows it.
+   *
+   * `text` renders as one paragraph — newlines in it collapse — so a set of
+   * parallel items belongs here instead, where each gets its own line.
+   */
+  bullets?: string[];
+  /** A closing line under `bullets`, continuing the row's own text. */
+  textAfter?: string;
+  /** A numbered grid of decisions below the row's own text. */
+  decisions?: RowDecision[];
+  /** A numbered list of pillars, shown beside the row's slot. */
+  pillars?: RowPillar[];
+  /**
+   * A banner below the row's own slot, opening the live prototype in a new
+   * tab. An application wants the whole window and its own URL, so this links
+   * out rather than framing it in a panel.
+   */
+  prototypeBanner?: RowPrototypeBanner;
+  /**
+   * "Try this" cards below the row: screens, each showing one behaviour of
+   * the thing the row describes.
+   */
+  behaviours?: RowBehaviour[];
+
+  /**
    * Renders the slot as a row of 2–4 related pieces rather than one image —
    * a poster beside a brochure spread, say. Each is clickable, opening
    * full-size in an in-page lightbox. Omit for a standard single slot.
@@ -195,6 +243,56 @@ export interface RowMotion {
   title: string;
 }
 
+/** One screen in a `ScreenTrio`. */
+export interface RowShot {
+  src: string;
+  alt: string;
+  /** Width ÷ height, which sets this screen's share of the row's width. */
+  ratio: number;
+}
+
+/**
+ * A row of live screens at three widths, optionally able to swap back to the
+ * wireframes behind them. See `ScreenTrio`.
+ */
+export interface RowScreens {
+  shots: RowShot[];
+  wireframes?: {
+    src: string;
+    alt: string;
+    /** The button's text while the screens are showing. */
+    toggleLabel: string;
+    caption?: string;
+    /**
+     * Further boards beneath the main one, as a scrollable strip. Each opens
+     * full size in a new tab: at thumbnail width they show the shape of a
+     * screen, and reading one means seeing it properly.
+     */
+    boards?: { src: string; alt: string }[];
+  };
+}
+
+/**
+ * A banner linking out to a live prototype. See `PrototypeBanner`.
+ */
+export interface RowPrototypeBanner {
+  href: string;
+  /** Artwork filling the banner — a mockup of the prototype itself. */
+  image: string;
+  label: string;
+  /** The muted line beneath: provenance, caveats, what the data is. */
+  caption?: string;
+}
+
+/** One "try this" card: a screen and a line about what it shows. */
+export interface RowBehaviour {
+  image: string;
+  title: string;
+  line: string;
+  /** Defaults to `title`, which describes the screen in every case so far. */
+  alt?: string;
+}
+
 /** One piece in an `assetSet` slot. */
 export interface RowAsset {
   src: string;
@@ -239,10 +337,100 @@ export interface RowAsset {
 }
 
 /** A colour chip carries its own border so darker swatches stay visible on the dark surface. */
+/**
+ * A proto-persona rendered as markup, filling a process row's slot in place
+ * of an exported sheet. See `PersonaCard`.
+ */
+export interface RowPersona {
+  name: string;
+  /** The one-line facts under the name — age, role, location, and so on. */
+  meta: string;
+  bio: string;
+  quote: string;
+  needs: string[];
+  frustrations: string[];
+  /** The avatar disc and quote rule; defaults to the site's teal. */
+  avatarColor?: string;
+  /**
+   * The line beneath the card. Where the persona is built from assumptions
+   * rather than research, saying so is the difference between a working
+   * device and a false claim about users.
+   */
+  note?: string;
+}
+
 export interface ColorChip {
   color: string;
   /** Defaults to a faint white border in the UI; only set this for a chip that needs a different one. */
   border?: string;
+}
+
+/**
+ * A swatch whose colour stands for a state, shown with the word it means.
+ *
+ * Unlike a `ColorChip`, which is one of a palette and reads as a group, this
+ * carries meaning on its own — so the label is part of the chip rather than a
+ * caption beside it.
+ */
+export interface StatusChip {
+  color: string;
+  label: string;
+  /** Draws a warning triangle on the swatch — for a colour that never travels without one. */
+  warning?: boolean;
+}
+
+/**
+ * One labelled row of swatches in the brand-system box.
+ *
+ * Where a palette is organised — a base set, a colour per product, a single
+ * caution value — the grouping is the system, so the rows are named and every
+ * swatch carries its own word. A flat strip of colour would throw that away.
+ */
+export interface ChipRow {
+  label: string;
+  chips: StatusChip[];
+  /**
+   * A second, smaller group on the same row, divided from the first.
+   *
+   * For a value that belongs beside the palette rather than beneath it — a
+   * caution colour reads against the set it must stay distinct from, so
+   * putting it on its own row would hide the comparison the row exists to
+   * make.
+   */
+  aside?: { label: string; chips: StatusChip[] };
+}
+
+/**
+ * The research card beside a premise — findings rather than a persona.
+ *
+ * Where the work rests on published figures instead of interviews, this says
+ * so plainly and cites each one, which an invented biography cannot do
+ * honestly. See `ResearchCard`.
+ */
+export interface RowResearch {
+  title: string;
+  /** Each finding, with its source named in the text. */
+  points: string[];
+  /** Short labels for the audiences the work assumes. */
+  chips?: string[];
+  note?: string;
+}
+
+/** One numbered decision in a `decisions` grid. */
+export interface RowDecision {
+  /** "01", "02" … shown large in the accent face. */
+  number: string;
+  title: string;
+  text: string;
+  /** The number's colour — one per bike, in Halden's case. */
+  color?: string;
+}
+
+/** One pillar in a numbered list beside a row's screens. */
+export interface RowPillar {
+  title: string;
+  text: string;
+  color?: string;
 }
 
 /**
@@ -316,6 +504,20 @@ export interface Project {
    * is worse than none — omit both and the row renders nothing.
    */
   chips?: ColorChip[];
+  /**
+   * A second, smaller swatch row beneath the palette, for colours that carry a
+   * fixed meaning rather than brand identity — a status scale, say.
+   *
+   * Each chip shows its word, because the whole point of a status colour is
+   * what it means: a red square a reader has to hover or guess at tells them
+   * nothing. Optional, and rendered inside the same box as `chips`.
+   */
+  statusChips?: StatusChip[];
+  /**
+   * The brand-system box as named rows of labelled swatches, for a palette
+   * whose grouping carries meaning. Replaces `chips`/`statusChips` where set.
+   */
+  chipRows?: ChipRow[];
   typeface?: string;
   processRows: ProcessRow[];
   /**
@@ -686,64 +888,132 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Healthcare dashboard',
-        thumbnail: '/images/UIUX/Healthdesk/thumbnail.svg',
-        software: ['Figma', 'Illustrator'],
+        /*
+          The hero, the triage trio and the behaviour clips all come from the
+          live build at care-log-quest.lovable.app rather than from Figma: the
+          project exists now, so the case study shows the thing itself.
+
+          The v2 images are stand-ins captured off that build at a working
+          size, pending the production set.
+        */
+        thumbnail: '/images/UIUX/Healthdesk/v2/hero.webp',
+        software: ['Figma', 'Illustrator', 'Lovable'],
         problem:
-          "A self-directed exploration. Clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.",
-        solution: "A dashboard ranked by urgency instead of organised by category. The day's shape readable in one glance.",
+          'A 3-day design challenge from ValGenesis. Clinicians finish charts after hours because patient data, appointments, labs and messages sit in separate places, and nothing on screen separates urgent from routine.',
+        solution:
+          "A dashboard ranked by urgency instead of organised by category. The day's shape readable in one glance, now a working build you can click through.",
+        // Taken from the live build; the secondary blue was darkened for contrast.
         chips: [
-          { color: '#16697A', border: 'rgba(255,255,255,0.15)' },
-          { color: '#489FB5', border: 'rgba(255,255,255,0.15)' },
+          { color: '#15697A', border: 'rgba(255,255,255,0.15)' },
+          { color: '#328DA3', border: 'rgba(255,255,255,0.15)' },
           { color: '#8ABCC7', border: 'rgba(255,255,255,0.15)' },
           { color: '#EEF3F3', border: 'rgba(255,255,255,0.15)' },
           { color: '#F6AF4E', border: 'rgba(255,255,255,0.15)' },
+        ],
+        statusChips: [
+          { color: '#B42318', label: 'Critical' },
+          { color: '#147F3D', label: 'Done' },
         ],
         typeface: 'Roboto',
         processRows: [
           {
             label: 'PREMISE',
-            text: "I set myself a standard healthcare dashboard brief. Patient list, scheduling, records, messaging, analytics, and one rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.",
+            text: 'The brief: patient list, scheduling, records, messaging and analytics for a primary care physician, in three days. One rule: every feature earns its position or loses it. Five equal panels would have been the obvious answer, and the wrong one.',
             slot: 'PERSONA',
-            // 2485 × 1574 — the sheet's own ratio, so it is contained rather
-            // than cropped to a 16:9 slot it does not fit.
-            assetSet: [{ src: '/images/UIUX/Healthdesk/Persona.webp', ratio: 1.579 }],
+            persona: {
+              name: 'Dr. Jennifer Williamson',
+              meta: 'Age 38 · MD · Primary care physician · Chicago · Tech-literate: High',
+              bio: 'A primary care physician in a busy urban practice, juggling packed appointments and documentation that often stretches into late-night "pajama time" charting.',
+              quote:
+                '"I want to spend my time caring for patients, not wrestling with screens. Show me only what truly changed, and stop overwhelming me with noise."',
+              needs: [
+                'Faster charting and orders during clinic hours',
+                'An inbox that surfaces what changed',
+                'Reliable alerts and patients arriving with labs ready',
+              ],
+              frustrations: [
+                'Charting that spills into the evening',
+                'Inbox overload',
+                'Patients arriving with missing labs',
+              ],
+              avatarColor: '#15697A',
+              note: 'Proto-persona, built from assumptions, not interviews.',
+            },
           },
           {
             label: 'TRIAGE',
-            text: "The physician I wrote for doesn't need more capability, she needs less noise. Alerts and messages each split into critical and routine. Four counters set the day's shape. Analytics, the flashiest thing in the brief, got demoted below the fold. Accessibility and data-privacy constraints shaped the structure at wireframe stage, across three screen sizes.",
-            slot: 'WIREFRAMES — DESKTOP / TABLET / MOBILE',
-            /*
-              1298 × 470 — the three screen sizes end to end, so roughly 2.8:1.
-              Far wider than the 16:9 the slot would otherwise impose; `AssetSet`
-              fits it to the width and letterboxes rather than cropping, which
-              keeps all three widths in the frame. The lightbox is where the
-              wireframes become legible.
-            */
-            assetSet: [{ src: '/images/UIUX/Healthdesk/Wireframes.webp', ratio: 2.762 }],
+            text: "She doesn't need more capability, she needs less noise. Alerts and messages each split into critical and routine. Four counters set the day's shape: patients, labs pending, charts to close, critical alerts. Analytics moved off the home view into its own Insights page, built for weekly planning rather than the next patient.",
+            slot: 'THE BUILD — PHONE / DESKTOP / TABLET',
+            stacked: true,
+            screens: {
+              shots: [
+                {
+                  src: '/images/UIUX/Healthdesk/v2/home-phone.webp',
+                  alt: 'HealthDesk today view on a phone',
+                  ratio: 0.462,
+                },
+                {
+                  src: '/images/UIUX/Healthdesk/v2/home-desktop.webp',
+                  alt: 'HealthDesk today view on a desktop',
+                  ratio: 1.6,
+                },
+                {
+                  src: '/images/UIUX/Healthdesk/v2/home-tablet.webp',
+                  alt: 'HealthDesk today view on a tablet',
+                  ratio: 0.699,
+                },
+              ],
+              wireframes: {
+                src: '/images/UIUX/Healthdesk/Wireframes.webp',
+                alt: 'The 3-day wireframes across desktop, tablet and mobile',
+                toggleLabel: 'Show the 3-day wireframes',
+                caption: 'The wireframes the build came from, across three screen sizes.',
+              },
+            },
           },
           {
             label: 'INTERFACE',
-            text: "Blue for everything routine, amber only for what needs attention. Using it once is what makes it work. The mark follows the same logic, an H and a D whose negative space forms a cross.",
-            slot: 'MOCKUPS',
+            text: 'Three colours, three meanings: blue for routine, amber for a task, red only for clinical risk, always paired with an icon and a label, never colour alone. The mark follows the same logic, an H and a D whose negative space forms a cross.',
             stacked: true,
-            // The artboard's own ratio, measured off the painted region of the
-            // rendered embed. The frame matches it so `scale-down-width` — which
-            // fills the width exactly — also lands flush top and bottom.
-            slotAspect: 1.4087,
-            // Served from embed.figma.com rather than the /proto/ share link:
-            // Figma refuses to frame the latter. The starting point is the
-            // prototype's own, carried over. The player's chrome is switched
-            // off — footer bar and prev/next/reset — so only the artefact shows.
-            prototype: {
-              embedUrl:
-                'https://embed.figma.com/proto/vjpRthE782pDPJFkAPwt2D/Shri-Design-Portfolio' +
-                '?node-id=2685-1054&starting-point-node-id=2685%3A1054' +
-                '&scaling=scale-down-width&content-scaling=fixed&page-id=0%3A1' +
-                '&hide-ui=1&hotspot-hints=0&embed-host=share',
+            textOnly: true,
+            prototypeBanner: {
+              href: 'https://care-log-quest.lovable.app/',
+              image: '/images/UIUX/Healthdesk/v2/prototype-banner.webp',
+              label: 'Open prototype in full screen ↗',
+              caption:
+                'Fictional patient data. Built in Lovable from my designs; the demo clock is fixed at Sat 17 Oct, 1:20 pm.',
             },
+            behaviours: [
+              {
+                image: '/images/UIUX/Healthdesk/v2/still-acknowledge.webp',
+                title: "Critical results can't be dismissed",
+                line: 'Acknowledging asks what you did and records it with the time.',
+              },
+              {
+                image: '/images/UIUX/Healthdesk/v2/still-privacy.webp',
+                title: 'Privacy mode for shared screens',
+                line: 'One click or Shift+P hides names, results and message previews.',
+              },
+              {
+                image: '/images/UIUX/Healthdesk/v2/still-booking.webp',
+                title: "Booking that won't double-book by accident",
+                line: 'A 15-minute grid shows what’s free, what’s taken and what’s too short.',
+              },
+              {
+                image: '/images/UIUX/Healthdesk/v2/still-charts.webp',
+                title: 'Charts you can close before evening',
+                line: 'The counter opens draft notes to review and sign.',
+              },
+              {
+                image: '/images/UIUX/Healthdesk/v2/still-insights.webp',
+                title: 'Insights, kept off the home view',
+                line: 'This week, last 30 days and last 3 months, for planning.',
+              },
+            ],
           },
         ],
-        endNote: 'The brief asked for five features. The exercise was deciding which four could be quieter.',
+        endNote:
+          'The brief asked for five features. The exercise was deciding which four could be quieter, then building it so every number had to be true.',
       },
       {
         name: 'Prudent',
@@ -925,6 +1195,228 @@ export const CATEGORIES: Category[] = [
         ],
         endNote:
           "The locked form was the client's call, not mine. Designing around it turned out to be the more interesting problem. It went live and has since been adapted into their own brand.",
+      },
+      /*
+        The sixth UI/UX project, sitting after GlobeIA rather than replacing
+        anything. Every image comes from the live build at
+        halden-responsive-website.lovable.app.
+      */
+      {
+        name: 'Halden',
+        subtitle: 'A motorcycle brand that sells answers, not spec sheets.',
+        eyebrow: 'AUTOMOTIVE · CONCEPT',
+        thumbnail: '/images/UIUX/Halden/hero.webp',
+        software: ['Figma', 'Illustrator', 'Lovable'],
+        problem:
+          'Riders now decide online. They research for weeks, visit dealers half as often as they used to, and arrive with their mind mostly made up. But brand websites still behave like printed catalogues: numbers without meaning, prices that hide the real on-road cost, and no memory of the rider between visits.',
+        solution:
+          'One continuous journey — from "is this for me?" to a booked test ride — where every answer, price and build is saved and carried forward.',
+        /*
+          The palette's grouping is the system: a base set, one neon per bike
+          so colour works as wayfinding, and a single caution value that never
+          doubles as decoration. Shown as named rows for that reason.
+        */
+        chipRows: [
+          {
+            label: 'Base',
+            chips: [
+              { color: '#0B0907', label: 'Near-black' },
+              { color: '#F5F1EA', label: 'Cream' },
+              { color: '#ADC1CF', label: 'Mist · body text' },
+            ],
+          },
+          {
+            label: 'Colour = bike',
+            chips: [
+              { color: '#C8FF2D', label: 'Rift 350' },
+              { color: '#FFF200', label: 'Vector 450' },
+              { color: '#9501FF', label: 'Nomad 700' },
+              { color: '#00A5EC', label: 'Summit 800 + brand' },
+            ],
+            // Beside the palette, not beneath it: Cherry earns its place by
+            // staying distinct from the four neons shown next to it.
+            aside: {
+              label: 'Caution',
+              chips: [{ color: '#FF1801', label: 'Cherry + icon', warning: true }],
+            },
+          },
+        ],
+        typeface: 'Bebas Neue · Barlow',
+        processRows: [
+          {
+            label: 'PREMISE',
+            heading: 'Four bikes, four questions every rider actually asks',
+            text: '',
+            bullets: [
+              'Will it fit me?',
+              'What will it really cost, on the road?',
+              'Which one is right for how I ride?',
+              'Can I pick up where I left off?',
+            ],
+            textAfter: 'Every feature had to answer one of these — or it didn’t ship.',
+            slot: 'RESEARCH',
+            research: {
+              title: 'The real price lives below the fold',
+              points: [
+                'Dealer visits before purchase halved, from four to about two (Pied Piper, 2017).',
+                '78% of buyers research for more than a month (Cycle Trader, 2018).',
+                'In India, the gap between ex-showroom and on-road is large: GST jumps from 18% to 40% above 350cc (Sept 2025), road tax adds 10–12% in Tamil Nadu, and 5-year third-party insurance is mandatory.',
+              ],
+              chips: ['The First-timer', 'The Upgrader', 'The Tourer'],
+              note: 'Proto-personas, built from assumptions, not interviews.',
+            },
+          },
+          {
+            label: 'SIX DECISIONS',
+            text: '',
+            stacked: true,
+            textOnly: true,
+            decisions: [
+              {
+                number: '01',
+                title: 'Colour = bike.',
+                text: "Four neons rotating at random would mean nothing. Assigning one per bike turns colour into wayfinding: you always know which machine you're looking at.",
+                color: '#C8FF2D',
+              },
+              {
+                number: '02',
+                title: 'Cherry, not amber.',
+                text: 'Lemon and amber read as the same colour, so warnings would vanish on the Vector. Caution moved to Cherry.',
+                color: '#FF1801',
+              },
+              {
+                number: '03',
+                title: 'A bike under the tax line.',
+                text: 'All three original bikes sat above 350cc. The Rift 350 was added for first-time riders — and for the 18% GST band.',
+                color: '#00A5EC',
+              },
+              {
+                number: '04',
+                title: 'Bars for the truth, not the drama.',
+                text: 'A rider figure on a studio photo looked like a cartoon and lied about scale. Two bars at the same scale — seat height vs your reach — say it honestly.',
+                color: '#9501FF',
+              },
+              {
+                number: '05',
+                title: 'Lighter is better.',
+                text: 'Spec bars originally made the heaviest bike look best. Lower-is-better specs now fill for the lightest.',
+                color: '#FFF200',
+              },
+              {
+                number: '06',
+                title: 'One source of truth.',
+                text: 'Price, seat height and "beginner friendly" each live in one place, so the card, the quiz and the configurator can never disagree.',
+                color: '#C8FF2D',
+              },
+            ],
+          },
+          {
+            label: 'INTERFACE',
+            heading: 'Built to WCAG 2.2 AA from the first prompt',
+            text: 'Contrast rules, scrims behind every line of text on photos, labelled progress dots, keyboard-complete journey, reduced-motion mode where nothing is hidden behind animation. Rules lived in the project’s knowledge base, so every page inherited them.',
+            stacked: true,
+            textOnly: true,
+            prototypeBanner: {
+              href: 'https://halden-responsive-website.lovable.app/',
+              image: '/images/UIUX/Halden/prototype-banner.webp',
+              label: 'Open prototype in full screen ↗',
+              caption:
+                'I wrote the strategy, content model and design rules, and directed the build in Lovable, reviewing every iteration against the pillars, the data and WCAG. Imagery is AI-generated.',
+            },
+            behaviours: [
+              {
+                image: '/images/UIUX/Halden/try-lineup.webp',
+                title: 'Colour = bike',
+                line: "The tab, price and spec bars take each bike's neon, so you always know which machine you're on.",
+              },
+              {
+                image: '/images/UIUX/Halden/try-match.webp',
+                title: 'Ride Match in five questions',
+                line: 'A new rider is matched to the beginner bike; bigger bikes stay visible with a note.',
+              },
+              {
+                image: '/images/UIUX/Halden/try-fit.webp',
+                title: 'Will it fit me?',
+                line: 'Seat height and your reach at the same scale. The low seat turns tiptoe into ball of foot.',
+              },
+              {
+                image: '/images/UIUX/Halden/try-configure.webp',
+                title: 'Honest on-road pricing',
+                line: 'Road tax, registration and insurance itemised by city, using one pricing logic everywhere.',
+              },
+              {
+                image: '/images/UIUX/Halden/try-testride.webp',
+                title: 'One journey, saved',
+                line: 'The build gets a code, lands in My Garage and rides along into the test-ride booking.',
+              },
+            ],
+          },
+          {
+            label: 'JOURNEY',
+            text: 'Four pillars, one per bike colour, each one a step in the same journey.',
+            slot: 'THE BUILD — PHONE / DESKTOP / TABLET',
+            pillars: [
+              {
+                title: '01 Fit before specs.',
+                text: 'A five-question Ride Match and a seat-vs-reach check. New riders are only ever matched to a beginner bike.',
+                color: '#C8FF2D',
+              },
+              {
+                title: '02 Honest on-road pricing.',
+                text: 'One pricing logic everywhere: tax bands, registration and insurance shown line by line, by city.',
+                color: '#FFF200',
+              },
+              {
+                title: '03 One journey, saved.',
+                text: 'Every build gets a code and a shareable link, lives in My Garage, and carries into Compare and the test ride.',
+                color: '#9501FF',
+              },
+              {
+                title: '04 Earned trust.',
+                text: 'Ownership costs and warranty on one page; stories labelled as concept pieces; no invented reviews.',
+                color: '#00A5EC',
+              },
+            ],
+            screens: {
+              shots: [
+                {
+                  src: '/images/UIUX/Halden/home-phone.webp',
+                  alt: 'Halden home on a phone',
+                  ratio: 0.463,
+                },
+                {
+                  src: '/images/UIUX/Halden/home-desktop.webp',
+                  alt: 'Halden home on a desktop',
+                  ratio: 1.6,
+                },
+                {
+                  src: '/images/UIUX/Halden/home-tablet.webp',
+                  alt: 'Halden home on a tablet',
+                  ratio: 0.76,
+                },
+              ],
+              wireframes: {
+                src: '/images/UIUX/Halden/wireframes/wf-main.webp',
+                alt: 'Halden site map and core journey',
+                toggleLabel: 'Show the wireframes',
+                caption:
+                  'Information architecture: the site map and eight boards behind the build.',
+                boards: [
+                  { src: '/images/UIUX/Halden/wireframes/wf-01-home.webp', alt: 'Home' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-02-models.webp', alt: 'Models' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-03-model-detail.webp', alt: 'Model detail' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-04-find-your-fit.webp', alt: 'Find your fit' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-05-configure.webp', alt: 'Configure' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-06-garage-compare-test-ride.webp', alt: 'Garage, compare and test ride' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-07-supporting-pages.webp', alt: 'Supporting pages' },
+                  { src: '/images/UIUX/Halden/wireframes/wf-08-mobile.webp', alt: 'Mobile' },
+                ],
+              },
+            },
+          },
+        ],
+        endNote:
+          'Four bikes, four neons, one rule: every screen answers a question a rider is actually asking.',
       },
       /*
       ...['Client onboarding flow'].map(
