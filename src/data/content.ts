@@ -1848,35 +1848,159 @@ export const CATEGORIES: Category[] = [
       },
       {
         name: 'Forge',
-        thumbnail: '/images/Brand Identity/Forge/thumbnail-light.svg',
-        thumbnailDark: '/images/Brand Identity/Forge/thumbnail-dark.svg',
+        subtitle: 'Identity for a startup accelerator programme',
+        /*
+          The brand book's own cover, cropped to the banner ratio every other
+          project uses. The spread is 2:1 with the lockup in its middle band,
+          so it is cropped around the artwork rather than fitted whole, which
+          would fill the banner with the spread's empty ground.
+
+          Having both grounds is what drives the banner's light/dark toggle.
+        */
+        thumbnail: '/images/Brand Identity/Forge/book/01-cover-light.webp',
+        thumbnailDark: '/images/Brand Identity/Forge/book/01-cover-dark.webp',
         software: ['Illustrator', 'Figma'],
         problem:
-          "An accelerator programme for early-stage founders needed a mark of its own. One that described what the programme does to a company, not just who runs it.",
-        solution: 'An anvil and the letter F share a silhouette. Overlaid, they make one mark: the surface things get made on.',
+          'An accelerator programme for early-stage founders needed a mark of its own. One that described what the programme does to a company, not just who runs it.',
+        solution:
+          'An anvil and the letter F share a silhouette. Overlaid, they make one mark: the surface things get made on.',
         chips: [
-          { color: '#FF9900', border: 'rgba(255,255,255,0.15)' },
-          { color: '#434343', border: 'rgba(255,255,255,0.15)' },
+          { color: '#FF9B00', border: 'rgba(255,255,255,0.15)' },
+          { color: '#444444', border: 'rgba(255,255,255,0.15)' },
+          { color: '#402700', border: 'rgba(255,255,255,0.15)' },
+          { color: '#111111', border: 'rgba(255,255,255,0.15)' },
+          { color: '#F6F6F6', border: 'rgba(255,255,255,0.15)' },
         ],
-        typeface: 'Roboto',
+        typeface: 'Rubik',
+        /*
+          The brand book, spread by spread.
+
+          Each row carries one page of the guidelines as artwork rather than as
+          markup: these are a designer's finished spreads, fixed compositions
+          documenting a system that will not change, so rebuilding them in the
+          browser would add a second source of truth for the same thing.
+
+          Spread 02 is absent on purpose — it is the problem/solution pair,
+          which the modal already renders above these rows as live text.
+
+          Every spread is 2400 x 1200, so they share one ratio.
+        */
         processRows: [
           {
             label: 'PREMISE',
-            text: "Forge is a verb before it's a name. Heat and force applied until raw material takes an edge. A fair description of what an accelerator does to an early company.",
-            slot: 'NAME + CONCEPT',
-            assetSet: [{ src: '/images/Brand Identity/Forge/PREMISE.png', ratio: 1.892, light: true, padded: true }],
+            text: 'Why the name fits what an accelerator actually does.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/03-premise.webp', ratio: 2 }],
           },
           {
-            label: 'FUSION',
-            text: 'An anvil profile and a capital F share the same structure: flat top, stepped shoulder, vertical base. Overlaying them produced a single mark that holds both readings.',
-            slot: 'ANVIL / F STUDIES',
-            assetSet: [{ src: '/images/Brand Identity/Forge/FUSION.webp', ratio: 5.4839, light: true, padded: true }],
+            label: 'PROCESS',
+            text: 'How a letter and an anvil became one mark.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/04-process.webp', ratio: 2 }],
           },
           {
-            label: 'HEAT',
-            text: 'The wordmark stays graphite; only the leading edge of the F ignites. Orange reads as the moment of striking rather than as decoration.',
-            slot: 'FINAL MARK + APPLICATION',
-            assetSet: [{ src: '/images/Brand Identity/Forge/HEAT.webp', ratio: 3.6776 }],
+            label: 'LOGO SYSTEM',
+            text: 'The lockup, the symbol and the app tile, on light and dark.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/05-logo-system.webp', ratio: 2 }],
+          },
+          {
+            label: 'CONSTRUCTION',
+            text: 'The measurements behind the mark.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/06-construction.webp', ratio: 2 }],
+          },
+          {
+            label: 'CLEAR SPACE & MINIMUM SIZE',
+            text: 'How much room the logo needs, and how small it can go.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/07-clear-space.webp', ratio: 2 }],
+          },
+          {
+            label: 'LOGO ON BACKGROUNDS',
+            text: 'Which version to use on each background.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Forge/book/08-logo-on-backgrounds.webp', ratio: 2 },
+            ],
+          },
+          {
+            label: 'MISUSE',
+            text: 'A few things that will break the logo.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/09-misuse.webp', ratio: 2 }],
+          },
+          {
+            label: 'COLOUR',
+            text: 'The palette, with values for screen and print.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/10-colour.webp', ratio: 2 }],
+          },
+          {
+            label: 'ACCESSIBLE COLOUR PAIRS',
+            text: 'Which colour combinations are safe to use for text.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [
+              { src: '/images/Brand Identity/Forge/book/11-accessible-colour-pairs.webp', ratio: 2 },
+            ],
+          },
+          {
+            label: 'TYPOGRAPHY',
+            text: 'Rubik, and the sizes we use it at.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/12-typography.webp', ratio: 2 }],
+          },
+          {
+            label: 'ICONOGRAPHY',
+            text: 'The icon set and how it is drawn.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/13-iconography.webp', ratio: 2 }],
+          },
+          {
+            label: 'ILLUSTRATION',
+            text: 'The illustration style, with two examples.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/14-illustration.webp', ratio: 2 }],
+          },
+          {
+            label: 'IMAGE GRID',
+            text: 'How photos are cropped and arranged.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/15-image-grid.webp', ratio: 2 }],
+          },
+          {
+            label: 'VOICE & TONE',
+            text: 'How Forge sounds when it talks to founders.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/16-voice-and-tone.webp', ratio: 2 }],
+          },
+          {
+            label: 'APPLICATIONS',
+            text: 'The launch banners and a mentor welcome post.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/17-applications.webp', ratio: 2 }],
+          },
+          {
+            label: 'CLOSE',
+            text: 'A last word on the anvil.',
+            stacked: true,
+            slotMaxHeight: '900px',
+            assetSet: [{ src: '/images/Brand Identity/Forge/book/18-close.webp', ratio: 2 }],
           },
         ],
         endNote:
