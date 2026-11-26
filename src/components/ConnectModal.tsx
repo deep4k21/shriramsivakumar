@@ -66,7 +66,7 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
       // that panel's opacity is offset by an opaque header sitting on top of
       // it, which this modal has none of. Without that header to compensate,
       // this goes straight to the body's own lighter mix instead.
-      className="flex max-h-full w-[min(560px,100%)] flex-col gap-5.5 overflow-y-auto rounded-[20px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,42,48,.72),rgba(20,21,25,.66)_40%,rgba(28,30,35,.70))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-2xl backdrop-saturate-150"
+      className="flex max-h-full w-[min(560px,100%)] flex-col gap-4 overflow-y-auto rounded-[20px] border border-white/12 bg-[linear-gradient(158deg,rgba(40,42,48,.72),rgba(20,21,25,.66)_40%,rgba(28,30,35,.70))] px-9 py-8.5 shadow-[0_30px_90px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.14),inset_0_0_0_1px_rgba(255,255,255,.06)] backdrop-blur-2xl backdrop-saturate-150"
     >
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
@@ -112,36 +112,58 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
               className={`${fieldClass} resize-y leading-[1.6]`}
             />
           </label>
-          <div className="flex flex-wrap items-center gap-4">
+          {/*
+            The status lines sit beside the button rather than under it: in
+            flow below, they reserved a second row whatever the form was
+            doing, which left a band of empty space above the links.
+
+            The two share one grid cell, so only one line's width is ever
+            taken rather than both competing for what the button leaves. Both
+            stay mounted so the opacity can animate.
+          */}
+          <div className="flex items-center gap-4">
             <motion.button
               type="submit"
               disabled={status === 'sending'}
               // Matches the resume button in Intro — see the note in ProjectPage.
-              className="cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-6 py-3.5 font-heading text-[14.5px] font-bold text-teal disabled:cursor-default disabled:opacity-60"
+              className="shrink-0 cursor-pointer rounded-xl border border-teal bg-[#005961]/10 px-6 py-3.5 font-heading text-[14.5px] font-bold whitespace-nowrap text-teal disabled:cursor-default disabled:opacity-60"
               whileHover={status === 'sending' ? undefined : { y: -2 }}
               whileTap={status === 'sending' ? undefined : { scale: 0.97 }}
               transition={{ duration: 0.18 }}
             >
               {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Sent' : 'Send message'}
             </motion.button>
-            <motion.span
-              className="font-body text-[13px] text-green"
-              animate={{ opacity: status === 'sent' ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              Thanks — I&rsquo;ll reply within a day.
-            </motion.span>
-            <motion.span
-              className="font-body text-[13px] text-orange"
-              animate={{ opacity: status === 'error' ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              Something went wrong — try again, or email me directly below.
-            </motion.span>
+            <span className="grid min-w-0 flex-1 font-body text-[13px]">
+              <motion.span
+                className="col-start-1 row-start-1 text-green"
+                animate={{ opacity: status === 'sent' ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                Thanks — I&rsquo;ll reply within a day.
+              </motion.span>
+              <motion.span
+                className="col-start-1 row-start-1 text-orange"
+                animate={{ opacity: status === 'error' ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                Something went wrong — try again, or email me directly below.
+              </motion.span>
+            </span>
           </div>
         </form>
 
-        <div className="grid grid-cols-2 gap-2 border-t border-white/15 pt-4.5">
+        {/*
+          Three across rather than two, and one line per tile rather than
+          two: six links in a 2-column grid of stacked label-and-value tiles
+          ran the panel past the viewport on a short window, which put the
+          whole modal — form included — behind a scrollbar.
+
+          The values go rather than the labels. An address or a handle is
+          what the link leads to, not what it is, and the tile already
+          carries both the name and its icon; a reader who wants the address
+          itself gets it on arrival.
+        */}
+        <div className="grid grid-cols-3 gap-2 border-t border-white/15 pt-3.5">
           {CONNECT_LINKS.map((l) => {
             const Icon = CONNECT_ICONS[l.label];
             return (
@@ -163,17 +185,11 @@ export function ConnectModal({ onClose }: ConnectModalProps) {
                   : l.href === RESUME_HREF
                     ? { download: RESUME_FILENAME }
                     : {})}
-                // Stacked rather than the label and value side by side — a
-                // long value like the email address had nowhere to go at
-                // half the panel's width and just ran into an ellipsis; a
-                // line of its own gives it the full tile width to sit in.
-                className={`flex min-w-0 flex-col gap-0.5 rounded-[9px] ${SURFACE} px-3.5 py-2.5 font-body text-[13px] text-white! transition-colors duration-180 hover:text-teal!`}
+                title={l.value}
+                className={`flex min-w-0 items-center gap-2 rounded-[9px] ${SURFACE} px-3 py-2.5 font-body text-[13px] text-white! transition-colors duration-180 hover:text-teal!`}
               >
-                <span className="flex items-center gap-1.5">
-                  {Icon && <Icon size={16} className="flex-none text-teal" />}
-                  {l.label}
-                </span>
-                <span className="truncate text-grey">{l.value}</span>
+                {Icon && <Icon size={16} className="flex-none text-teal" />}
+                <span className="truncate">{l.label}</span>
               </a>
             );
           })}
